@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, ShieldCheck, CalendarCheck, Eyeglasses, Stethoscope, ShoppingBag, Bell, X, MapPin, ArrowLeft, Users, User, Question, ChatCircleDots, Info, QrCode, CaretRight, WechatLogo } from "@phosphor-icons/react";
+import { Eye, ShieldCheck, CalendarCheck, Eyeglasses, Stethoscope, ShoppingBag, Bell, X, MapPin, ArrowLeft, Users, User, Question, ChatCircleDots, Info, QrCode, CaretRight, WechatLogo, UsersThree, EnvelopeSimple, Crown, Plus, HouseLine } from "@phosphor-icons/react";
 import clsx from "clsx";
 
 type PageId = "login" | "home" | "notifications" | "store-select" | "appointment" | "profile" | "family-group" | "family-group-detail" | "patient-list" | "my-appointments" | "appointment-detail";
@@ -193,7 +193,7 @@ export default function Miniprogram() {
             </div>
             <CaretRight weight="bold" className="text-gray-300" />
           </div>
-          <div className="border-b border-gray-50 p-4 flex justify-between items-center active:bg-gray-50" onClick={() => showToast("功能开发中")}>
+          <div className="border-b border-gray-50 p-4 flex justify-between items-center active:bg-gray-50" onClick={() => navigateTo("family-group")}>
             <div className="flex items-center gap-3">
               <Users weight="fill" className="text-orange-400 w-6 text-center text-xl" />
               <span className="text-sm font-medium text-gray-700">我的家庭组</span>
@@ -281,6 +281,61 @@ export default function Miniprogram() {
           {currentPage === "home" && <HomePage />}
           {currentPage === "profile" && <ProfilePage />}
 
+          {currentPage === "notifications" && (
+            <div className="min-h-full flex flex-col bg-gray-100">
+              <div className="bg-white px-4 py-3 shadow-sm flex items-center gap-3 z-10 sticky top-0">
+                <ArrowLeft weight="bold" onClick={goBack} className="text-gray-600 p-2 cursor-pointer text-xl" />
+                <h2 className="font-bold text-lg flex-1 text-center pr-8">消息中心</h2>
+              </div>
+              <div className="p-4 space-y-4">
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-50 relative">
+                  <div className="absolute top-4 right-4 w-2 h-2 bg-red-500 rounded-full"></div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <CalendarCheck weight="fill" className="text-blue-500 text-lg" />
+                    <h3 className="font-bold text-gray-800 text-sm">预约成功提醒</h3>
+                    <span className="text-xs text-gray-400 ml-auto mr-4">10:30</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                    您预约 <span className="font-medium text-gray-800">3.20 号 张志明 医生</span>的特需号，就诊时间：<span className="font-medium text-gray-800">8:00-8:30</span>，请按时到店。
+                  </p>
+                  <div className="flex justify-end">
+                    <button className="bg-emerald-600 text-white text-xs px-4 py-1.5 rounded-full font-medium active:scale-95 transition-transform">查看详情</button>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <UsersThree weight="fill" className="text-green-500 text-lg" />
+                    <h3 className="font-bold text-gray-800 text-sm">家庭组成员加入</h3>
+                    <span className="text-xs text-gray-400 ml-auto">昨天</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                    您邀请的 <span className="font-medium text-gray-800">王小宝</span> 已成功加入家庭组：<span className="font-medium text-gray-800">温馨小家</span>。
+                  </p>
+                  <div className="flex justify-end">
+                    <button className="bg-gray-100 text-gray-600 text-xs px-4 py-1.5 rounded-full font-medium active:bg-gray-200 transition-colors">查看详情</button>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-50 relative">
+                  <div className="absolute top-4 right-4 w-2 h-2 bg-red-500 rounded-full"></div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <EnvelopeSimple weight="fill" className="text-orange-500 text-lg" />
+                    <h3 className="font-bold text-gray-800 text-sm">家庭组邀请</h3>
+                    <span className="text-xs text-gray-400 ml-auto mr-4">前天</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                    您被 <span className="font-medium text-gray-800">张伟 (133****8888)</span> 邀请加入家庭组：<span className="font-medium text-gray-800">上海66号</span>。
+                  </p>
+                  <div className="flex justify-end gap-2">
+                    <button className="bg-red-50 text-red-500 text-xs px-4 py-1.5 rounded-full font-medium active:bg-red-100 transition-colors">拒绝</button>
+                    <button className="bg-emerald-600 text-white text-xs px-4 py-1.5 rounded-full font-medium active:scale-95 transition-transform">同意</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {currentPage === "store-select" && (
             <div className="min-h-full bg-gray-50 flex flex-col">
               <div className="bg-white px-4 py-3 shadow-sm flex items-center gap-3 z-10">
@@ -322,22 +377,133 @@ export default function Miniprogram() {
             </div>
           )}
 
+          {currentPage === "family-group" && (
+            <div className="min-h-full flex flex-col bg-gray-100">
+              <div className="bg-white px-4 py-3 shadow-sm flex items-center justify-between z-10 sticky top-0">
+                <ArrowLeft weight="bold" onClick={goBack} className="text-gray-600 p-2 cursor-pointer text-xl" />
+                <h2 className="font-bold text-lg">我的家庭组</h2>
+                <Plus weight="bold" className="text-emerald-600 p-2 cursor-pointer text-xl" onClick={() => showToast("添加家庭组")} />
+              </div>
+              <div className="p-4 space-y-4">
+                <div onClick={() => navigateTo("family-group-detail")} className="bg-white rounded-xl p-4 shadow-sm border border-gray-50 flex items-center justify-between active:scale-[0.98] transition-transform cursor-pointer">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center text-orange-500">
+                      <HouseLine weight="fill" className="text-2xl" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-800 text-base flex items-center gap-2">
+                        温馨小家
+                      </h3>
+                      <p className="text-xs text-gray-500 mt-1">3 位成员</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className="bg-emerald-50 text-emerald-600 text-[10px] px-2 py-0.5 rounded font-medium border border-emerald-100">管理员</span>
+                    <CaretRight weight="bold" className="text-gray-300" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-50 flex items-center justify-between active:scale-[0.98] transition-transform cursor-pointer" onClick={() => showToast("详情开发中")}>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-500">
+                      <HouseLine weight="fill" className="text-2xl" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-gray-800 text-base flex items-center gap-2">
+                        老家大院
+                      </h3>
+                      <p className="text-xs text-gray-500 mt-1">3 位成员</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className="bg-blue-50 text-blue-600 text-[10px] px-2 py-0.5 rounded font-medium border border-blue-100">成员</span>
+                    <CaretRight weight="bold" className="text-gray-300" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentPage === "family-group-detail" && (
+            <div className="min-h-full flex flex-col bg-gray-50">
+              <div className="bg-white px-4 py-3 flex items-center gap-3 z-10 sticky top-0">
+                <ArrowLeft weight="bold" onClick={goBack} className="text-gray-600 p-2 cursor-pointer text-xl" />
+                <h2 className="font-bold text-lg flex-1 text-center pr-8">家庭组详情</h2>
+              </div>
+              <div className="p-4 flex-1 overflow-y-auto">
+                <div className="bg-emerald-600 rounded-2xl p-6 text-white mb-6 shadow-lg shadow-emerald-500/20 bg-gradient-to-br from-emerald-500 to-emerald-700">
+                  <h3 className="text-2xl font-bold mb-2">温馨小家</h3>
+                  <div className="flex items-center gap-2 text-xs text-emerald-100">
+                    <span className="bg-white/20 px-2 py-0.5 rounded">管理员</span>
+                    <span>成员 3 人</span>
+                  </div>
+                </div>
+
+                <h4 className="font-bold text-gray-800 mb-3 px-1">家庭成员</h4>
+                <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
+                  <div className="p-4 border-b border-gray-50 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600">你</div>
+                      <div>
+                        <h5 className="font-bold text-gray-800 text-sm">你 <span className="bg-gray-100 text-gray-500 text-[10px] px-1.5 py-0.5 rounded ml-1 font-normal">我</span></h5>
+                        <p className="text-xs text-gray-400 mt-0.5">管理员</p>
+                      </div>
+                    </div>
+                    <Crown weight="fill" className="text-yellow-500 text-xl" />
+                  </div>
+
+                  <div className="p-4 border-b border-gray-50 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600">李</div>
+                      <div>
+                        <h5 className="font-bold text-gray-800 text-sm">李梅</h5>
+                        <p className="text-xs text-gray-400 mt-0.5">妻子</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600">王</div>
+                      <div>
+                        <h5 className="font-bold text-gray-800 text-sm">王小宝</h5>
+                        <p className="text-xs text-gray-400 mt-0.5">儿子</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="p-4 bg-gray-50 border-t border-gray-100 flex gap-3 pb-8 shrink-0">
+                <button className="flex-1 bg-red-50 text-red-500 py-3.5 rounded-xl font-bold active:bg-red-100 transition-colors">
+                  解散家庭组
+                </button>
+                <button className="flex-1 bg-emerald-600 text-white py-3.5 rounded-xl font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition-transform">
+                  邀请成员
+                </button>
+              </div>
+            </div>
+          )}
+
           {currentPage === "my-appointments" && (
-            <div className="h-full flex flex-col bg-gray-100">
-              <div className="bg-white px-4 py-3 shadow-sm flex items-center gap-3 z-10 sticky top-0">
+            <div className="min-h-full flex flex-col bg-gray-100">
+              <div className="bg-white px-4 py-3 flex items-center gap-3 z-10 sticky top-0">
                 <ArrowLeft weight="bold" onClick={goBack} className="text-gray-600 p-2 cursor-pointer text-xl" />
                 <h2 className="font-bold text-lg flex-1 text-center pr-8">我的预约</h2>
               </div>
-              <div className="p-4">
+              <div className="bg-white px-4 pb-2 border-b border-gray-200 flex gap-4 sticky top-[52px] z-10">
+                <div className="flex-1 py-2 text-center text-emerald-600 font-bold border-b-2 border-emerald-600">门诊预约</div>
+                <div className="flex-1 py-2 text-center text-gray-500 font-medium">视觉训练</div>
+              </div>
+              <div className="p-4 space-y-3">
                 <div className="bg-white rounded-xl p-4 shadow-sm relative">
                   <div className="flex justify-between items-start mb-3 pb-3 border-b border-gray-50">
                     <div>
                       <div className="text-sm font-bold text-gray-800">
                         09:00-09:30 <span className="ml-1">上午05号</span>
                       </div>
-                      <div className="text-xs text-gray-500 mt-0.5">明天</div>
+                      <div className="text-xs text-gray-400 mt-0.5">2026-04-23</div>
                     </div>
-                    <div className="border bg-green-600 text-white border-green-600 text-xs px-2 py-0.5 rounded shrink-0">
+                    <div className="bg-emerald-600 text-white text-xs px-2 py-0.5 rounded shrink-0 font-medium">
                       预约成功
                     </div>
                   </div>
@@ -355,6 +521,61 @@ export default function Miniprogram() {
                     <button className="border border-gray-200 text-gray-600 text-xs px-3 py-1.5 rounded-full active:bg-gray-50 bg-white">
                       电子凭条
                     </button>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 shadow-sm relative">
+                  <div className="flex justify-between items-start mb-3 pb-3 border-b border-gray-50">
+                    <div>
+                      <div className="text-sm font-bold text-gray-800">
+                        14:00-14:30 <span className="ml-1">下午12号</span>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5">2026-04-20</div>
+                    </div>
+                    <div className="border border-emerald-600 text-emerald-600 bg-emerald-50 text-xs px-2 py-0.5 rounded shrink-0 font-medium">
+                      已完成
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mb-3 opacity-60">
+                    <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-lg border border-emerald-100">
+                      李
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-800 text-base">李晓华 <span className="text-xs text-gray-400 font-normal ml-1">主任医师</span></h4>
+                      <p className="text-xs text-gray-500 mt-0.5">海淀分院 眼科</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-gray-600">就诊人：张三</p>
+                    <button className="border border-gray-200 text-gray-600 text-xs px-3 py-1.5 rounded-full active:bg-gray-50 bg-white">
+                      查看详情
+                    </button>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-xl p-4 shadow-sm relative">
+                  <div className="flex justify-between items-start mb-3 pb-3 border-b border-gray-50">
+                    <div>
+                      <div className="text-sm font-bold text-gray-800">
+                        10:00-10:30 <span className="ml-1">上午08号</span>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-0.5">2026-04-17</div>
+                    </div>
+                    <div className="border border-red-500 text-red-500 bg-red-50 text-xs px-2 py-0.5 rounded shrink-0 font-medium">
+                      已取消
+                    </div>
+                  </div>
+                  <div className="flex gap-3 mb-3 opacity-40">
+                    <div className="w-12 h-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 font-bold text-lg border border-emerald-100">
+                      王
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-800 text-base">王大力 <span className="text-xs text-gray-400 font-normal ml-1">主任医师</span></h4>
+                      <p className="text-xs text-gray-500 mt-0.5">惟爱视觉总院 眼科</p>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center opacity-40">
+                    <p className="text-sm text-gray-600">就诊人：张三</p>
                   </div>
                 </div>
               </div>
