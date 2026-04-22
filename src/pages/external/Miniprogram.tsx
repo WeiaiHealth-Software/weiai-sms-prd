@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, ShieldCheck, CalendarCheck, Eyeglasses, Stethoscope, ShoppingBag, Bell, X, MapPin, ArrowLeft, Users, User, Question, ChatCircleDots, Info, QrCode } from "@phosphor-icons/react";
+import { Eye, ShieldCheck, CalendarCheck, Eyeglasses, Stethoscope, ShoppingBag, Bell, X, MapPin, ArrowLeft, Users, User, Question, ChatCircleDots, Info, QrCode, CaretRight, WechatLogo } from "@phosphor-icons/react";
 import clsx from "clsx";
 
 type PageId = "login" | "home" | "notifications" | "store-select" | "appointment" | "profile" | "family-group" | "family-group-detail" | "patient-list" | "my-appointments" | "appointment-detail";
@@ -117,6 +117,55 @@ export default function Miniprogram() {
           </div>
         </div>
       </div>
+      <div className="px-4 mt-4">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="font-bold text-lg text-slate-800">健康资讯</h3>
+          <div className="flex bg-white rounded-lg p-1 border border-slate-100 shadow-sm">
+            <button className="px-3 py-1 text-xs font-bold text-emerald-600 bg-emerald-50 rounded-md">科普文章</button>
+            <button className="px-3 py-1 text-xs text-slate-500 hover:bg-slate-50 rounded-md transition-colors">健康视频</button>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 cursor-pointer active:scale-[0.98] transition-transform">
+            <div className="h-32 bg-slate-200 relative">
+              <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover" alt="article" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+              <h4 className="absolute bottom-3 left-4 right-4 text-white font-bold text-sm line-clamp-2">
+                孩子近视加深快？可能是这几个坏习惯导致...
+              </h4>
+            </div>
+            <div className="p-4">
+              <p className="text-xs text-slate-500 line-clamp-2 mb-3 leading-relaxed">
+                长时间近距离用眼、户外活动不足、睡眠不足等都是导致近视加深的主要原因。家长应该如何科学干预？眼...
+              </p>
+              <div className="flex justify-between items-center text-[10px] text-slate-400">
+                <span className="flex items-center gap-1"><Eye weight="fill" /> 2381 阅读</span>
+                <span>2024-03-10</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 cursor-pointer active:scale-[0.98] transition-transform">
+            <div className="h-32 bg-slate-200 relative">
+              <img src="https://images.unsplash.com/photo-1520690214124-2405c5217036?auto=format&fit=crop&q=80&w=800" className="w-full h-full object-cover" alt="article" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+              <h4 className="absolute bottom-3 left-4 right-4 text-white font-bold text-sm line-clamp-2">
+                干眼症不仅是缺水，可能是睑板腺堵了
+              </h4>
+            </div>
+            <div className="p-4">
+              <p className="text-xs text-slate-500 line-clamp-2 mb-3 leading-relaxed">
+                眼睛干涩、异物感、畏光流泪？这可能是干眼症的信号。除了点眼药水，热敷和睑板腺按摩也很重要。
+              </p>
+              <div className="flex justify-between items-center text-[10px] text-slate-400">
+                <span className="flex items-center gap-1"><Eye weight="fill" /> 1542 阅读</span>
+                <span>2024-03-08</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
@@ -136,45 +185,51 @@ export default function Miniprogram() {
       </div>
 
       <div className="p-2 mt-4 space-y-3">
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mx-2">
           <div className="border-b border-gray-50 p-4 flex justify-between items-center active:bg-gray-50" onClick={() => navigateTo("my-appointments")}>
             <div className="flex items-center gap-3">
               <CalendarCheck weight="fill" className="text-blue-500 w-6 text-center text-xl" />
-              <span className="text-sm text-gray-700">我的预约</span>
+              <span className="text-sm font-medium text-gray-700">我的预约</span>
             </div>
+            <CaretRight weight="bold" className="text-gray-300" />
           </div>
           <div className="border-b border-gray-50 p-4 flex justify-between items-center active:bg-gray-50" onClick={() => showToast("功能开发中")}>
             <div className="flex items-center gap-3">
               <Users weight="fill" className="text-orange-400 w-6 text-center text-xl" />
-              <span className="text-sm text-gray-700">我的家庭组</span>
+              <span className="text-sm font-medium text-gray-700">我的家庭组</span>
             </div>
+            <CaretRight weight="bold" className="text-gray-300" />
           </div>
           <div className="border-b border-gray-50 p-4 flex justify-between items-center active:bg-gray-50" onClick={() => showToast("功能开发中")}>
             <div className="flex items-center gap-3">
               <User weight="fill" className="text-green-400 w-6 text-center text-xl" />
-              <span className="text-sm text-gray-700">我的就诊人</span>
+              <span className="text-sm font-medium text-gray-700">我的就诊人</span>
             </div>
+            <CaretRight weight="bold" className="text-gray-300" />
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden mx-2">
           <div className="border-b border-gray-50 p-4 flex justify-between items-center active:bg-gray-50" onClick={() => showToast("功能开发中")}>
             <div className="flex items-center gap-3">
               <Question weight="fill" className="text-gray-400 w-6 text-center text-xl" />
-              <span className="text-sm text-gray-700">帮助中心</span>
+              <span className="text-sm font-medium text-gray-700">帮助中心</span>
             </div>
+            <CaretRight weight="bold" className="text-gray-300" />
           </div>
           <div className="border-b border-gray-50 p-4 flex justify-between items-center active:bg-gray-50" onClick={() => showToast("功能开发中")}>
             <div className="flex items-center gap-3">
               <ChatCircleDots weight="fill" className="text-gray-400 w-6 text-center text-xl" />
-              <span className="text-sm text-gray-700">意见反馈</span>
+              <span className="text-sm font-medium text-gray-700">意见反馈</span>
             </div>
+            <CaretRight weight="bold" className="text-gray-300" />
           </div>
           <div className="p-4 flex justify-between items-center active:bg-gray-50" onClick={() => showToast("功能开发中")}>
             <div className="flex items-center gap-3">
               <Info weight="fill" className="text-gray-400 w-6 text-center text-xl" />
-              <span className="text-sm text-gray-700">关于我们</span>
+              <span className="text-sm font-medium text-gray-700">关于我们</span>
             </div>
+            <CaretRight weight="bold" className="text-gray-300" />
           </div>
         </div>
       </div>
@@ -200,15 +255,26 @@ export default function Miniprogram() {
         <div className="flex-1 overflow-y-auto relative bg-gray-50 no-scrollbar">
           {currentPage === "login" && (
             <div className="min-h-full flex flex-col items-center justify-center p-8 bg-white z-50 absolute inset-0">
-              <div className="w-24 h-24 bg-emerald-100 rounded-2xl flex items-center justify-center mb-6 text-emerald-600">
-                <Eye weight="fill" className="text-4xl" />
+              <div className="w-24 h-24 bg-emerald-100 rounded-3xl flex items-center justify-center mb-6 text-emerald-600 shadow-sm">
+                <Eye weight="fill" className="text-5xl" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-800 mb-2">惟爱视觉</h1>
-              <p className="text-gray-500 mb-12 text-sm">专业的视光门诊服务平台</p>
+              <h1 className="text-2xl font-bold text-slate-800 mb-2">惟爱视觉</h1>
+              <p className="text-slate-500 mb-12 text-sm">专业的视光门诊服务平台</p>
               
-              <button onClick={handleLogin} className="w-full bg-emerald-600 text-white py-3 rounded-lg font-medium shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-                微信用户一键登录
-              </button>
+              <div className="w-full space-y-4">
+                <button onClick={handleLogin} className="w-full bg-[#07C160] hover:bg-[#06ad56] text-white py-3.5 rounded-xl font-medium shadow-md shadow-emerald-500/20 active:scale-95 transition-all flex items-center justify-center gap-2">
+                  <WechatLogo weight="fill" className="text-xl" />
+                  微信用户一键登录
+                </button>
+                <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1">
+                  <Info weight="fill" className="text-slate-300" /> 为了提供完整的预约服务，我们需要获取您的公开信息
+                </p>
+              </div>
+
+              <div className="absolute bottom-12 flex items-center gap-2 text-xs text-slate-500">
+                <input type="checkbox" className="w-3.5 h-3.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 accent-emerald-600" />
+                <span>我已阅读并同意 <a href="#" className="text-emerald-600 hover:underline">《用户协议》</a> 与 <a href="#" className="text-emerald-600 hover:underline">《隐私政策》</a></span>
+              </div>
             </div>
           )}
 
