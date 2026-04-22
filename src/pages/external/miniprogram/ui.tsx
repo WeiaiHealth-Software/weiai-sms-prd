@@ -70,19 +70,25 @@ export function MiniTopBar({
   rightSlot?: ReactNode;
 }) {
   return (
-    <div className="bg-white h-12 flex items-center px-3 border-b border-gray-100 sticky top-0 z-10">
-      <button
-        onClick={onBack}
-        className="w-10 h-10 -ml-1 flex items-center justify-center rounded-full active:bg-gray-100 text-slate-800"
-        type="button"
-        aria-label="返回"
-      >
-        <MiniBackIcon className="w-5 h-5" />
-      </button>
-      <div className="flex-1 text-center font-bold text-slate-900 text-base">
-        {title}
+    <div className="bg-white px-3 py-2.5 flex items-center justify-between z-10 sticky top-0 border-b border-gray-100 min-h-[44px] relative">
+      <div className="flex-1 flex">
+        <button 
+          onClick={onBack} 
+          className="w-10 h-10 flex items-center justify-center -ml-1 text-gray-800 active:bg-gray-50 rounded-full transition-colors"
+          aria-label="返回"
+        >
+          <MiniBackIcon className="w-5 h-5" />
+        </button>
       </div>
-      <div className="w-10 h-10 flex items-center justify-center">{rightSlot}</div>
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <h2 className="font-bold text-[17px] text-gray-900 tracking-wide">{title}</h2>
+      </div>
+      <div className="flex-1"></div>
+      {rightSlot && (
+        <div className="flex-1 flex justify-end">
+          {rightSlot}
+        </div>
+      )}
     </div>
   );
 }
@@ -96,28 +102,30 @@ export function MiniTabBar({
   onChange: (t: "home" | "profile") => void;
   onCenter: () => void;
 }) {
-  const activeColor = "text-emerald-600";
-  const idleColor = "text-slate-400";
+  const activeColor = "text-[#07C160]";
+  const idleColor = "text-gray-400";
 
   return (
-    <div className="bg-white border-t border-gray-200 h-[78px] pt-2 pb-6 px-6 flex items-end justify-between shrink-0 relative z-40">
+    <div className="bg-white border-t border-gray-200 flex justify-between items-end px-4 pb-6 pt-2 z-40 shrink-0 shadow-[0_-1px_3px_rgba(0,0,0,0.02)] relative">
       <button
         type="button"
         onClick={() => onChange("home")}
         className={clsx(
-          "flex flex-col items-center justify-center gap-1 w-20 active:opacity-70",
+          "flex-1 flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors",
           active === "home" ? activeColor : idleColor
         )}
+        aria-label="首页"
       >
-        <MiniHomeIcon className="w-[22px] h-[22px]" />
-        <span className="text-[10px] font-medium">首页</span>
+        <MiniHomeIcon className="w-6 h-6" />
+        <span className="text-[10px] font-medium tracking-wide">首页</span>
       </button>
 
-      <div className="w-20 relative flex justify-center pointer-events-none">
+      {/* Center Button */}
+        <div className="w-20 relative flex justify-center pointer-events-none">
           <button 
             type="button"
             onClick={onCenter}
-            className="absolute -top-[29px] pointer-events-auto w-[58px] h-[58px] rounded-full bg-emerald-500 border-[6px] border-white shadow-[0_10px_24px_rgba(16,185,129,0.35)] flex items-center justify-center text-white active:scale-95 transition-transform"
+            className="absolute bottom-2 pointer-events-auto w-[52px] h-[52px] rounded-full bg-[#07C160] border-[4px] border-white shadow-[0_4px_12px_rgba(7,193,96,0.3)] flex items-center justify-center text-white active:scale-95 transition-transform"
             aria-label="中间按钮"
           >
           <MiniGridIcon className="w-7 h-7" />
@@ -128,12 +136,13 @@ export function MiniTabBar({
         type="button"
         onClick={() => onChange("profile")}
         className={clsx(
-          "flex flex-col items-center justify-center gap-1 w-20 active:opacity-70",
+          "flex-1 flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors",
           active === "profile" ? activeColor : idleColor
         )}
+        aria-label="个人中心"
       >
-        <MiniUserIcon className="w-[22px] h-[22px]" />
-        <span className="text-[10px] font-medium">个人中心</span>
+        <MiniUserIcon className="w-6 h-6" />
+        <span className="text-[10px] font-medium tracking-wide">个人中心</span>
       </button>
     </div>
   );
