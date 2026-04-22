@@ -494,7 +494,16 @@ export default function Miniprogram() {
               <MiniTopBar 
                 title="我的就诊人" 
                 onBack={goBack} 
-                rightSlot={<Plus weight="bold" className="text-emerald-600 text-xl cursor-pointer p-2 active:scale-95 transition-transform" onClick={() => setIsAddPatientOpen(true)} />}
+                rightSlot={
+                  <button
+                    type="button"
+                    onClick={() => setIsAddPatientOpen(true)}
+                    className="w-10 h-10 flex items-center justify-center rounded-full active:bg-gray-100 text-emerald-600"
+                    aria-label="添加"
+                  >
+                    <Plus weight="bold" className="text-xl" />
+                  </button>
+                }
               />
               <div className="p-4 space-y-4">
                 <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 flex items-center justify-between active:scale-[0.98] transition-transform">
