@@ -114,12 +114,12 @@ export function MiniTabBar({
       </button>
 
       <div className="w-20 relative flex justify-center pointer-events-none">
-        <button
-          type="button"
-          onClick={onCenter}
-          className="absolute -top-[42px] pointer-events-auto w-[58px] h-[58px] rounded-full bg-emerald-500 border-[6px] border-white shadow-[0_10px_24px_rgba(16,185,129,0.35)] flex items-center justify-center text-white active:scale-95 transition-transform"
-          aria-label="中间按钮"
-        >
+          <button 
+            type="button"
+            onClick={onCenter}
+            className="absolute -top-[29px] pointer-events-auto w-[58px] h-[58px] rounded-full bg-emerald-500 border-[6px] border-white shadow-[0_10px_24px_rgba(16,185,129,0.35)] flex items-center justify-center text-white active:scale-95 transition-transform"
+            aria-label="中间按钮"
+          >
           <MiniGridIcon className="w-7 h-7" />
         </button>
       </div>
