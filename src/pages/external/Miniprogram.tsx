@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Eye, ShieldCheck, CalendarCheck, Eyeglasses, Stethoscope, ShoppingBag, Bell, X, MapPin, ArrowLeft, Users, User, Question, ChatCircleDots, Info, QrCode, CaretRight, WechatLogo, UsersThree, EnvelopeSimple, Crown, Plus, HouseLine } from "@phosphor-icons/react";
+import { Eye, ShieldCheck, CalendarCheck, Eyeglasses, Stethoscope, ShoppingBag, Bell, X, MapPin, Users, User, Question, ChatCircleDots, Info, QrCode, CaretRight, WechatLogo, UsersThree, EnvelopeSimple, Crown, Plus, HouseLine } from "@phosphor-icons/react";
 import clsx from "clsx";
+import { MiniTabBar, MiniTopBar } from "./miniprogram/ui";
 
 type PageId = "login" | "home" | "notifications" | "store-select" | "appointment" | "profile" | "family-group" | "family-group-detail" | "patient-list" | "my-appointments" | "appointment-detail";
 
@@ -11,6 +12,7 @@ export default function Miniprogram() {
   
   const [isLoginDrawerOpen, setIsLoginDrawerOpen] = useState(false);
   const [isQrCodeOpen, setIsQrCodeOpen] = useState(false);
+  const showTabBar = currentPage !== "login" && currentPage !== "notifications";
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -252,7 +254,12 @@ export default function Miniprogram() {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto relative bg-gray-50 no-scrollbar">
+        <div
+          className={clsx(
+            "flex-1 overflow-y-auto relative bg-gray-50 no-scrollbar",
+            showTabBar && "pb-[78px]"
+          )}
+        >
           {currentPage === "login" && (
             <div className="min-h-full flex flex-col items-center justify-center p-8 bg-white z-50 absolute inset-0">
               <div className="w-24 h-24 bg-emerald-100 rounded-3xl flex items-center justify-center mb-6 text-emerald-600 shadow-sm">
@@ -283,10 +290,7 @@ export default function Miniprogram() {
 
           {currentPage === "notifications" && (
             <div className="min-h-full flex flex-col bg-gray-100">
-              <div className="bg-white px-4 py-3 shadow-sm flex items-center gap-3 z-10 sticky top-0">
-                <ArrowLeft weight="bold" onClick={goBack} className="text-gray-600 p-2 cursor-pointer text-xl" />
-                <h2 className="font-bold text-lg flex-1 text-center pr-8">消息中心</h2>
-              </div>
+              <MiniTopBar title="消息中心" onBack={goBack} />
               <div className="p-4 space-y-4">
                 <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-50 relative">
                   <div className="absolute top-4 right-4 w-2 h-2 bg-red-500 rounded-full"></div>
@@ -338,10 +342,7 @@ export default function Miniprogram() {
 
           {currentPage === "store-select" && (
             <div className="min-h-full bg-gray-50 flex flex-col">
-              <div className="bg-white px-4 py-3 shadow-sm flex items-center gap-3 z-10">
-                <ArrowLeft weight="bold" onClick={goBack} className="text-gray-600 p-2 cursor-pointer text-xl" />
-                <h2 className="font-bold text-lg">选择就诊门店</h2>
-              </div>
+              <MiniTopBar title="选择就诊门店" onBack={goBack} />
               <div className="p-4 space-y-3">
                 <div onClick={() => navigateTo("appointment")} className="bg-white p-2 rounded-xl shadow-sm border border-gray-100 active:border-emerald-500 cursor-pointer flex gap-3">
                   <div className="w-24 h-20 shrink-0 bg-gray-100 rounded-lg overflow-hidden">
@@ -364,12 +365,9 @@ export default function Miniprogram() {
 
           {currentPage === "appointment" && (
             <div className="h-full flex flex-col bg-white">
-              <div className="bg-white px-4 py-3 border-b flex items-center gap-3 shrink-0">
-                <ArrowLeft weight="bold" onClick={goBack} className="text-gray-600 p-2 cursor-pointer text-xl" />
-                <div>
-                  <h2 className="font-bold text-base">惟爱视觉·上海海华医院</h2>
-                  <p className="text-xs text-gray-400">请选择就诊时间与医生</p>
-                </div>
+              <MiniTopBar title="惟爱视觉·上海海华医院" onBack={goBack} />
+              <div className="px-4 py-2 text-xs text-gray-400 border-b border-gray-100 bg-white">
+                请选择就诊时间与医生
               </div>
               <div className="flex-1 flex items-center justify-center text-gray-400 text-sm">
                 预约选择页面开发中...
@@ -379,11 +377,20 @@ export default function Miniprogram() {
 
           {currentPage === "family-group" && (
             <div className="min-h-full flex flex-col bg-gray-100">
-              <div className="bg-white px-4 py-3 shadow-sm flex items-center justify-between z-10 sticky top-0">
-                <ArrowLeft weight="bold" onClick={goBack} className="text-gray-600 p-2 cursor-pointer text-xl" />
-                <h2 className="font-bold text-lg">我的家庭组</h2>
-                <Plus weight="bold" className="text-emerald-600 p-2 cursor-pointer text-xl" onClick={() => showToast("添加家庭组")} />
-              </div>
+              <MiniTopBar
+                title="我的家庭组"
+                onBack={goBack}
+                rightSlot={
+                  <button
+                    type="button"
+                    onClick={() => showToast("添加家庭组")}
+                    className="w-10 h-10 flex items-center justify-center rounded-full active:bg-gray-100 text-emerald-600"
+                    aria-label="添加"
+                  >
+                    <Plus weight="bold" className="text-xl" />
+                  </button>
+                }
+              />
               <div className="p-4 space-y-4">
                 <div onClick={() => navigateTo("family-group-detail")} className="bg-white rounded-xl p-4 shadow-sm border border-gray-50 flex items-center justify-between active:scale-[0.98] transition-transform cursor-pointer">
                   <div className="flex items-center gap-4">
@@ -426,10 +433,7 @@ export default function Miniprogram() {
 
           {currentPage === "family-group-detail" && (
             <div className="min-h-full flex flex-col bg-gray-50">
-              <div className="bg-white px-4 py-3 flex items-center gap-3 z-10 sticky top-0">
-                <ArrowLeft weight="bold" onClick={goBack} className="text-gray-600 p-2 cursor-pointer text-xl" />
-                <h2 className="font-bold text-lg flex-1 text-center pr-8">家庭组详情</h2>
-              </div>
+              <MiniTopBar title="家庭组详情" onBack={goBack} />
               <div className="p-4 flex-1 overflow-y-auto">
                 <div className="bg-emerald-600 rounded-2xl p-6 text-white mb-6 shadow-lg shadow-emerald-500/20 bg-gradient-to-br from-emerald-500 to-emerald-700">
                   <h3 className="text-2xl font-bold mb-2">温馨小家</h3>
@@ -486,11 +490,8 @@ export default function Miniprogram() {
 
           {currentPage === "my-appointments" && (
             <div className="min-h-full flex flex-col bg-gray-100">
-              <div className="bg-white px-4 py-3 flex items-center gap-3 z-10 sticky top-0">
-                <ArrowLeft weight="bold" onClick={goBack} className="text-gray-600 p-2 cursor-pointer text-xl" />
-                <h2 className="font-bold text-lg flex-1 text-center pr-8">我的预约</h2>
-              </div>
-              <div className="bg-white px-4 pb-2 border-b border-gray-200 flex gap-4 sticky top-[52px] z-10">
+              <MiniTopBar title="我的预约" onBack={goBack} />
+              <div className="bg-white px-4 pb-2 border-b border-gray-200 flex gap-4 sticky top-[48px] z-10">
                 <div className="flex-1 py-2 text-center text-emerald-600 font-bold border-b-2 border-emerald-600">门诊预约</div>
                 <div className="flex-1 py-2 text-center text-gray-500 font-medium">视觉训练</div>
               </div>
@@ -584,26 +585,15 @@ export default function Miniprogram() {
         </div>
 
         {/* Tab Bar */}
-        {(currentPage === "home" || currentPage === "profile") && (
-          <div className="bg-white border-t flex justify-between items-end px-2 pb-6 pt-2 z-40 shrink-0">
-            <div onClick={() => { setCurrentTab("home"); navigateTo("home"); }} className={clsx("flex-1 flex flex-col items-center justify-center gap-1 cursor-pointer", currentTab === "home" ? "text-emerald-600" : "text-gray-400")}>
-              <Eye weight="fill" className="text-xl" />
-              <span className="text-[10px] font-medium">首页</span>
-            </div>
-            
-            <div className="w-20 relative flex justify-center pointer-events-none">
-              <div className="absolute -top-16 cursor-pointer pointer-events-auto" onClick={() => setIsQrCodeOpen(true)}>
-                <div className="w-14 h-14 bg-emerald-500 rounded-full shadow-[0_4px_10px_rgba(16,185,129,0.4)] flex items-center justify-center text-white border-4 border-gray-50 transform transition-transform active:scale-95">
-                  <QrCode weight="bold" className="text-2xl" />
-                </div>
-              </div>
-            </div>
-
-            <div onClick={() => { setCurrentTab("profile"); navigateTo("profile"); }} className={clsx("flex-1 flex flex-col items-center justify-center gap-1 cursor-pointer", currentTab === "profile" ? "text-emerald-600" : "text-gray-400")}>
-              <User weight="fill" className="text-xl" />
-              <span className="text-[10px] font-medium">个人中心</span>
-            </div>
-          </div>
+        {showTabBar && (
+          <MiniTabBar
+            active={currentTab}
+            onChange={(t) => {
+              setCurrentTab(t);
+              navigateTo(t);
+            }}
+            onCenter={() => setIsQrCodeOpen(true)}
+          />
         )}
 
         {/* Login Drawer */}
