@@ -34,7 +34,7 @@ export function Sidebar() {
     <aside
       className={clsx(
         "bg-white border-r border-gray-200 flex-none flex flex-col transition-all duration-300 z-50",
-        isCollapsed ? "w-20" : "w-64"
+        isCollapsed ? "w-20" : "w-72"
       )}
     >
       {/* Logo Area */}
@@ -51,7 +51,7 @@ export function Sidebar() {
           </div>
           {!isCollapsed && (
             <span className="font-bold text-xl text-gray-900 tracking-tight">
-              惟爱视觉
+              惟爱 · 门店管理系统
             </span>
           )}
         </div>
