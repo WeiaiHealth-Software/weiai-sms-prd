@@ -1,5 +1,6 @@
 
-import { Gear, X, Television, PaintBucket, UsersThree, LockKey, ArrowRight } from "@phosphor-icons/react";
+import { Gear, X, Television, DeviceMobile, DeviceTabletCamera, PaintBucket, UsersThree, LockKey } from "@phosphor-icons/react";
+import { Link } from "react-router";
 import clsx from "clsx";
 
 export function SettingsDrawer({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -33,10 +34,11 @@ export function SettingsDrawer({ isOpen, onClose }: { isOpen: boolean; onClose: 
             <X weight="bold" className="text-lg" />
           </button>
         </div>
-        <div className="p-6 overflow-y-auto flex-1 bg-white">
-          {/* Card to link to screen-list.html */}
-          <a
-            href="#"
+        <div className="p-6 overflow-y-auto flex-1 bg-white space-y-4">
+          {/* Card to link to screen-list */}
+          <Link
+            to="/screen-list"
+            target="_blank"
             className="block bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:border-primary-200 transition group relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition">
@@ -54,10 +56,53 @@ export function SettingsDrawer({ isOpen, onClose }: { isOpen: boolean; onClose: 
             <p className="text-sm text-gray-500 relative z-10 leading-relaxed">
               点击查看所有诊室的实时排队叫号状态，支持大屏展示模式。
             </p>
-            <div className="mt-4 flex items-center text-primary-600 text-sm font-bold opacity-0 group-hover:opacity-100 transition transform translate-x-[-10px] group-hover:translate-x-0">
-              打开大屏 <ArrowRight weight="bold" className="ml-1" />
+          </Link>
+
+          {/* Card to link to miniprogram */}
+          <Link
+            to="/miniprogram"
+            target="_blank"
+            className="block bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:border-primary-200 transition group relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition">
+              <DeviceMobile weight="duotone" className="text-6xl text-primary-500" />
             </div>
-          </a>
+            <div className="flex items-start gap-4 mb-3 relative z-10">
+              <div className="w-12 h-12 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center flex-none">
+                <DeviceMobile weight="duotone" className="text-2xl" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg group-hover:text-primary-600 transition">小程序端演示</h3>
+                <p className="text-xs text-gray-500 mt-1">患者端预约与服务</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 relative z-10 leading-relaxed">
+              模拟微信小程序界面，包含预约挂号、排队提醒、个人中心等功能。
+            </p>
+          </Link>
+
+          {/* Card to link to pad */}
+          <Link
+            to="/pad"
+            target="_blank"
+            className="block bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:border-primary-200 transition group relative overflow-hidden"
+          >
+            <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition">
+              <DeviceTabletCamera weight="duotone" className="text-6xl text-primary-500" />
+            </div>
+            <div className="flex items-start gap-4 mb-3 relative z-10">
+              <div className="w-12 h-12 bg-primary-50 text-primary-600 rounded-xl flex items-center justify-center flex-none">
+                <DeviceTabletCamera weight="duotone" className="text-2xl" />
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900 text-lg group-hover:text-primary-600 transition">Pad 工作台演示</h3>
+                <p className="text-xs text-gray-500 mt-1">医护人员移动办公终端</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500 relative z-10 leading-relaxed">
+              模拟医生、视光师、前台在 Pad 端的操作界面，包括接诊、排班、签到等功能。
+            </p>
+          </Link>
 
           {/* Placeholder for future settings */}
           <div className="mt-8">

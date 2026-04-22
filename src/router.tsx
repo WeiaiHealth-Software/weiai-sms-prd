@@ -8,6 +8,10 @@ import Schedule from "./pages/store/Schedule";
 import { GenericPlaceholder } from "./pages/generic/GenericPlaceholder";
 import { menuConfig } from "./config/menu";
 
+import ScreenList from "./pages/external/ScreenList";
+import Miniprogram from "./pages/external/Miniprogram";
+import Pad from "./pages/external/Pad";
+
 // Create dynamic routes based on menuConfig for generic pages
 const genericRoutes = menuConfig.flatMap((item) =>
   item.subs
@@ -61,5 +65,17 @@ export const router = createHashRouter([
         element: <Navigate to="/" replace />,
       },
     ],
+  },
+  {
+    path: "/screen-list",
+    element: <ScreenList />,
+  },
+  {
+    path: "/miniprogram",
+    element: <Miniprogram />,
+  },
+  {
+    path: "/pad",
+    element: <Pad />,
   },
 ]);
