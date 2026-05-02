@@ -1,0 +1,2357 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>惟爱眼科 CRM 高保真原型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              ink: "#0f172a",
+              mist: "#f5f7fb",
+              line: "#dde4f0",
+              brand: "#316BFF",
+              brandSoft: "#EAF1FF",
+              accent: "#19A38C",
+              warn: "#F59E0B",
+              rose: "#E85D75",
+              night: "#0B1020",
+            },
+            boxShadow: {
+              card: "0 18px 40px rgba(15, 23, 42, 0.08)",
+              soft: "0 10px 30px rgba(49, 107, 255, 0.08)",
+            },
+            borderRadius: {
+              "2xl": "1.25rem",
+              "3xl": "1.75rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      body {
+        font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        background:
+          radial-gradient(circle at top left, rgba(49, 107, 255, 0.12), transparent 28%),
+          radial-gradient(circle at top right, rgba(25, 163, 140, 0.08), transparent 22%),
+          linear-gradient(180deg, #f8fbff 0%, #f4f7fb 38%, #f6f8fc 100%);
+      }
+      .display-font {
+        font-family: "Songti SC", "STSong", "Noto Serif SC", serif;
+      }
+      .glass {
+        backdrop-filter: blur(16px);
+        background: rgba(255, 255, 255, 0.78);
+      }
+      .grid-bg {
+        background-image:
+          linear-gradient(rgba(99, 102, 241, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(99, 102, 241, 0.05) 1px, transparent 1px);
+        background-size: 26px 26px;
+      }
+      .status-dot::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        display: inline-block;
+        margin-right: 8px;
+      }
+      .status-active::before { background: #22c55e; }
+      .status-warn::before { background: #f59e0b; }
+      .status-danger::before { background: #ef4444; }
+      .status-info::before { background: #3b82f6; }
+      .metric-active {
+        border-color: rgba(49, 107, 255, 0.28);
+        background: linear-gradient(180deg, rgba(49, 107, 255, 0.16), rgba(49, 107, 255, 0.06));
+        box-shadow: 0 10px 25px rgba(49, 107, 255, 0.12);
+      }
+      .scrollbar-thin::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.5);
+        border-radius: 999px;
+      }
+      .scrollbar-thin::-webkit-scrollbar-track {
+        background: transparent;
+      }
+    </style>
+  </head>
+  <body class="text-slate-800">
+    <div class="min-h-screen p-4 lg:p-5">
+      <div class="mx-auto flex min-h-[calc(100vh-2rem)] max-w-[1640px] overflow-hidden rounded-[32px] border border-white/60 bg-white/60 shadow-card">
+        <aside class="hidden w-[290px] shrink-0 border-r border-slate-200/80 bg-white/90 lg:flex lg:flex-col">
+          <div class="border-b border-slate-200/80 px-6 py-6">
+            <div class="flex items-center gap-3">
+              <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand to-sky-400 text-lg font-bold text-white shadow-soft">
+                视
+              </div>
+              <div>
+                <div class="display-font text-lg font-semibold text-ink">惟爱眼科 CRM</div>
+                <div class="text-xs tracking-[0.24em] text-slate-500">ADMIN PROTOTYPE</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 overflow-y-auto px-4 py-5 scrollbar-thin">
+            <div class="mb-5 rounded-3xl bg-slate-50 p-4">
+              <div class="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400">工作总览</div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="rounded-2xl bg-white p-3 shadow-sm">
+                  <div class="text-xs text-slate-500">今日到诊</div>
+                  <div class="mt-1 text-xl font-semibold text-ink">36</div>
+                </div>
+                <div class="rounded-2xl bg-white p-3 shadow-sm">
+                  <div class="text-xs text-slate-500">待回访</div>
+                  <div class="mt-1 text-xl font-semibold text-rose">18</div>
+                </div>
+              </div>
+            </div>
+
+            <nav class="space-y-2">
+              <button class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium text-slate-500 hover:bg-slate-50">
+                <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-500">仪</span>
+                仪表盘
+              </button>
+              <button class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium text-slate-500 hover:bg-slate-50">
+                <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-500">店</span>
+                门店管理
+              </button>
+              <button class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium text-slate-500 hover:bg-slate-50">
+                <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-500">析</span>
+                数据分析
+              </button>
+
+              <div class="rounded-3xl border border-brand/15 bg-gradient-to-b from-brandSoft to-white p-3">
+                <div class="mb-2 flex items-center gap-3 px-2">
+                  <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-brand text-white">客</span>
+                  <div>
+                    <div class="text-sm font-semibold text-ink">客户档案（CRM）</div>
+                    <div class="text-xs text-slate-500">眼科患者全生命周期</div>
+                  </div>
+                </div>
+
+                <div class="space-y-1 pt-2">
+                  <button data-page="customers" class="nav-item flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left text-sm font-medium">
+                    <span>档案列表</span>
+                    <span class="rounded-full bg-white px-2 py-0.5 text-xs text-slate-500">1,286</span>
+                  </button>
+                  <button data-page="tags" class="nav-item flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left text-sm font-medium">
+                    <span>标签管理</span>
+                    <span class="rounded-full bg-white px-2 py-0.5 text-xs text-slate-500">12</span>
+                  </button>
+                  <button data-page="appointments" class="nav-item flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left text-sm font-medium">
+                    <span>预约管理</span>
+                    <span class="rounded-full bg-amber-50 px-2 py-0.5 text-xs text-amber-600">92</span>
+                  </button>
+                  <button data-page="followups" class="nav-item flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left text-sm font-medium">
+                    <span>回访管理</span>
+                    <span class="rounded-full bg-rose-50 px-2 py-0.5 text-xs text-rose-600">18</span>
+                  </button>
+                </div>
+              </div>
+
+              <button class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium text-slate-500 hover:bg-slate-50">
+                <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-500">仓</span>
+                库存管理（ERP）
+              </button>
+              <button class="flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-left text-sm font-medium text-slate-500 hover:bg-slate-50">
+                <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-slate-100 text-slate-500">收</span>
+                单据收银
+              </button>
+            </nav>
+          </div>
+
+          <div class="border-t border-slate-200/80 p-4">
+            <div class="rounded-3xl bg-night p-4 text-white">
+              <div class="text-xs tracking-[0.28em] text-white/50">DESIGN NOTE</div>
+              <p class="mt-3 text-sm leading-6 text-white/80">
+                保留旧系统字段与业务动作，用更轻、更清晰的交互完成患者、预约、病史、回访的串联。
+              </p>
+            </div>
+          </div>
+        </aside>
+
+        <div class="flex min-w-0 flex-1 flex-col">
+          <header class="glass border-b border-slate-200/80 px-5 py-4 lg:px-8">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <div class="text-xs font-semibold uppercase tracking-[0.32em] text-brand">惟爱 · 门诊管理系统</div>
+                <h1 id="page-title" class="display-font mt-2 text-2xl font-semibold text-ink"></h1>
+              </div>
+
+              <div class="flex items-center gap-3">
+                <div class="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 xl:flex">
+                  <div class="text-xs text-slate-500">当前门店</div>
+                  <div class="font-medium text-ink">徐汇旗舰店</div>
+                </div>
+                <div class="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 lg:flex">
+                  <div class="text-xs text-slate-500">今日提醒</div>
+                  <div class="font-medium text-rose">18 项待处理</div>
+                </div>
+                <div class="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-2">
+                  <div class="text-right">
+                    <div class="text-sm font-semibold text-ink">张绍长</div>
+                    <div class="text-xs text-slate-500">运营超级管理员</div>
+                  </div>
+                  <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-900 to-slate-700 font-semibold text-white">
+                    张
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <main class="grid-bg flex-1 overflow-y-auto px-4 py-4 lg:px-6 lg:py-5">
+            <div id="app" class="mx-auto max-w-[1280px]"></div>
+          </main>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const patients = [
+        {
+          id: "p1",
+          no: "P20260001",
+          name: "周沐言",
+          gender: "女",
+          age: 12,
+          mobile: "138 1712 0291",
+          store: "徐汇旗舰店",
+          owner: "王懿雯",
+          latestVisit: "2026-05-01 10:20",
+          nextReview: "2026-06-01",
+          diagnosis: "青少年近视进展期",
+          diagnosisNote: "近三个月眼轴增长趋缓，建议继续当前干预方案。",
+          treatment: "离焦镜片 + 视觉训练",
+          followupType: "离焦框架镜",
+          tags: ["复诊", "高关注", "会员"],
+          profile: {
+            memberLevel: "VIP",
+            other: "老客户",
+            reviewStatus: "跟进中",
+          },
+          followStatus: "跟进中",
+          memberStatus: "生效中",
+          summary: "本次复查眼轴增长放缓，建议持续离焦镜片干预。",
+        },
+        {
+          id: "p2",
+          no: "P20260024",
+          name: "顾景川",
+          gender: "男",
+          age: 10,
+          mobile: "136 0188 8801",
+          store: "静安门店",
+          owner: "刘嘉程",
+          latestVisit: "2026-04-27 15:10",
+          nextReview: "2026-05-15",
+          diagnosis: "OK镜复查",
+          diagnosisNote: "镜片配适稳定，夜戴依从性需持续观察。",
+          treatment: "角膜塑形镜复查",
+          followupType: "角膜塑形镜",
+          tags: ["OK镜", "待复查"],
+          profile: {
+            memberLevel: "普通用户",
+            other: "老客户",
+            reviewStatus: "待复查",
+          },
+          followStatus: "待复查",
+          memberStatus: "非会员",
+          summary: "镜片配适稳定，但依从性需要继续观察。",
+        },
+        {
+          id: "p3",
+          no: "P20260103",
+          name: "林舒予",
+          gender: "女",
+          age: 14,
+          mobile: "139 6600 4221",
+          store: "浦东中心店",
+          owner: "陈意宁",
+          latestVisit: "2026-04-23 09:30",
+          nextReview: "2026-05-23",
+          diagnosis: "干眼伴视疲劳",
+          diagnosisNote: "首诊后干眼指标改善，建议按计划继续回访。",
+          treatment: "干眼治疗 + 训练计划",
+          followupType: "定期复查",
+          tags: ["干眼", "会员"],
+          profile: {
+            memberLevel: "SVIP",
+            other: "新客户",
+            reviewStatus: "已就诊",
+          },
+          followStatus: "已就诊",
+          memberStatus: "生效中",
+          summary: "泪膜指标改善明显，保留基础治疗方案。",
+        },
+      ];
+
+      const appointments = [
+        { id: "a1", patient: "周沐言", time: "09:00-09:30", date: "2026-05-12", store: "徐汇旗舰店", room: "2号诊室", source: "小程序预约", issue: "复查视力变化", solution: "验光检查", status: "已确认", tags: "复诊 / 会员", note: "需家长陪同" },
+        { id: "a2", patient: "顾景川", time: "10:30-11:00", date: "2026-05-12", store: "静安门店", room: "1号诊室", source: "后台代预约", issue: "OK镜复查", solution: "复查+镜片检查", status: "待到诊", tags: "OK镜", note: "需测角膜曲率" },
+        { id: "a3", patient: "林舒予", time: "14:00-14:30", date: "2026-05-12", store: "浦东中心店", room: "3号诊室", source: "小程序预约", issue: "干眼回访", solution: "复诊复评", status: "已改期", tags: "干眼 / 会员", note: "已改到周三" },
+      ];
+
+      const followups = [
+        { id: "f1", patient: "顾景川", latestVisit: "2026-04-27", diagnosis: "OK镜复查", treatment: "镜片复查", reviewDate: "2026-05-15", status: "待跟进", result: "未联系", owner: "刘嘉程" },
+        { id: "f2", patient: "周沐言", latestVisit: "2026-05-01", diagnosis: "近视进展期", treatment: "离焦镜片", reviewDate: "2026-06-01", status: "已联系", result: "家长确认复诊", owner: "王懿雯" },
+        { id: "f3", patient: "赵一宁", latestVisit: "2026-04-18", diagnosis: "视疲劳", treatment: "视觉训练", reviewDate: "2026-05-08", status: "已逾期", result: "三次未接通", owner: "陈意宁" },
+      ];
+
+      const historyVisits = [
+        { id: "v1", date: "2026-05-01", title: "复查 · 徐汇旗舰店", diagnosis: "青少年近视进展期", treatment: "离焦镜片 + 视觉训练", axial: "24.22mm", va: "4.8 / 4.9", summary: "眼轴增长较上次减缓，建议维持离焦方案并继续每晚训练。", review: "2026-06-01" },
+        { id: "v2", date: "2026-03-28", title: "复诊 · 徐汇旗舰店", diagnosis: "近视控制中", treatment: "离焦镜片", axial: "24.17mm", va: "4.9 / 4.9", summary: "配镜适应良好，家长反馈配戴依从性高。", review: "2026-05-01" },
+        { id: "v3", date: "2026-02-14", title: "首诊 · 徐汇旗舰店", diagnosis: "青少年近视", treatment: "离焦镜片评估", axial: "24.05mm", va: "4.7 / 4.8", summary: "完成首诊评估，建议进入近视防控方案。", review: "2026-03-28" },
+      ];
+
+      const visitDetailRecords = {
+        v1: {
+          basicInfo: { doctor: "吴丽颖", optometrist: "/", cycloplegia: "/" },
+          chiefHistory: {
+            eye: "双眼",
+            symptom: "视力下降",
+            duration: "1",
+            durationUnit: "日",
+            description:
+              "双眼OK镜复诊，戴镜1月。日前光学矫正(OK镜)治疗，无眼红、眼痛等不适主诉。脱镜无明显畏光，目前视力好。既往史：否认“高血压病、糖尿病、心脏病”等慢性病史；否认“病毒性肝炎、结核病、伤寒、疟疾”等急慢性传染病史；无肝、肾等重要脏器疾病史，否认新型冠状病毒肺炎流行病学史；否认头痛、发热、呼吸道症状病史。",
+          },
+          eyeExam: [
+            { label: "眼位", right: "位正", left: "位正" },
+            { label: "交替遮盖", right: "轻度由外到中", left: "轻度由外到中" },
+            { label: "眼球运动", right: "无受限", left: "无受限" },
+            { label: "眼前节", right: "阴性", left: "阴性", type: "boolean" },
+            { label: "眼底", right: "阴性", left: "阴性", type: "boolean" },
+          ],
+          auxExam: [
+            { label: "裸眼视力", right: "1.20", left: "1.20" },
+            { label: "最佳矫正视力", right: "", left: "" },
+            { label: "球镜", right: "-1.00", left: "-1.50" },
+            { label: "柱镜", right: "-1.00", left: "-1.00" },
+            { label: "轴位", right: "141", left: "38" },
+            { label: "SE", right: "-1.5", left: "-2.0" },
+            { label: "角膜曲率", right: "39.50", left: "40.00" },
+            { label: "K1", right: "39.00", left: "39.25" },
+            { label: "K2", right: "40.00", left: "40.50" },
+            { label: "眼轴", right: "25.36", left: "25.54" },
+            { label: "轴率比", right: "0.6420", left: "0.6385" },
+            { label: "晶体厚度(mm)", right: "4.00", left: "3.85" },
+            { label: "角膜厚度(um)", right: "550", left: "545" },
+            { label: "角膜内皮计数", right: "2963", left: "3292" },
+            { label: "CRT(um)", right: "", left: "" },
+            { label: "RNFL(um)", right: "", left: "" },
+            { label: "眼压(mmHg)", right: "16", left: "16" },
+            { label: "泪膜破裂时间(s)", right: "/", left: "/" },
+            { label: "泪液分泌试验(mm)", right: "/", left: "/" },
+            { label: "立体视(s)", right: "/", left: "/" },
+            { label: "色觉", right: "/", left: "/" },
+          ],
+          diagnosis: "1.双眼屈光不正 2.结膜炎",
+          treatment: {
+            inspection: { item: "无数据", quantity: "0", unit: "无数据", price: "0 元", total: "0 元" },
+            prescription: { drug: "无数据", quantity: "0", spec: "无数据", unit: "无数据", price: "0 元", eye: "无数据", usage: "无数据", total: "0 元" },
+            therapy: { item: "无数据", quantity: "0", unit: "无数据", price: "0 元", total: "0 元" },
+            advice: "1.继续光学矫正(OK镜); 3月复查;",
+            followupCycle: "3 / 月",
+            estimatedDate: "2026-07-31",
+            reminderDate: "2026-07-24",
+          },
+        },
+        v2: {
+          basicInfo: { doctor: "吴丽颖", optometrist: "/", cycloplegia: "/" },
+          chiefHistory: {
+            eye: "双眼",
+            symptom: "复诊随访",
+            duration: "3",
+            durationUnit: "月",
+            description: "离焦镜片复诊，配戴适应良好，家长反馈依从性高，无明显眼部不适。",
+          },
+          eyeExam: [
+            { label: "眼位", right: "位正", left: "位正" },
+            { label: "交替遮盖", right: "正常", left: "正常" },
+            { label: "眼球运动", right: "无受限", left: "无受限" },
+            { label: "眼前节", right: "阴性", left: "阴性", type: "boolean" },
+            { label: "眼底", right: "阴性", left: "阴性", type: "boolean" },
+          ],
+          auxExam: [
+            { label: "裸眼视力", right: "1.00", left: "1.00" },
+            { label: "最佳矫正视力", right: "1.20", left: "1.20" },
+            { label: "球镜", right: "-1.25", left: "-1.75" },
+            { label: "柱镜", right: "-0.75", left: "-1.00" },
+            { label: "轴位", right: "140", left: "35" },
+            { label: "SE", right: "-1.63", left: "-2.25" },
+            { label: "角膜曲率", right: "39.40", left: "39.80" },
+            { label: "K1", right: "38.95", left: "39.10" },
+            { label: "K2", right: "39.90", left: "40.20" },
+            { label: "眼轴", right: "24.98", left: "25.11" },
+            { label: "轴率比", right: "0.6391", left: "0.6352" },
+            { label: "晶体厚度(mm)", right: "3.92", left: "3.86" },
+            { label: "角膜厚度(um)", right: "543", left: "541" },
+            { label: "角膜内皮计数", right: "3012", left: "3156" },
+            { label: "CRT(um)", right: "", left: "" },
+            { label: "RNFL(um)", right: "", left: "" },
+            { label: "眼压(mmHg)", right: "15", left: "15" },
+            { label: "泪膜破裂时间(s)", right: "/", left: "/" },
+            { label: "泪液分泌试验(mm)", right: "/", left: "/" },
+            { label: "立体视(s)", right: "/", left: "/" },
+            { label: "色觉", right: "/", left: "/" },
+          ],
+          diagnosis: "双眼近视控制中",
+          treatment: {
+            inspection: { item: "复查检查套餐", quantity: "1", unit: "次", price: "320 元", total: "320 元" },
+            prescription: { drug: "人工泪液", quantity: "1", spec: "10ml", unit: "瓶", price: "38 元", eye: "双眼", usage: "每日 3 次", total: "38 元" },
+            therapy: { item: "离焦镜片复查", quantity: "1", unit: "次", price: "0 元", total: "0 元" },
+            advice: "继续佩戴离焦镜片，保持用眼卫生，1个月后复查。",
+            followupCycle: "1 / 月",
+            estimatedDate: "2026-05-01",
+            reminderDate: "2026-04-27",
+          },
+        },
+        v3: {
+          basicInfo: { doctor: "吴丽颖", optometrist: "/", cycloplegia: "散瞳后" },
+          chiefHistory: {
+            eye: "双眼",
+            symptom: "首诊评估",
+            duration: "6",
+            durationUnit: "月",
+            description: "首诊完成基础屈光与近视防控评估，拟进入离焦镜片干预方案。",
+          },
+          eyeExam: [
+            { label: "眼位", right: "位正", left: "位正" },
+            { label: "交替遮盖", right: "正常", left: "正常" },
+            { label: "眼球运动", right: "无受限", left: "无受限" },
+            { label: "眼前节", right: "阴性", left: "阴性", type: "boolean" },
+            { label: "眼底", right: "阴性", left: "阴性", type: "boolean" },
+          ],
+          auxExam: [
+            { label: "裸眼视力", right: "0.8", left: "0.8" },
+            { label: "最佳矫正视力", right: "1.2", left: "1.2" },
+            { label: "球镜", right: "-1.00", left: "-1.25" },
+            { label: "柱镜", right: "-0.50", left: "-0.75" },
+            { label: "轴位", right: "145", left: "42" },
+            { label: "SE", right: "-1.25", left: "-1.63" },
+            { label: "角膜曲率", right: "39.20", left: "39.70" },
+            { label: "K1", right: "38.88", left: "39.02" },
+            { label: "K2", right: "39.72", left: "40.05" },
+            { label: "眼轴", right: "24.05", left: "24.18" },
+            { label: "轴率比", right: "0.6180", left: "0.6206" },
+            { label: "晶体厚度(mm)", right: "3.84", left: "3.79" },
+            { label: "角膜厚度(um)", right: "538", left: "536" },
+            { label: "角膜内皮计数", right: "3105", left: "3188" },
+            { label: "CRT(um)", right: "", left: "" },
+            { label: "RNFL(um)", right: "", left: "" },
+            { label: "眼压(mmHg)", right: "14", left: "14" },
+            { label: "泪膜破裂时间(s)", right: "/", left: "/" },
+            { label: "泪液分泌试验(mm)", right: "/", left: "/" },
+            { label: "立体视(s)", right: "/", left: "/" },
+            { label: "色觉", right: "/", left: "/" },
+          ],
+          diagnosis: "青少年近视",
+          treatment: {
+            inspection: { item: "首诊评估", quantity: "1", unit: "次", price: "260 元", total: "260 元" },
+            prescription: { drug: "无数据", quantity: "0", spec: "无数据", unit: "无数据", price: "0 元", eye: "无数据", usage: "无数据", total: "0 元" },
+            therapy: { item: "离焦镜片评估", quantity: "1", unit: "次", price: "0 元", total: "0 元" },
+            advice: "建议进入近视防控方案，复诊观察配戴适应情况。",
+            followupCycle: "1 / 月",
+            estimatedDate: "2026-03-28",
+            reminderDate: "2026-03-24",
+          },
+        },
+      };
+
+      const state = {
+        page: "customers",
+        selectedPatientId: "p1",
+        detailTab: "visits",
+        selectedVisitId: "v1",
+        selectedMetric: "axial",
+        visitEditMode: false,
+        tagFilter: "全部类型",
+        tagModalOpen: false,
+        tagPage: 1,
+        selectedTagColor: "灰色",
+        tagColorDropdownOpen: false,
+      };
+
+      const tagColorPresets = [
+        { label: "蓝色", value: "#316BFF", className: "border-blue-100 bg-blue-50 text-blue-700" },
+        { label: "黄色", value: "#FACC15", className: "border-yellow-100 bg-yellow-50 text-yellow-700" },
+        { label: "橙色", value: "#F59E0B", className: "border-orange-100 bg-orange-50 text-orange-700" },
+        { label: "绿色", value: "#10B981", className: "border-emerald-100 bg-emerald-50 text-emerald-700" },
+        { label: "紫色", value: "#8B5CF6", className: "border-violet-100 bg-violet-50 text-violet-700" },
+        { label: "红色", value: "#EF4444", className: "border-rose-100 bg-rose-50 text-rose-700" },
+        { label: "灰色", value: "#94A3B8", className: "border-slate-200 bg-slate-100 text-slate-600" },
+      ];
+
+      const profileTagStandard = [
+        {
+          key: "memberLevel",
+          label: "会员类型",
+          options: [
+            { value: "普通用户", className: "border-slate-200 bg-slate-100 text-slate-600" },
+            { value: "VIP", className: "border-violet-100 bg-violet-50 text-violet-700" },
+            { value: "SVIP", className: "border-fuchsia-100 bg-fuchsia-50 text-fuchsia-700" },
+          ],
+          desc: "用于区分普通用户与会员等级。",
+        },
+        {
+          key: "reviewStatus",
+          label: "复查状态",
+          options: [
+            { value: "跟进中", className: "border-emerald-100 bg-emerald-50 text-emerald-700" },
+            { value: "待复查", className: "border-orange-100 bg-orange-50 text-orange-700" },
+            { value: "已就诊", className: "border-brand/15 bg-brandSoft text-brand" },
+            { value: "已终止", className: "border-rose-100 bg-rose-50 text-rose-700" },
+          ],
+          desc: "沿用当前 CRM 复查状态逻辑。",
+        },
+        {
+          key: "source",
+          label: "客户来源",
+          options: [
+            { value: "徐蔚", className: "border-sky-100 bg-sky-50 text-sky-700" },
+            { value: "美团", className: "border-amber-100 bg-amber-50 text-amber-700" },
+            { value: "小红书", className: "border-rose-100 bg-rose-50 text-rose-700" },
+            { value: "海华", className: "border-teal-100 bg-teal-50 text-teal-700" },
+            { value: "自然", className: "border-emerald-100 bg-emerald-50 text-emerald-700" },
+            { value: "其他", className: "border-slate-200 bg-slate-100 text-slate-600" },
+          ],
+          desc: "标识客户进入系统的主要来源渠道。",
+        },
+        {
+          key: "other",
+          label: "其他",
+          options: [
+            { value: "新客户", className: "border-sky-100 bg-sky-50 text-sky-700" },
+            { value: "老客户", className: "border-amber-100 bg-amber-50 text-amber-700" },
+          ],
+          desc: "用于承接新客户、老客户等辅助标签。",
+        },
+      ];
+
+      const tagManagementRows = profileTagStandard.flatMap((group, groupIndex) =>
+        group.options.map((option, optionIndex) => {
+          const seq = groupIndex * 5 + optionIndex + 1;
+          const day = String(((seq - 1) % 28) + 1).padStart(2, "0");
+          const updateDay = String((((seq + 4) % 28) || 28)).padStart(2, "0");
+          return {
+            category: group.label,
+            value: option.value,
+            className: option.className,
+            createdAt: `2026-04-${day}`,
+            updatedAt: `2026-05-${updateDay}`,
+          };
+        })
+      );
+
+      const app = document.getElementById("app");
+      const pageTitle = document.getElementById("page-title");
+
+      function tagClass(label) {
+        if (["生效中", "已联系", "已确认", "已完成"].includes(label)) return "bg-emerald-50 text-emerald-700 border-emerald-100";
+        if (["待复查", "待跟进", "待到诊", "已改期"].includes(label)) return "bg-amber-50 text-amber-700 border-amber-100";
+        if (["已逾期", "未联系"].includes(label)) return "bg-rose-50 text-rose-700 border-rose-100";
+        return "bg-slate-50 text-slate-600 border-slate-200";
+      }
+
+      function topHero(title, subTitle, actions = []) {
+        return `
+          <section class="mb-5 overflow-hidden rounded-[28px] border border-white/70 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-6 text-white shadow-card">
+            <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+              <div class="max-w-3xl">
+                <div class="text-xs uppercase tracking-[0.34em] text-white/45">Weiai Vision CRM</div>
+                <h2 class="display-font mt-3 text-3xl font-semibold leading-tight">${title}</h2>
+                <p class="mt-3 max-w-2xl text-sm leading-7 text-white/72">${subTitle}</p>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                ${actions
+                  .map(
+                    (action) => `
+                    <button ${action.page ? `data-page="${action.page}"` : ""} class="rounded-2xl border ${action.primary ? "border-brand bg-brand text-white" : "border-white/15 bg-white/8 text-white"} px-4 py-3 text-sm font-medium transition hover:-translate-y-0.5 hover:bg-white/12">
+                      ${action.label}
+                    </button>`
+                  )
+                  .join("")}
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      function formatDateOnly(value) {
+        if (!value) return "-";
+        return String(value).split(" ")[0];
+      }
+
+      function renderProfileTags(profile) {
+        if (!profile) return "";
+        return profileTagStandard
+          .map((group) => {
+            const value = profile[group.key];
+            if (!value) return "";
+            const option = group.options.find((item) => item.value === value);
+            const className = option?.className || "border-slate-200 bg-white text-slate-500";
+            return `<span class="rounded-full border px-2.5 py-1 text-[11px] ${className}">${value}</span>`;
+          })
+          .join("");
+      }
+
+      function renderGenderIcon(gender) {
+        const isMale = gender === "男";
+        const toneClass = isMale ? "bg-sky-50 text-sky-600 border-sky-100" : "bg-pink-50 text-pink-500 border-pink-100";
+        return `
+          <span class="inline-flex h-7 w-7 items-center justify-center rounded-full border ${toneClass}">
+            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              ${isMale
+                ? `<circle cx="8" cy="12" r="4.2"></circle>
+                   <path d="M11.2 8.8L16 4"></path>
+                   <path d="M12.8 4H16v3.2"></path>`
+                : `<circle cx="10" cy="8" r="4"></circle>
+                   <path d="M10 12v4.5"></path>
+                   <path d="M7.5 14.6h5"></path>`}
+            </svg>
+          </span>
+        `;
+      }
+
+      function profileStandardTooltip() {
+        return `
+          <div class="pointer-events-none absolute bottom-full left-0 z-30 mb-3 hidden w-[320px] rounded-2xl border border-slate-200 bg-white p-4 normal-case tracking-normal text-slate-600 shadow-2xl group-hover:block">
+            <div class="text-sm font-semibold text-ink">用户标签标准</div>
+            <div class="mt-3 space-y-3 text-xs leading-5">
+              ${profileTagStandard
+                .map(
+                  (item) => `
+                    <div>
+                      <div class="font-medium text-slate-700">${item.label}：${item.options.map((option) => option.value).join(" / ")}</div>
+                      <div class="mt-1 text-slate-500">${item.desc}</div>
+                    </div>`
+                )
+                .join("")}
+            </div>
+          </div>
+        `;
+      }
+
+      function renderColorSwatch(hex) {
+        return `<span class="inline-flex h-4 w-4 rounded-[4px] border border-black/5" style="background:${hex}"></span>`;
+      }
+
+      function visitField(label, value) {
+        return `
+          <div class="rounded-2xl bg-slate-50 p-4">
+            <div class="text-sm text-slate-500">${label}</div>
+            <div class="mt-2 font-medium text-ink">${value || "-"}</div>
+          </div>
+        `;
+      }
+
+      function visitInput(label, value, type = "text") {
+        if (type === "textarea") {
+          return `
+            <label class="block">
+              <span class="mb-2 block text-sm text-slate-500">${label}</span>
+              <textarea class="h-28 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">${value || ""}</textarea>
+            </label>
+          `;
+        }
+        return `
+          <label class="block">
+            <span class="mb-2 block text-sm text-slate-500">${label}</span>
+            <input type="${type}" value="${value || ""}" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700" />
+          </label>
+        `;
+      }
+
+      function visitTwoEyeTable(title, rows, editable = false) {
+        return `
+          <div class="rounded-[26px] border border-slate-200 bg-white p-5">
+            <div class="text-lg font-semibold text-ink">${title}</div>
+            <div class="mt-4 overflow-x-auto">
+              <table class="min-w-full text-left text-sm">
+                <thead class="text-slate-400">
+                  <tr class="border-b border-slate-200">
+                    <th class="px-3 py-3 font-medium">检查项目</th>
+                    <th class="px-3 py-3 font-medium">右眼</th>
+                    <th class="px-3 py-3 font-medium">左眼</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  ${rows
+                    .map(
+                      (row) => `
+                        <tr>
+                          <td class="px-3 py-4 font-medium text-slate-600">${row.label}</td>
+                          <td class="px-3 py-4">
+                            ${
+                              editable
+                                ? `<input value="${row.right || ""}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />`
+                                : `<div class="rounded-xl bg-slate-50 px-3 py-2 text-slate-700">${row.right || "-"}</div>`
+                            }
+                          </td>
+                          <td class="px-3 py-4">
+                            ${
+                              editable
+                                ? `<input value="${row.left || ""}" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />`
+                                : `<div class="rounded-xl bg-slate-50 px-3 py-2 text-slate-700">${row.left || "-"}</div>`
+                            }
+                          </td>
+                        </tr>`
+                    )
+                    .join("")}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+
+      function statCard(label, value, meta, color = "text-ink") {
+        return `
+          <div class="glass rounded-[26px] border border-white/70 p-5 shadow-soft">
+            <div class="text-sm text-slate-500">${label}</div>
+            <div class="mt-3 flex items-end justify-between">
+              <div class="text-3xl font-semibold ${color}">${value}</div>
+              <div class="rounded-full bg-slate-50 px-3 py-1 text-xs text-slate-500">${meta}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function archiveStatCard(label, value, meta, options = {}) {
+        const valueClass = options.valueClass || "text-ink";
+        const metaClass = options.metaClass || "bg-slate-50 text-slate-500";
+        return `
+          <div class="glass rounded-[26px] border border-white/70 p-5 shadow-soft">
+            <div class="text-sm text-slate-500">${label}</div>
+            <div class="mt-3 flex items-end justify-between gap-3">
+              <div class="text-3xl font-semibold ${valueClass}">${value}</div>
+              <div class="rounded-full px-3 py-1 text-xs ${metaClass}">${meta}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderCustomersPage() {
+        pageTitle.textContent = "档案列表";
+
+        return `
+          ${topHero(
+            "把客户档案做成真正的工作入口",
+            "保留旧系统核心字段不变，但通过更清晰的筛选、更顺滑的详情联动和更高频的快捷动作，让验光师能在一个页面完成建档、预约、回访和档案查看。",
+            [
+              { label: "新增档案" },
+              { label: "新增预约", page: "appointments", primary: true },
+            ]
+          )}
+
+          <section class="mb-5 glass rounded-[30px] border border-white/70 p-5 shadow-card">
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <div>
+                <div class="text-lg font-semibold text-ink">原系统功能映射</div>
+                <div class="mt-1 text-sm text-slate-500">当前“档案列表”页面承接旧系统中的客户管理、用户档案、个人信息查询等入口，用于统一沉淀为客户档案池。</div>
+              </div>
+              <div class="rounded-full bg-brandSoft px-3 py-1 text-xs font-medium text-brand">用于设计与研发对照，不属于最终业务组件</div>
+            </div>
+
+            <div class="mt-5 grid gap-4 xl:grid-cols-3">
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧 CRM 系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">客户管理 / 复诊回访</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">
+                  主要承接原“客户管理”模块和部分“复诊回访”场景中的患者查找、跟进入口。
+                </div>
+                <a href="https://crm.weiaishijue.cn/" target="_blank" class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-brand">
+                  打开旧 CRM 地址
+                </a>
+              </div>
+
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧后台系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">用户档案 · 档案列表</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">
+                  主要承接原后台“用户档案”下的“档案列表”，作为患者主档案的核心来源页面。
+                </div>
+                <a href="https://www.weiaishijue.cn/#/document/documentList" target="_blank" class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-brand">
+                  打开档案列表地址
+                </a>
+              </div>
+
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧后台系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">个人信息管理 · 查询个人信息</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">
+                  承接原后台“个人信息管理”中的查询入口，用于补足患者基础身份信息检索与查看。
+                </div>
+                <a href="https://www.weiaishijue.cn/#/personalInfo/checkPersonalInfo" target="_blank" class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-brand">
+                  打开个人信息地址
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <section class="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            ${archiveStatCard(
+              "总客户数",
+              "1,286",
+              `<span class="inline-flex items-center gap-1"><svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10h12"></path><path d="M10 4l6 6-6 6"></path></svg>新增人数 + 8</span>`,
+              { metaClass: "bg-emerald-50 text-emerald-600" }
+            )}
+            ${archiveStatCard("今日客户数", "12", "首次就诊 9 人")}
+            ${archiveStatCard("今日复诊客户数", "84", "查看详情")}
+            ${archiveStatCard("待回访客户数", "18", "查看详情")}
+          </section>
+
+          <section class="mb-5 glass rounded-[30px] border border-white/70 shadow-card">
+            <div class="border-b border-slate-200/80 p-5">
+              <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div>
+                    <div class="text-lg font-semibold text-ink">档案列表</div>
+                  <div class="mt-1 text-sm text-slate-500">当前列表先按数据库友好的轻量结构展示，聚焦客户主档、联系方式、用户画像、回访项目类型、就诊时间与诊断备注，查看详情进入客户档案页。</div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button class="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M10 3v9"></path>
+                      <path d="M6.5 8.5L10 12l3.5-3.5"></path>
+                      <path d="M4 15.5h12"></path>
+                    </svg>
+                    导出
+                  </button>
+                  <button class="inline-flex items-center gap-2 rounded-2xl bg-brand px-4 py-2 text-sm font-medium text-white">
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                      <path d="M10 4v12"></path>
+                      <path d="M4 10h12"></path>
+                    </svg>
+                    新增档案
+                  </button>
+                </div>
+              </div>
+
+              <div class="mt-5 grid gap-3 xl:grid-cols-[1.42fr_0.66fr_0.82fr_1.42fr_auto] xl:items-center">
+                <input class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none ring-0 placeholder:text-slate-400" placeholder="搜索姓名 / 手机号 / 患者编号" />
+                <select class="rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-600">
+                  <option>全部跟进状态</option>
+                  <option>跟进中</option>
+                  <option>待复查</option>
+                  <option>已终止</option>
+                </select>
+                <select class="rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-600">
+                  <option>回访项目类型</option>
+                  <option>角膜塑形镜</option>
+                  <option>离焦框架镜</option>
+                  <option>离焦软镜</option>
+                  <option>哺光仪</option>
+                  <option>视训</option>
+                  <option>用药</option>
+                  <option>定期复查</option>
+                </select>
+                <div class="flex items-center rounded-2xl border border-slate-200 bg-white px-5 py-3 text-sm text-slate-500">
+                  <svg class="mr-3 h-5 w-5 shrink-0 text-slate-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7">
+                    <rect x="3.5" y="4.5" width="13" height="12" rx="2"></rect>
+                    <path d="M6.5 2.8v3.2"></path>
+                    <path d="M13.5 2.8v3.2"></path>
+                    <path d="M3.5 8.5h13"></path>
+                  </svg>
+                  <span class="min-w-0 flex-1 text-slate-400">起始日期</span>
+                  <span class="px-5 text-base font-semibold text-slate-700">至</span>
+                  <span class="min-w-0 flex-1 text-right text-slate-400">结束日期</span>
+                </div>
+                <div class="flex items-center justify-end gap-4">
+                  <div class="h-6 w-px bg-slate-200"></div>
+                  <div class="flex items-center gap-3">
+                    <button class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600">重置</button>
+                    <button class="rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white">搜索</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="overflow-x-auto scrollbar-thin">
+              <table class="min-w-full text-left">
+                <thead class="bg-slate-50/80 text-xs uppercase tracking-[0.18em] text-slate-400">
+                  <tr>
+                    <th class="px-5 py-4 font-medium">客户信息</th>
+                    <th class="px-5 py-4 font-medium">联系方式</th>
+                    <th class="px-5 py-4 font-medium">
+                      <div class="inline-flex items-center gap-1.5">
+                        <span>用户标签</span>
+                        <span class="group relative inline-flex">
+                          <span class="inline-flex h-4 w-4 cursor-help items-center justify-center rounded-full border border-slate-300 text-[10px] font-semibold text-slate-400">?</span>
+                          ${profileStandardTooltip()}
+                        </span>
+                      </div>
+                    </th>
+                    <th class="px-5 py-4 font-medium">回访项目类型</th>
+                    <th class="px-5 py-4 font-medium">就诊日期</th>
+                    <th class="px-5 py-4 font-medium">诊断备注</th>
+                    <th class="px-5 py-4 font-medium">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                  ${patients
+                    .map(
+                      (p) => `
+                      <tr class="transition hover:bg-slate-50/70">
+                        <td class="px-5 py-4">
+                          <button data-select-patient="${p.id}" data-page="detail" class="text-left">
+                            <div class="flex items-center gap-3">
+                              ${renderGenderIcon(p.gender)}
+                              <div>
+                                <div class="flex items-baseline gap-2">
+                                  <span class="font-semibold text-ink hover:text-brand">${p.name}</span>
+                                  <span class="text-xs text-slate-400">${p.age}岁</span>
+                                </div>
+                                <div class="mt-1 text-xs text-slate-500">${p.no}</div>
+                              </div>
+                            </div>
+                          </button>
+                        </td>
+                        <td class="px-5 py-4 whitespace-nowrap">
+                          <div class="font-medium text-slate-700">${p.mobile}</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="flex flex-wrap gap-2">
+                              ${renderProfileTags(p.profile)}
+                          </div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="font-medium text-slate-700">${p.followupType}</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="flex items-center gap-2 text-sm">
+                            <span class="text-slate-500">本次:</span>
+                            <span class="font-medium text-ink">${formatDateOnly(p.latestVisit)}</span>
+                          </div>
+                          <div class="mt-2 flex items-center gap-2 text-sm">
+                            <span class="text-slate-500">复查:</span>
+                            <span class="font-medium text-slate-700">${formatDateOnly(p.nextReview)}</span>
+                          </div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="max-w-[240px] truncate text-sm font-medium text-slate-600">${p.diagnosisNote}</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="flex min-w-[132px] flex-col gap-2">
+                            <button data-select-patient="${p.id}" data-page="detail" class="w-full rounded-xl bg-brandSoft px-3 py-2 text-xs font-medium text-brand">查看档案</button>
+                            <button data-select-patient="${p.id}" data-page="new-visit" class="w-full rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">新增就诊记录</button>
+                            <button data-page="followups" class="w-full rounded-xl bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600">发起回访</button>
+                          </div>
+                        </td>
+                      </tr>`
+                    )
+                    .join("")}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="flex flex-col gap-4 border-t border-slate-200/80 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+              <div class="text-sm text-slate-500">共 <span class="font-semibold text-ink">1,286</span> 条患者记录，当前显示 1 - 20 条</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500">上一页</button>
+                <button class="rounded-xl bg-brand px-3 py-2 text-sm font-medium text-white">1</button>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">2</button>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">3</button>
+                <span class="px-2 text-sm text-slate-400">...</span>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">64</button>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">下一页</button>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      function renderDetailPage() {
+        pageTitle.textContent = "客户档案详情";
+        const patient = patients.find((p) => p.id === state.selectedPatientId) || patients[0];
+        const patientAppointments = appointments.filter((a) => a.patient === patient.name);
+        const patientFollowups = followups.filter((f) => f.patient === patient.name);
+        const upcomingTask =
+          patientFollowups[0] || {
+            id: `f-${patient.id}`,
+            patient: patient.name,
+            latestVisit: formatDateOnly(patient.latestVisit),
+            diagnosis: patient.diagnosis,
+            treatment: patient.followupType,
+            reviewDate: patient.nextReview,
+            status: patient.followStatus,
+            result: "待建立回访记录",
+            owner: patient.owner,
+          };
+        const followupHistory = patientFollowups.length ? patientFollowups : [upcomingTask];
+        const selectedVisit = historyVisits.find((v) => v.id === state.selectedVisitId) || historyVisits[0];
+        const visitDetail = visitDetailRecords[selectedVisit.id] || visitDetailRecords.v1;
+        const tabs = [
+          { key: "visits", label: "就诊记录" },
+          { key: "appointments", label: "预约记录" },
+          { key: "followup", label: "回访记录" },
+          { key: "consumption", label: "消费记录" },
+        ];
+        const activeTab = tabs.some((item) => item.key === state.detailTab) ? state.detailTab : "visits";
+        const consumptionRecords = [
+          { id: "c1", date: "2026-05-01", item: "离焦镜片年度方案", amount: "¥ 6,980", method: "微信支付", status: "已支付", orderNo: "SO20260501001" },
+          { id: "c2", date: "2026-03-28", item: "复查检查套餐", amount: "¥ 320", method: "门店收银", status: "已支付", orderNo: "SO20260328016" },
+        ];
+
+        const tabContent = {
+          visits: `
+            <div class="grid gap-5 xl:grid-cols-[300px_1fr]">
+              <aside class="rounded-[28px] border border-slate-200 bg-white p-5">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <div class="text-lg font-semibold text-ink">就诊时间轴</div>
+                    <div class="mt-1 text-sm text-slate-500">默认定位到最新一次就诊记录</div>
+                  </div>
+                  <span class="rounded-2xl bg-slate-100 px-3 py-1 text-xs text-slate-500">共 ${historyVisits.length} 次</span>
+                </div>
+                <div class="mt-4 space-y-3">
+                  ${historyVisits
+                    .map(
+                      (v) => `
+                      <button data-select-visit="${v.id}" class="w-full rounded-[22px] border px-4 py-4 text-left transition ${
+                        v.id === state.selectedVisitId ? "border-brand bg-brandSoft" : "border-slate-200 bg-white hover:bg-slate-50"
+                      }">
+                        <div class="flex items-start justify-between gap-3">
+                          <div>
+                            <div class="font-semibold text-ink">${v.date}</div>
+                            <div class="mt-1 text-sm text-slate-500">${v.title}</div>
+                          </div>
+                          <span class="rounded-full bg-slate-50 px-2.5 py-1 text-[11px] text-slate-500">${v.review}</span>
+                        </div>
+                        <div class="mt-3 text-sm text-slate-600">${v.diagnosis}</div>
+                      </button>`
+                    )
+                    .join("")}
+                </div>
+              </aside>
+              <section class="space-y-4">
+                <div class="rounded-[28px] border border-slate-200 bg-white p-5">
+                  <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                    <div>
+                      <div class="text-lg font-semibold text-ink">本次就诊详情</div>
+                      <div class="mt-1 text-sm text-slate-500">${selectedVisit.title} · 复查建议 ${selectedVisit.review}</div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      <button data-toggle-visit-edit class="rounded-2xl ${state.visitEditMode ? "bg-brand text-white" : "bg-brandSoft text-brand"} px-4 py-2 text-sm font-medium">
+                        ${state.visitEditMode ? "完成编辑" : "编辑内容"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div class="grid gap-4 xl:grid-cols-2">
+                  <div class="rounded-[26px] border border-slate-200 bg-white p-5">
+                    <div class="text-lg font-semibold text-ink">基本信息</div>
+                    <div class="mt-4 grid gap-4 md:grid-cols-3">
+                      ${
+                        state.visitEditMode
+                          ? [
+                              visitInput("接诊医生", visitDetail.basicInfo.doctor),
+                              visitInput("验光师", visitDetail.basicInfo.optometrist),
+                              visitInput("散瞳", visitDetail.basicInfo.cycloplegia),
+                            ].join("")
+                          : [
+                              visitField("接诊医生", visitDetail.basicInfo.doctor),
+                              visitField("验光师", visitDetail.basicInfo.optometrist),
+                              visitField("散瞳", visitDetail.basicInfo.cycloplegia),
+                            ].join("")
+                      }
+                    </div>
+                  </div>
+                  <div class="rounded-[26px] border border-slate-200 bg-white p-5">
+                    <div class="text-lg font-semibold text-ink">诊断</div>
+                    <div class="mt-4">
+                      ${
+                        state.visitEditMode
+                          ? visitInput("诊断内容", visitDetail.diagnosis, "textarea")
+                          : `<div class="rounded-[22px] bg-slate-50 p-4 text-sm leading-7 text-slate-700">${visitDetail.diagnosis}</div>`
+                      }
+                    </div>
+                  </div>
+                </div>
+                <div class="rounded-[26px] border border-slate-200 bg-white p-5">
+                  <div class="text-lg font-semibold text-ink">主诉与病史</div>
+                  <div class="mt-4 grid gap-4 md:grid-cols-[0.9fr_1.2fr_0.5fr_0.4fr]">
+                    ${
+                      state.visitEditMode
+                        ? [
+                            visitInput("眼别", visitDetail.chiefHistory.eye),
+                            visitInput("视力下降", visitDetail.chiefHistory.symptom),
+                            visitInput("持续时长", visitDetail.chiefHistory.duration),
+                            visitInput("单位", visitDetail.chiefHistory.durationUnit),
+                          ].join("")
+                        : [
+                            visitField("眼别", visitDetail.chiefHistory.eye),
+                            visitField("视力下降", visitDetail.chiefHistory.symptom),
+                            visitField("持续时长", visitDetail.chiefHistory.duration),
+                            visitField("单位", visitDetail.chiefHistory.durationUnit),
+                          ].join("")
+                    }
+                  </div>
+                  <div class="mt-4">
+                    ${
+                      state.visitEditMode
+                        ? visitInput("病史描述", visitDetail.chiefHistory.description, "textarea")
+                        : `<div class="rounded-[22px] bg-slate-50 p-4 text-sm leading-7 text-slate-700">${visitDetail.chiefHistory.description}</div>`
+                    }
+                  </div>
+                </div>
+                ${visitTwoEyeTable("眼部检查", visitDetail.eyeExam, state.visitEditMode)}
+                ${visitTwoEyeTable("辅助检查", visitDetail.auxExam, state.visitEditMode)}
+                <div class="rounded-[26px] border border-slate-200 bg-white p-5">
+                  <div class="text-lg font-semibold text-ink">处理</div>
+                  <div class="mt-5 space-y-5">
+                    <div class="rounded-[22px] bg-slate-50 p-4">
+                      <div class="text-sm font-semibold text-ink">检查</div>
+                      <div class="mt-3 grid gap-3 md:grid-cols-4">
+                        ${
+                          state.visitEditMode
+                            ? [
+                                visitInput("项目", visitDetail.treatment.inspection.item),
+                                visitInput("数量", visitDetail.treatment.inspection.quantity),
+                                visitInput("单位", visitDetail.treatment.inspection.unit),
+                                visitInput("单价", visitDetail.treatment.inspection.price),
+                              ].join("")
+                            : [
+                                visitField("项目", visitDetail.treatment.inspection.item),
+                                visitField("数量", visitDetail.treatment.inspection.quantity),
+                                visitField("单位", visitDetail.treatment.inspection.unit),
+                                visitField("单价", visitDetail.treatment.inspection.price),
+                              ].join("")
+                        }
+                      </div>
+                      <div class="mt-3 text-sm font-medium text-slate-700">总价：${visitDetail.treatment.inspection.total}</div>
+                    </div>
+                    <div class="rounded-[22px] bg-slate-50 p-4">
+                      <div class="text-sm font-semibold text-ink">处方</div>
+                      <div class="mt-3 grid gap-3 md:grid-cols-4">
+                        ${
+                          state.visitEditMode
+                            ? [
+                                visitInput("药品名", visitDetail.treatment.prescription.drug),
+                                visitInput("数量", visitDetail.treatment.prescription.quantity),
+                                visitInput("规格", visitDetail.treatment.prescription.spec),
+                                visitInput("单位", visitDetail.treatment.prescription.unit),
+                                visitInput("单价", visitDetail.treatment.prescription.price),
+                                visitInput("眼别", visitDetail.treatment.prescription.eye),
+                                visitInput("用法", visitDetail.treatment.prescription.usage),
+                              ].join("")
+                            : [
+                                visitField("药品名", visitDetail.treatment.prescription.drug),
+                                visitField("数量", visitDetail.treatment.prescription.quantity),
+                                visitField("规格", visitDetail.treatment.prescription.spec),
+                                visitField("单位", visitDetail.treatment.prescription.unit),
+                                visitField("单价", visitDetail.treatment.prescription.price),
+                                visitField("眼别", visitDetail.treatment.prescription.eye),
+                                visitField("用法", visitDetail.treatment.prescription.usage),
+                              ].join("")
+                        }
+                      </div>
+                      <div class="mt-3 text-sm font-medium text-slate-700">总价：${visitDetail.treatment.prescription.total}</div>
+                    </div>
+                    <div class="rounded-[22px] bg-slate-50 p-4">
+                      <div class="text-sm font-semibold text-ink">治疗</div>
+                      <div class="mt-3 grid gap-3 md:grid-cols-4">
+                        ${
+                          state.visitEditMode
+                            ? [
+                                visitInput("项目名", visitDetail.treatment.therapy.item),
+                                visitInput("数量", visitDetail.treatment.therapy.quantity),
+                                visitInput("单位", visitDetail.treatment.therapy.unit),
+                                visitInput("单价", visitDetail.treatment.therapy.price),
+                              ].join("")
+                            : [
+                                visitField("项目名", visitDetail.treatment.therapy.item),
+                                visitField("数量", visitDetail.treatment.therapy.quantity),
+                                visitField("单位", visitDetail.treatment.therapy.unit),
+                                visitField("单价", visitDetail.treatment.therapy.price),
+                              ].join("")
+                        }
+                      </div>
+                      <div class="mt-3 text-sm font-medium text-slate-700">总价：${visitDetail.treatment.therapy.total}</div>
+                    </div>
+                    <div class="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
+                      <div class="rounded-[22px] border border-emerald-100 bg-emerald-50 p-5 text-emerald-900">
+                        <div class="text-sm font-semibold text-emerald-800">医生建议</div>
+                        <div class="mt-3">
+                          ${
+                            state.visitEditMode
+                              ? `<textarea class="h-28 w-full rounded-2xl border border-emerald-200 bg-white px-4 py-3 text-sm text-slate-700">${visitDetail.treatment.advice}</textarea>`
+                              : `<p class="text-sm leading-7 text-emerald-900/85">${visitDetail.treatment.advice}</p>`
+                          }
+                        </div>
+                      </div>
+                      <div class="rounded-[22px] bg-slate-50 p-4">
+                        <div class="text-sm font-semibold text-ink">门诊随访</div>
+                        <div class="mt-3 grid gap-3">
+                          ${
+                            state.visitEditMode
+                              ? [
+                                  visitInput("复诊周期", visitDetail.treatment.followupCycle),
+                                  visitInput("预计复诊日期", visitDetail.treatment.estimatedDate),
+                                  visitInput("复诊提醒发出日期", visitDetail.treatment.reminderDate),
+                                ].join("")
+                              : [
+                                  visitField("复诊周期", visitDetail.treatment.followupCycle),
+                                  visitField("预计复诊日期", visitDetail.treatment.estimatedDate),
+                                  visitField("复诊提醒发出日期", visitDetail.treatment.reminderDate),
+                                ].join("")
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          `,
+          appointments: `
+            <div class="overflow-x-auto scrollbar-thin">
+              <table class="min-w-full text-left">
+                <thead class="bg-slate-50 text-xs uppercase tracking-[0.16em] text-slate-400">
+                  <tr>
+                    <th class="px-4 py-4">预约日期</th>
+                    <th class="px-4 py-4">时段</th>
+                    <th class="px-4 py-4">门店 / 诊室</th>
+                    <th class="px-4 py-4">问题 / 方案</th>
+                    <th class="px-4 py-4">来源</th>
+                    <th class="px-4 py-4">状态</th>
+                    <th class="px-4 py-4">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                  ${patientAppointments
+                    .map(
+                      (a) => `
+                      <tr class="hover:bg-slate-50/70">
+                        <td class="px-4 py-4">
+                          <div class="font-semibold text-ink">${a.date}</div>
+                          <div class="mt-1 text-xs text-slate-500">${patient.name}</div>
+                        </td>
+                        <td class="px-4 py-4 font-medium text-slate-700">${a.time}</td>
+                        <td class="px-4 py-4">
+                          <div class="font-medium text-slate-700">${a.store}</div>
+                          <div class="mt-1 text-xs text-slate-500">${a.room}</div>
+                        </td>
+                        <td class="px-4 py-4">
+                          <div class="font-medium text-slate-700">${a.issue}</div>
+                          <div class="mt-1 text-xs text-slate-500">${a.solution}</div>
+                        </td>
+                        <td class="px-4 py-4 text-slate-600">${a.source}</td>
+                        <td class="px-4 py-4">
+                          <span class="rounded-full border px-3 py-1 text-xs ${tagClass(a.status)}">${a.status}</span>
+                        </td>
+                        <td class="px-4 py-4">
+                          <div class="flex flex-wrap gap-2">
+                            <button class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">改期</button>
+                            <button data-page="new-visit" class="rounded-xl bg-brandSoft px-3 py-2 text-xs font-medium text-brand">到诊录入</button>
+                          </div>
+                        </td>
+                      </tr>`
+                    )
+                    .join("") || `
+                      <tr>
+                        <td colspan="7" class="px-4 py-12 text-center text-sm text-slate-500">暂无预约记录</td>
+                      </tr>`}
+                </tbody>
+              </table>
+            </div>
+          `,
+          followup: `
+            <div class="space-y-4">
+              <div class="rounded-[28px] border border-slate-200 bg-white p-5">
+                <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                  <div>
+                    <div class="text-lg font-semibold text-ink">近期待回访</div>
+                    <div class="mt-1 text-sm text-slate-500">围绕下次复查时间组织随访动作，回访与复查在同一业务链路内管理</div>
+                  </div>
+                  <span class="rounded-full border px-3 py-1 text-xs ${tagClass(upcomingTask.status)}">${upcomingTask.status}</span>
+                </div>
+                <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  <div><div class="text-sm text-slate-500">关联就诊</div><div class="mt-2 font-medium text-ink">${upcomingTask.latestVisit}</div></div>
+                  <div><div class="text-sm text-slate-500">计划回访日期</div><div class="mt-2 font-medium text-ink">${upcomingTask.reviewDate}</div></div>
+                  <div><div class="text-sm text-slate-500">回访项目</div><div class="mt-2 font-medium text-ink">${upcomingTask.treatment}</div></div>
+                  <div><div class="text-sm text-slate-500">负责人</div><div class="mt-2 font-medium text-ink">${upcomingTask.owner}</div></div>
+                </div>
+                <div class="mt-4 rounded-2xl bg-slate-50 p-4 text-sm leading-7 text-slate-600">${upcomingTask.result}</div>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <button class="rounded-xl bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600">新增回访</button>
+                  <button data-page="followups" class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">进入回访管理</button>
+                </div>
+              </div>
+              <div class="rounded-[28px] border border-slate-200 bg-white p-5">
+                <div class="text-lg font-semibold text-ink">回访历史记录</div>
+                <div class="mt-4 overflow-x-auto scrollbar-thin">
+                  <table class="min-w-full text-left">
+                    <thead class="bg-slate-50 text-xs uppercase tracking-[0.16em] text-slate-400">
+                      <tr>
+                        <th class="px-4 py-4">回访日期</th>
+                        <th class="px-4 py-4">关联就诊</th>
+                        <th class="px-4 py-4">回访项目</th>
+                        <th class="px-4 py-4">状态</th>
+                        <th class="px-4 py-4">回访结果</th>
+                        <th class="px-4 py-4">负责人</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 text-sm">
+                      ${followupHistory
+                        .map(
+                          (item) => `
+                          <tr class="hover:bg-slate-50/70">
+                            <td class="px-4 py-4 font-medium text-ink">${item.reviewDate}</td>
+                            <td class="px-4 py-4 text-slate-600">${item.latestVisit}</td>
+                            <td class="px-4 py-4 text-slate-600">${item.treatment}</td>
+                            <td class="px-4 py-4"><span class="rounded-full border px-3 py-1 text-xs ${tagClass(item.status)}">${item.status}</span></td>
+                            <td class="px-4 py-4 text-slate-600">${item.result}</td>
+                            <td class="px-4 py-4 text-slate-600">${item.owner}</td>
+                          </tr>`
+                        )
+                        .join("")}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          `,
+          consumption: `
+            <div class="rounded-[28px] border border-slate-200 bg-white p-5">
+              <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div>
+                  <div class="text-lg font-semibold text-ink">消费记录</div>
+                  <div class="mt-1 text-sm text-slate-500">记录方案成交、检查收费与支付状态，作为后续收银与复购的依据</div>
+                </div>
+                <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">查看全部账单</button>
+              </div>
+              <div class="mt-4 overflow-x-auto scrollbar-thin">
+                <table class="min-w-full text-left">
+                  <thead class="bg-slate-50 text-xs uppercase tracking-[0.16em] text-slate-400">
+                    <tr>
+                      <th class="px-4 py-4">消费日期</th>
+                      <th class="px-4 py-4">消费项目</th>
+                      <th class="px-4 py-4">订单号</th>
+                      <th class="px-4 py-4">支付方式</th>
+                      <th class="px-4 py-4">金额</th>
+                      <th class="px-4 py-4">状态</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 text-sm">
+                    ${consumptionRecords
+                      .map(
+                        (item) => `
+                        <tr class="hover:bg-slate-50/70">
+                          <td class="px-4 py-4 font-medium text-ink">${item.date}</td>
+                          <td class="px-4 py-4 text-slate-600">${item.item}</td>
+                          <td class="px-4 py-4 text-slate-600">${item.orderNo}</td>
+                          <td class="px-4 py-4 text-slate-600">${item.method}</td>
+                          <td class="px-4 py-4 font-medium text-brand">${item.amount}</td>
+                          <td class="px-4 py-4"><span class="rounded-full border px-3 py-1 text-xs ${tagClass(item.status)}">${item.status}</span></td>
+                        </tr>`
+                      )
+                      .join("")}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          `,
+        }[activeTab];
+
+        return `
+          ${topHero(
+            `${patient.name} · 客户档案详情`,
+            "围绕单个客户档案统一查看就诊、预约、回访和消费记录，减少在多个系统和多个概念之间来回切换。",
+            [{ label: "返回档案列表", page: "customers" }]
+          )}
+
+          <section class="mb-5 glass rounded-[30px] border border-white/70 p-5 shadow-card">
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <div>
+                <div class="text-lg font-semibold text-ink">原系统功能映射</div>
+                <div class="mt-1 text-sm text-slate-500">当前“客户档案详情”页面用于把旧系统中分散的档案详情、就诊记录、回访跟进和消费摘要统一收口到客户档案上下文。</div>
+              </div>
+              <div class="rounded-full bg-brandSoft px-3 py-1 text-xs font-medium text-brand">详情页是 CRM 核心页面</div>
+            </div>
+            <div class="mt-5 grid gap-4 xl:grid-cols-3">
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧后台系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">用户档案 · 档案详情页</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">承接旧后台档案主信息、个人资料、历次记录和完整档案详情查看能力。</div>
+                <a href="https://www.weiaishijue.cn/#/document/documentPool/completeDocument?docId=mof86o4gkyyt027yalj&uuid=l5hhrr9f2edf3h66vu2&operationType=check" target="_blank" class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-brand">查看原档案详情</a>
+              </div>
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧 CRM 系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">复诊回访 · 客户跟进</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">承接旧 CRM 中客户关系、回访跟进、复查提醒等服务动作，作为回访记录的来源。</div>
+                <a href="https://crm.weiaishijue.cn/" target="_blank" class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-brand">关联旧 CRM 地址</a>
+              </div>
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧后台系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">问卷 / 配镜 / 清单</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">承接问卷结果、配镜信息、收费清单等数据来源，统一沉淀到档案详情内查看。</div>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <a href="https://www.weiaishijue.cn/#/survey/surveyList" target="_blank" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand">问卷列表</a>
+                  <a href="https://www.weiaishijue.cn/#/glassRx/glassRxList" target="_blank" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand">配镜信息</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="mb-5 grid gap-5 xl:grid-cols-[1.5fr_0.5fr]">
+            <div class="glass rounded-[30px] border border-white/70 p-5 shadow-card">
+              <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                <div>
+                  <div class="flex flex-wrap items-center gap-3">
+                    <div class="display-font text-3xl text-ink">${patient.name}</div>
+                    <div class="flex flex-wrap gap-2">${renderProfileTags(patient.profile)}</div>
+                  </div>
+                  <div class="mt-2 text-sm text-slate-500">${patient.no} · ${patient.gender} · ${patient.age}岁 · ${patient.mobile}</div>
+                </div>
+                <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">编辑档案</button>
+              </div>
+              <div class="mt-5 flex flex-wrap gap-x-12 gap-y-3 text-sm">
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-500">最近就诊：</span>
+                  <span class="font-medium text-ink">${formatDateOnly(patient.latestVisit)}</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-500">下次复查：</span>
+                  <span class="font-medium text-ink">${patient.nextReview}</span>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 xl:grid-cols-2">
+              <button data-page="new-visit" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:shadow-soft">
+                <span class="inline-flex h-5 w-5 items-center justify-center text-white">
+                  <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M10 4v12"></path>
+                    <path d="M4 10h12"></path>
+                  </svg>
+                </span>
+                <span>新增档案</span>
+              </button>
+              <button data-page="appointments" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:shadow-soft">
+                <span class="inline-flex h-5 w-5 items-center justify-center text-white">
+                  <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3.5" y="4.5" width="13" height="12" rx="2"></rect>
+                    <path d="M6.5 2.8v3.2"></path>
+                    <path d="M13.5 2.8v3.2"></path>
+                    <path d="M3.5 8.5h13"></path>
+                  </svg>
+                </span>
+                <span>新增预约</span>
+              </button>
+              <button data-page="followups" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:shadow-soft">
+                <span class="inline-flex h-5 w-5 items-center justify-center text-white">
+                  <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M4 5.5h12"></path>
+                    <path d="M4 10h8"></path>
+                    <path d="M4 14.5h6"></path>
+                    <path d="M14 11l2 2 3-4"></path>
+                  </svg>
+                </span>
+                <span>新增回访</span>
+              </button>
+              <button class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:shadow-soft">
+                <span class="inline-flex h-5 w-5 items-center justify-center text-white">
+                  <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M4.5 6.5h11"></path>
+                    <path d="M6.5 10h7"></path>
+                    <path d="M8 13.5h4"></path>
+                    <path d="M5.5 3.5h9a1.5 1.5 0 0 1 1.5 1.5v10a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 4 15V5a1.5 1.5 0 0 1 1.5-1.5Z"></path>
+                  </svg>
+                </span>
+                <span>发起收费</span>
+              </button>
+            </div>
+          </section>
+
+          <section class="glass rounded-[30px] border border-white/70 shadow-card">
+            <div class="border-b border-slate-200/80 px-5 py-4">
+              <div class="flex flex-wrap gap-2">
+                ${tabs
+                  .map(
+                    (item) => `
+                    <button data-detail-tab="${item.key}" class="rounded-2xl px-4 py-2 text-sm font-medium ${
+                      item.key === activeTab ? "bg-brand text-white" : "bg-slate-100 text-slate-600"
+                    }">
+                      ${item.label}
+                    </button>`
+                  )
+                  .join("")}
+              </div>
+            </div>
+            <div class="p-5">${tabContent}</div>
+          </section>
+        `;
+      }
+
+      function renderTagsPage() {
+        pageTitle.textContent = "标签管理";
+        const categoryOptions = ["全部类型", "会员类型", "复查状态", "客户来源", "其他"];
+        const filteredRows =
+          state.tagFilter === "全部类型" ? tagManagementRows : tagManagementRows.filter((item) => item.category === state.tagFilter);
+        const pageSize = 10;
+        const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+        const currentPage = Math.min(state.tagPage, totalPages);
+        const pagedRows = filteredRows.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+        const selectedColor = tagColorPresets.find((item) => item.label === state.selectedTagColor) || tagColorPresets[tagColorPresets.length - 1];
+        return `
+          ${topHero(
+            "统一管理客户标签规则",
+            "标签管理页保持轻量即可，支持按类别筛选、表格查看，并通过弹窗完成新增配置。",
+            [{ label: "新增标签", primary: true }]
+          )}
+
+          <section class="glass rounded-[28px] border border-white/70 p-5 shadow-card">
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <div>
+                <div class="text-lg font-semibold text-ink">标签列表</div>
+                <div class="mt-1 text-sm text-slate-500">支持按类别筛选，默认每页展示 10 条标签数据。</div>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <select data-tag-filter class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">
+                  ${categoryOptions
+                    .map((item) => `<option ${item === state.tagFilter ? "selected" : ""}>${item}</option>`)
+                    .join("")}
+                </select>
+                <button data-open-tag-modal class="rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white">新增标签</button>
+              </div>
+            </div>
+            <div class="mt-5 overflow-x-auto scrollbar-thin">
+              <table class="min-w-full text-left">
+                <thead class="bg-slate-50 text-xs uppercase tracking-[0.16em] text-slate-400">
+                  <tr>
+                    <th class="px-4 py-4">类别</th>
+                    <th class="px-4 py-4">值</th>
+                    <th class="px-4 py-4">创建日期</th>
+                    <th class="px-4 py-4">更新日期</th>
+                    <th class="px-4 py-4">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                  ${pagedRows
+                    .map(
+                      (row) => `
+                      <tr class="hover:bg-slate-50/70">
+                        <td class="px-4 py-4 font-medium text-ink">${row.category}</td>
+                        <td class="px-4 py-4">
+                          <span class="inline-flex rounded-full border px-3 py-1 text-xs ${row.className}">${row.value}</span>
+                        </td>
+                        <td class="px-4 py-4 text-slate-600">${row.createdAt}</td>
+                        <td class="px-4 py-4 text-slate-600">${row.updatedAt}</td>
+                        <td class="px-4 py-4">
+                          <div class="flex gap-2">
+                            <button class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">编辑</button>
+                            <button class="rounded-xl bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600">删除</button>
+                          </div>
+                        </td>
+                      </tr>`
+                    )
+                    .join("")}
+                </tbody>
+              </table>
+            </div>
+            <div class="mt-5 flex flex-col gap-3 border-t border-slate-100 pt-4 text-sm text-slate-500 lg:flex-row lg:items-center lg:justify-between">
+              <div>共 ${filteredRows.length} 条标签数据，当前第 ${currentPage} / ${totalPages} 页</div>
+              <div class="flex gap-2">
+                <button data-tag-page="${Math.max(1, currentPage - 1)}" class="rounded-xl border border-slate-200 bg-white px-3 py-2 ${currentPage === 1 ? "cursor-not-allowed text-slate-300" : "text-slate-600"}">上一页</button>
+                <button data-tag-page="${Math.min(totalPages, currentPage + 1)}" class="rounded-xl border border-slate-200 bg-white px-3 py-2 ${currentPage === totalPages ? "cursor-not-allowed text-slate-300" : "text-slate-600"}">下一页</button>
+              </div>
+            </div>
+          </section>
+
+          ${
+            state.tagModalOpen
+              ? `
+              <div class="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/40 px-4">
+                <div class="w-full max-w-xl rounded-[28px] bg-white p-6 shadow-2xl">
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <div class="text-xl font-semibold text-ink">新增标签</div>
+                      <div class="mt-1 text-sm text-slate-500">通过弹窗快速配置类别、颜色与标签值。</div>
+                    </div>
+                    <button data-close-tag-modal class="rounded-2xl bg-slate-100 px-3 py-2 text-sm text-slate-600">关闭</button>
+                  </div>
+                  <div class="mt-5 grid gap-4">
+                    <label class="block">
+                      <span class="mb-2 block text-sm text-slate-500">类别</span>
+                      <select class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                        ${categoryOptions
+                          .filter((item) => item !== "全部类型")
+                          .map((item) => `<option>${item}</option>`)
+                          .join("")}
+                      </select>
+                    </label>
+                    <div class="grid gap-4 md:grid-cols-[220px_1fr]">
+                      <div class="block">
+                        <span class="mb-2 block text-sm text-slate-500">颜色</span>
+                        <div class="relative">
+                          <button data-open-tag-color-dropdown class="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                            <span class="flex items-center gap-3">
+                              ${renderColorSwatch(selectedColor.value)}
+                              <span>${selectedColor.label}</span>
+                            </span>
+                            <span class="text-slate-400">▾</span>
+                          </button>
+                          ${
+                            state.tagColorDropdownOpen
+                              ? `
+                              <div class="absolute left-0 right-0 top-[calc(100%+8px)] z-10 rounded-2xl border border-slate-200 bg-white p-2 shadow-xl">
+                                ${tagColorPresets
+                                  .map(
+                                    (item) => `
+                                    <button data-select-tag-color="${item.label}" class="flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+                                      <span class="flex items-center gap-3">
+                                        ${renderColorSwatch(item.value)}
+                                        <span>${item.label}</span>
+                                      </span>
+                                      <span class="text-slate-300">${item.label === state.selectedTagColor ? "✓" : ""}</span>
+                                    </button>`
+                                  )
+                                  .join("")}
+                              </div>`
+                              : ""
+                          }
+                        </div>
+                      </div>
+                      <label class="block">
+                        <span class="mb-2 block text-sm text-slate-500">值</span>
+                        <input value="高意向" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700" />
+                      </label>
+                    </div>
+                  </div>
+                  <div class="mt-6 flex justify-end gap-3">
+                    <button data-close-tag-modal class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">取消</button>
+                    <button class="rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white">确认保存</button>
+                  </div>
+                </div>
+              </div>`
+              : ""
+          }
+        `;
+      }
+
+      function renderAppointmentsPage() {
+        pageTitle.textContent = "预约管理";
+        return `
+          ${topHero(
+            "把预约从“表格记录”升级为“可调度的门诊资源”",
+            "保留时段、姓名、联系方式、用户标签、问题、解决方案、备注、预约状态等旧字段，并增加门店、诊室、来源和通知状态，让预约真正可管理。",
+            [
+              { label: "日历视图" },
+              { label: "新增预约", primary: true },
+            ]
+          )}
+
+          <section class="mb-5 glass rounded-[30px] border border-white/70 p-5 shadow-card">
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <div>
+                <div class="text-lg font-semibold text-ink">原系统功能映射</div>
+                <div class="mt-1 text-sm text-slate-500">当前“预约管理”页面承接旧后台的预约管理与新系统患者预约入口，统一用于患者预约、后台代预约、预约状态流转与到诊录入。</div>
+              </div>
+              <div class="rounded-full bg-brandSoft px-3 py-1 text-xs font-medium text-brand">预约页聚焦排班与流转，不做右侧辅助卡片</div>
+            </div>
+            <div class="mt-5 grid gap-4 xl:grid-cols-3">
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧后台系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">预约管理 · 预约列表</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">承接原后台预约看板和预约列表，是本页的主要来源模块。</div>
+                <a href="https://www.weiaishijue.cn/#/appointment/appointmentList" target="_blank" class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-brand">打开预约列表地址</a>
+              </div>
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧后台系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">预约管理 · 新建预约</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">承接后台代预约能力，后续应支持从客户详情或预约页直接发起。</div>
+                <a href="https://www.weiaishijue.cn/#/appointment/createAppointment" target="_blank" class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-brand">打开新建预约地址</a>
+              </div>
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">新系统小程序</div>
+                <div class="mt-3 text-base font-semibold text-ink">患者自助预约入口</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">新增能力：患者在小程序端自助预约，后台在同一页面统一管理来源与状态。</div>
+                <div class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-500">小程序预约 · 新增来源</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            ${statCard("今日预约", "28", "小程序 18 单")}
+            ${statCard("后台代预约", "9", "占比 32%")}
+            ${statCard("待到诊", "14", "今日需提醒", "text-warn")}
+            ${statCard("已改期", "3", "需跟踪通知", "text-rose")}
+          </section>
+
+          <section class="mb-5 glass rounded-[30px] border border-white/70 shadow-card">
+            <div class="border-b border-slate-200/80 p-5">
+              <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div>
+                  <div class="text-lg font-semibold text-ink">预约全量视图</div>
+                  <div class="mt-1 text-sm text-slate-500">以“排班资源 + 患者预约 + 状态流转”为主线，保留旧字段并增强门店、诊室、来源、到诊和通知信息。</div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button class="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">日历视图</button>
+                  <button class="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">导出</button>
+                  <button class="rounded-2xl bg-brand px-4 py-2 text-sm font-medium text-white">新增预约</button>
+                </div>
+              </div>
+              <div class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+                <input class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" placeholder="搜索姓名 / 手机号" />
+                <input type="date" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" />
+                <select class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600"><option>全部门店</option></select>
+                <select class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600"><option>全部状态</option></select>
+                <select class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600"><option>全部来源</option></select>
+                <button class="rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white">筛选预约</button>
+              </div>
+              <div class="mt-4 flex flex-wrap gap-2">
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">今日视图</span>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">徐汇旗舰店</span>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">待到诊 14</span>
+              </div>
+            </div>
+            <div class="overflow-x-auto scrollbar-thin">
+              <table class="min-w-full text-left">
+                <thead class="bg-slate-50/80 text-xs uppercase tracking-[0.16em] text-slate-400">
+                  <tr>
+                    <th class="px-5 py-4">预约日期 / 时段</th>
+                    <th class="px-5 py-4">患者</th>
+                    <th class="px-5 py-4">门店 / 诊室</th>
+                    <th class="px-5 py-4">问题 / 解决方案</th>
+                    <th class="px-5 py-4">标签 / 来源</th>
+                    <th class="px-5 py-4">状态</th>
+                    <th class="px-5 py-4">备注</th>
+                    <th class="px-5 py-4">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                  ${appointments
+                    .map(
+                      (item) => `
+                      <tr class="hover:bg-slate-50/70">
+                        <td class="px-5 py-4">
+                          <div class="font-semibold text-ink">${item.date}</div>
+                          <div class="mt-1 text-xs text-slate-500">${item.time}</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="font-semibold text-ink">${item.patient}</div>
+                          <div class="mt-1 text-xs text-slate-500">联系方式待展示</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="font-medium text-slate-700">${item.store}</div>
+                          <div class="mt-1 text-xs text-slate-500">${item.room}</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="font-medium text-slate-700">${item.issue}</div>
+                          <div class="mt-1 text-xs text-slate-500">${item.solution}</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="font-medium text-slate-700">${item.tags}</div>
+                          <div class="mt-1 text-xs text-slate-500">${item.source}</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <span class="rounded-full border px-3 py-1 text-xs ${tagClass(item.status)}">${item.status}</span>
+                        </td>
+                        <td class="px-5 py-4 text-slate-600">${item.note}</td>
+                        <td class="px-5 py-4">
+                          <div class="flex flex-wrap gap-2">
+                            <button class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">改期</button>
+                            <button class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">取消</button>
+                            <button data-page="new-visit" class="rounded-xl bg-brandSoft px-3 py-2 text-xs font-medium text-brand">到诊录入</button>
+                          </div>
+                        </td>
+                      </tr>`
+                    )
+                    .join("")}
+                </tbody>
+              </table>
+            </div>
+            <div class="flex flex-col gap-4 border-t border-slate-200/80 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+              <div class="text-sm text-slate-500">共 <span class="font-semibold text-ink">92</span> 条预约记录，当前显示 1 - 20 条</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500">上一页</button>
+                <button class="rounded-xl bg-brand px-3 py-2 text-sm font-medium text-white">1</button>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">2</button>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">3</button>
+                <span class="px-2 text-sm text-slate-400">...</span>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">5</button>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">下一页</button>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      function renderFollowupsPage() {
+        pageTitle.textContent = "回访管理";
+        return `
+          ${topHero(
+            "把旧 CRM 的回访入口升级为复查任务中心",
+            "回访不是简单备注，而是围绕复查日期、联系动作、跟进结果和责任人形成明确任务制，帮助门店真正提升复查执行率。",
+            [
+              { label: "批量通知" },
+              { label: "新增回访任务", primary: true },
+            ]
+          )}
+
+          <section class="mb-5 glass rounded-[30px] border border-white/70 p-5 shadow-card">
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <div>
+                <div class="text-lg font-semibold text-ink">原系统功能映射</div>
+                <div class="mt-1 text-sm text-slate-500">当前“回访管理”页面承接旧 CRM 的复诊回访入口，并融合旧后台中的复查日期、病史摘要与患者联系方式，升级为标准化任务中心。</div>
+              </div>
+              <div class="rounded-full bg-brandSoft px-3 py-1 text-xs font-medium text-brand">回访页核心是任务流转，不做侧栏辅助卡片</div>
+            </div>
+            <div class="mt-5 grid gap-4 xl:grid-cols-3">
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧 CRM 系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">复诊回访 · 回访管理</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">承接旧 CRM 中的复诊回访主入口，是本页最核心的来源模块。</div>
+                <a href="https://crm.weiaishijue.cn/" target="_blank" class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-brand">打开旧 CRM 地址</a>
+              </div>
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧后台系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">用户档案 / 病史记录</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">复查日期、诊断摘要、主要治疗手段来自患者档案与历次就诊记录。</div>
+                <a href="https://www.weiaishijue.cn/#/document/documentList" target="_blank" class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-brand">打开档案列表地址</a>
+              </div>
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">新系统增强</div>
+                <div class="mt-3 text-base font-semibold text-ink">复查任务流转 + 通知留痕</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">新增任务状态、联系结果、通知次数、责任人和逾期识别，让回访真正可管理、可统计。</div>
+                <div class="mt-4 inline-flex rounded-2xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-500">新增：任务中心能力</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            ${statCard("待跟进任务", "18", "今日优先 6 条", "text-rose")}
+            ${statCard("已联系任务", "42", "本周累计")}
+            ${statCard("待复查到店", "11", "确认到店")}
+            ${statCard("已逾期", "5", "需升级处理", "text-warn")}
+          </section>
+
+          <section class="glass rounded-[30px] border border-white/70 shadow-card">
+            <div class="border-b border-slate-200/80 p-5">
+              <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                <div>
+                  <div class="text-lg font-semibold text-ink">复查回访任务视图</div>
+                  <div class="mt-1 text-sm text-slate-500">统一展示患者、最近就诊、诊断、主要治疗手段、应复查日期、跟进结果、责任人和任务状态。</div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button class="rounded-2xl bg-brand px-4 py-2 text-sm font-medium text-white">今日待回访</button>
+                  <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">已逾期</button>
+                  <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">已联系</button>
+                  <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">待复查到店</button>
+                </div>
+              </div>
+              <div class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-6">
+                <input class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" placeholder="搜索姓名 / 手机号" />
+                <input type="date" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" />
+                <select class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600"><option>全部门店</option></select>
+                <select class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600"><option>全部责任人</option></select>
+                <select class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600"><option>全部任务状态</option></select>
+                <button class="rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white">筛选任务</button>
+              </div>
+              <div class="mt-4 flex flex-wrap gap-2">
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">今日优先 6 条</span>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">逾期 5 条</span>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">待到店 11 条</span>
+              </div>
+            </div>
+            <div class="overflow-x-auto scrollbar-thin">
+              <table class="min-w-full text-left">
+                <thead class="bg-slate-50/80 text-xs uppercase tracking-[0.16em] text-slate-400">
+                  <tr>
+                    <th class="px-5 py-4">患者</th>
+                    <th class="px-5 py-4">最近就诊</th>
+                    <th class="px-5 py-4">诊断 / 治疗</th>
+                    <th class="px-5 py-4">应复查日期</th>
+                    <th class="px-5 py-4">联系结果</th>
+                    <th class="px-5 py-4">责任人</th>
+                    <th class="px-5 py-4">操作</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                  ${followups
+                    .map(
+                      (item) => `
+                      <tr class="hover:bg-slate-50/70">
+                        <td class="px-5 py-4">
+                          <div class="font-semibold text-ink">${item.patient}</div>
+                          <div class="mt-1 text-xs text-slate-500">联系方式已绑定小程序</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="font-medium text-slate-700">${item.latestVisit}</div>
+                          <div class="mt-1 text-xs text-slate-500">最近就诊时间</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="font-medium text-slate-700">${item.diagnosis}</div>
+                          <div class="mt-1 text-xs text-slate-500">${item.treatment}</div>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="font-semibold text-ink">${item.reviewDate}</div>
+                          <span class="mt-2 inline-flex rounded-full border px-3 py-1 text-xs ${tagClass(item.status)}">${item.status}</span>
+                        </td>
+                        <td class="px-5 py-4">
+                          <div class="font-medium text-slate-700">${item.result}</div>
+                          <div class="mt-1 text-xs text-slate-500">${item.status === "已逾期" ? "需升级联系策略" : "保留本次沟通摘要"}</div>
+                        </td>
+                        <td class="px-5 py-4 text-slate-600">${item.owner}</td>
+                        <td class="px-5 py-4">
+                          <div class="flex flex-wrap gap-2">
+                            <button class="rounded-xl bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600">发起回访</button>
+                            <button class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">记录结果</button>
+                            <button data-page="detail" class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">查看患者</button>
+                          </div>
+                        </td>
+                      </tr>`
+                    )
+                    .join("")}
+                </tbody>
+              </table>
+            </div>
+            <div class="flex flex-col gap-4 border-t border-slate-200/80 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+              <div class="text-sm text-slate-500">共 <span class="font-semibold text-ink">18</span> 条回访任务，当前显示 1 - 20 条</div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-500">上一页</button>
+                <button class="rounded-xl bg-brand px-3 py-2 text-sm font-medium text-white">1</button>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">2</button>
+                <button class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">下一页</button>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      function renderHistoryPage() {
+        pageTitle.textContent = "病史记录";
+        const selectedVisit = historyVisits.find((v) => v.id === state.selectedVisitId) || historyVisits[0];
+        const metrics = [
+          { key: "axial", label: "眼轴趋势", now: "24.22", prev: "24.17", unit: "mm" },
+          { key: "vision", label: "视力表现", now: "4.8 / 4.9", prev: "4.9 / 4.9", unit: "" },
+          { key: "se", label: "SE", now: "-2.00", prev: "-1.75", unit: "D" },
+          { key: "iop", label: "眼压", now: "15", prev: "14", unit: "mmHg" },
+        ];
+
+        return `
+          ${topHero(
+            "把病史做成可对比、可解释、可追踪的专业视图",
+            "旧系统里的专业检查字段全部保留，但从碎片表单升级为时间轴 + 指标对比 + 摘要解读的组合界面，让验光师和运营都能快速理解患者变化。",
+            [
+              { label: "打印病史摘要" },
+              { label: "新增本次记录", page: "new-visit", primary: true },
+            ]
+          )}
+
+          <section class="mb-5 glass rounded-[30px] border border-white/70 p-5 shadow-card">
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <div>
+                <div class="text-lg font-semibold text-ink">原系统功能映射</div>
+                <div class="mt-1 text-sm text-slate-500">当前“病史记录”页面承接旧后台中分散的档案、问卷、配镜、数据分析能力，统一沉淀为患者的长期病史时间轴和专业指标对比页面。</div>
+              </div>
+              <div class="rounded-full bg-brandSoft px-3 py-1 text-xs font-medium text-brand">病史页核心是时间轴、专业指标与趋势解读</div>
+            </div>
+            <div class="mt-5 grid gap-4 xl:grid-cols-3">
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧后台系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">用户档案 · 档案列表 / 填写档案</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">承接原后台的患者基础档案、历次记录和随访问卷沉淀，是病史信息的主要来源之一。</div>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <a href="https://www.weiaishijue.cn/#/document/documentList" target="_blank" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand">档案列表</a>
+                  <a href="https://www.weiaishijue.cn/#/document/documentPool" target="_blank" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand">填写档案</a>
+                </div>
+              </div>
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧后台系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">问卷管理 / 配镜处方</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">问卷结果、配镜信息、处方摘要等过去分散在不同列表页，现在应并入病史视角进行统一查看。</div>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <a href="https://www.weiaishijue.cn/#/survey/surveyList" target="_blank" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand">问卷列表</a>
+                  <a href="https://www.weiaishijue.cn/#/glassRx/glassRxList" target="_blank" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand">配镜信息库</a>
+                </div>
+              </div>
+              <div class="rounded-[24px] border border-slate-200 bg-white p-4">
+                <div class="text-xs uppercase tracking-[0.18em] text-slate-400">旧后台系统</div>
+                <div class="mt-3 text-base font-semibold text-ink">数据分析 · 眼轴分析 / 视力分析</div>
+                <div class="mt-2 text-sm leading-7 text-slate-600">病史记录页会吸收原分析页面中的专业指标展示，但改成围绕单个患者的纵向变化视图。</div>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  <a href="https://www.weiaishijue.cn/#/dataAnalysis/AL_analysis" target="_blank" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand">眼轴分析</a>
+                  <a href="https://www.weiaishijue.cn/#/dataAnalysis/VA_analysis" target="_blank" class="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-brand">视力分析</a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="mb-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+            ${statCard("历次就诊记录", "12", "首诊 1 次 / 复查 11 次")}
+            ${statCard("最新眼轴", "24.22mm", "较上次 +0.05")}
+            ${statCard("当前视力", "4.8 / 4.9", "双眼裸眼")}
+            ${statCard("最近复查建议", "2026-06-01", "1 个月后", "text-brand")}
+          </section>
+
+          <section class="grid gap-5 xl:grid-cols-[0.72fr_1.28fr]">
+            <div class="glass rounded-[30px] border border-white/70 p-5 shadow-card">
+              <div class="mb-4 flex items-center justify-between">
+                <div>
+                  <div class="text-lg font-semibold text-ink">病史时间轴</div>
+                  <div class="text-sm text-slate-500">患者：周沐言</div>
+                </div>
+                <button data-page="detail" class="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">返回详情</button>
+              </div>
+              <div class="space-y-3">
+                ${historyVisits
+                  .map(
+                    (v) => `
+                    <button data-select-visit="${v.id}" class="w-full rounded-[24px] border px-4 py-4 text-left transition ${
+                      v.id === state.selectedVisitId ? "border-brand bg-brandSoft" : "border-slate-200 bg-white hover:bg-slate-50"
+                    }">
+                      <div class="flex items-start justify-between gap-3">
+                        <div>
+                          <div class="font-semibold text-ink">${v.date}</div>
+                          <div class="mt-1 text-sm text-slate-500">${v.title}</div>
+                        </div>
+                        <span class="rounded-full bg-white px-2.5 py-1 text-[11px] text-slate-500">${v.review}</span>
+                      </div>
+                      <div class="mt-3 text-sm text-slate-600">${v.diagnosis}</div>
+                    </button>`
+                  )
+                  .join("")}
+              </div>
+            </div>
+
+            <div class="space-y-5">
+              <section class="glass rounded-[30px] border border-white/70 p-5 shadow-card">
+                <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                  <div>
+                    <div class="display-font text-2xl text-ink">${selectedVisit.title}</div>
+                    <div class="mt-1 text-sm text-slate-500">${selectedVisit.date} · 建议复查 ${selectedVisit.review}</div>
+                  </div>
+                  <div class="flex flex-wrap gap-2">
+                    <button class="rounded-2xl bg-brand px-4 py-2 text-sm font-medium text-white">双眼</button>
+                    <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">右眼</button>
+                    <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">左眼</button>
+                  </div>
+                </div>
+
+                <div class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  ${metrics
+                    .map(
+                      (m) => `
+                      <button data-metric="${m.key}" class="rounded-[24px] border p-4 text-left transition ${
+                        m.key === state.selectedMetric ? "metric-active" : "border-slate-200 bg-white"
+                      }">
+                        <div class="text-xs text-slate-500">${m.label}</div>
+                        <div class="mt-3 text-2xl font-semibold text-ink">${m.now}${m.unit ? `<span class="ml-1 text-sm text-slate-400">${m.unit}</span>` : ""}</div>
+                        <div class="mt-2 text-xs text-slate-500">上次：${m.prev}${m.unit}</div>
+                      </button>`
+                    )
+                    .join("")}
+                </div>
+
+                <div class="mt-5 rounded-[24px] border border-slate-200 bg-white p-5">
+                  <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                    <div>
+                      <div class="text-lg font-semibold text-ink">本次检查维度</div>
+                      <div class="mt-1 text-sm text-slate-500">保留旧系统中的专业字段，但按患者维度集中展示</div>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                      <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">全部指标</button>
+                      <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">屈光</button>
+                      <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">眼轴</button>
+                      <button class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">问卷</button>
+                    </div>
+                  </div>
+                  <div class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4 text-sm">
+                    <div class="rounded-2xl bg-slate-50 p-4"><div class="text-slate-500">右眼球镜</div><div class="mt-1 font-semibold text-ink">-2.00D</div></div>
+                    <div class="rounded-2xl bg-slate-50 p-4"><div class="text-slate-500">左眼球镜</div><div class="mt-1 font-semibold text-ink">-1.75D</div></div>
+                    <div class="rounded-2xl bg-slate-50 p-4"><div class="text-slate-500">K1 / K2</div><div class="mt-1 font-semibold text-ink">42.8 / 43.4</div></div>
+                    <div class="rounded-2xl bg-slate-50 p-4"><div class="text-slate-500">眼压</div><div class="mt-1 font-semibold text-ink">15 mmHg</div></div>
+                    <div class="rounded-2xl bg-slate-50 p-4"><div class="text-slate-500">角膜厚度</div><div class="mt-1 font-semibold text-ink">541 μm</div></div>
+                    <div class="rounded-2xl bg-slate-50 p-4"><div class="text-slate-500">立体视</div><div class="mt-1 font-semibold text-ink">正常</div></div>
+                    <div class="rounded-2xl bg-slate-50 p-4"><div class="text-slate-500">泪膜破裂时间</div><div class="mt-1 font-semibold text-ink">8 s</div></div>
+                    <div class="rounded-2xl bg-slate-50 p-4"><div class="text-slate-500">问卷评价</div><div class="mt-1 font-semibold text-ink">轻度视疲劳</div></div>
+                  </div>
+                </div>
+              </section>
+
+              <section class="glass rounded-[30px] border border-white/70 p-5 shadow-card">
+                <div class="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+                  <div class="rounded-[26px] border border-slate-200 bg-white p-5">
+                    <div class="mb-4 flex items-center justify-between">
+                      <div class="text-lg font-semibold text-ink">专业指标摘要</div>
+                      <span class="rounded-full bg-brandSoft px-3 py-1 text-xs text-brand">自动解读视图</span>
+                    </div>
+                    <div class="space-y-4 text-sm">
+                      <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3"><span>裸眼视力</span><strong>${selectedVisit.va}</strong></div>
+                      <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3"><span>眼轴长度</span><strong>${selectedVisit.axial}</strong></div>
+                      <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3"><span>诊断结论</span><strong>${selectedVisit.diagnosis}</strong></div>
+                      <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3"><span>治疗方案</span><strong>${selectedVisit.treatment}</strong></div>
+                    </div>
+                  </div>
+                  <div class="rounded-[26px] bg-slate-950 p-5 text-white">
+                    <div class="text-lg font-semibold">本次病史解读</div>
+                    <p class="mt-4 text-sm leading-7 text-white/75">${selectedVisit.summary}</p>
+                    <div class="mt-5 rounded-2xl bg-white/8 p-4 text-sm text-white/75">
+                      对比上次：当前眼轴增幅趋缓，说明近视控制方案有效，建议保持现有佩戴依从性和复查周期。
+                    </div>
+                    <div class="mt-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+                      <div class="text-xs uppercase tracking-[0.18em] text-white/45">原型说明</div>
+                      <div class="mt-2 text-sm leading-7 text-white/75">病史记录页应该是专业判断页，而不是普通详情页，所以这里保留了时间轴、眼轴趋势、专业指标与解读的组合结构。</div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+        `;
+      }
+
+      function renderNewVisitPage() {
+        pageTitle.textContent = "新增就诊记录";
+        const patient = patients.find((p) => p.id === state.selectedPatientId) || patients[0];
+        return `
+          ${topHero(
+            "从档案列表直接进入的就诊录入页",
+            "“新增就诊记录”不再作为左侧菜单模块存在，而是从档案列表、客户档案详情、预约管理等客户上下文中进入。这样信息架构更轻，录入动作更贴近实际工作流。",
+            [
+              { label: "返回档案列表", page: "customers" },
+              { label: "保存并开单", primary: true },
+            ]
+          )}
+
+          <section class="mb-5 glass rounded-[30px] border border-white/70 p-5 shadow-card">
+            <div class="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+              <div>
+                <div class="text-lg font-semibold text-ink">入口说明</div>
+                <div class="mt-1 text-sm text-slate-500">当前页应通过“档案列表最后一列 -> 新增就诊记录”进入，也可由“预约管理 -> 到诊录入”、“客户档案详情 -> 新增就诊记录”进入，但不放在左侧菜单中。</div>
+              </div>
+              <div class="rounded-full bg-brandSoft px-3 py-1 text-xs font-medium text-brand">这是页面动作入口，不是导航入口</div>
+            </div>
+          </section>
+
+          <section class="grid gap-5 xl:grid-cols-[1.08fr_0.92fr]">
+            <div class="space-y-5">
+              <div class="glass rounded-[30px] border border-white/70 p-5 shadow-card">
+                <div class="mb-4 flex items-center justify-between">
+                  <div>
+                    <div class="text-lg font-semibold text-ink">档案信息</div>
+                    <div class="text-sm text-slate-500">从客户档案详情自动带入，减少重复录入</div>
+                  </div>
+                  <button data-page="detail" class="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">查看档案详情</button>
+                </div>
+                <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs text-slate-500">患者姓名</div><div class="mt-1 font-semibold">${patient.name}</div></div>
+                  <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs text-slate-500">编号</div><div class="mt-1 font-semibold">${patient.no}</div></div>
+                  <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs text-slate-500">联系方式</div><div class="mt-1 font-semibold">${patient.mobile}</div></div>
+                  <div class="rounded-2xl bg-slate-50 p-4"><div class="text-xs text-slate-500">责任验光师</div><div class="mt-1 font-semibold">${patient.owner}</div></div>
+                </div>
+              </div>
+
+              <div class="glass rounded-[30px] border border-white/70 p-5 shadow-card">
+                <div class="text-lg font-semibold text-ink">就诊与检查数据</div>
+                <div class="mt-5 grid gap-4 md:grid-cols-2">
+                  <label class="block"><span class="mb-2 block text-sm text-slate-500">就诊日期</span><input type="datetime-local" class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" value="2026-05-12T10:30" /></label>
+                  <label class="block"><span class="mb-2 block text-sm text-slate-500">接诊门店</span><select class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm"><option>徐汇旗舰店</option></select></label>
+                  <label class="block"><span class="mb-2 block text-sm text-slate-500">接诊验光师</span><select class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm"><option>王懿雯</option></select></label>
+                  <label class="block"><span class="mb-2 block text-sm text-slate-500">就诊类型</span><select class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm"><option>复查</option><option>首诊</option><option>复诊</option></select></label>
+                  <label class="block md:col-span-2"><span class="mb-2 block text-sm text-slate-500">主诉</span><textarea class="h-24 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">复查视力变化，家长关心眼轴控制效果。</textarea></label>
+                </div>
+
+                <div class="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                  ${[
+                    ["右眼裸眼视力", "4.8"],
+                    ["左眼裸眼视力", "4.9"],
+                    ["右眼球镜", "-2.00"],
+                    ["左眼球镜", "-1.75"],
+                    ["右眼柱镜", "-0.50"],
+                    ["左眼柱镜", "-0.25"],
+                    ["眼轴", "24.22"],
+                    ["眼压", "15"],
+                  ]
+                    .map(
+                      ([label, value]) => `
+                      <label class="block">
+                        <span class="mb-2 block text-sm text-slate-500">${label}</span>
+                        <input value="${value}" class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
+                      </label>`
+                    )
+                    .join("")}
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-5">
+              <div class="glass rounded-[30px] border border-white/70 p-5 shadow-card">
+                <div class="text-lg font-semibold text-ink">诊断与方案</div>
+                <div class="mt-4 space-y-4">
+                  <label class="block">
+                    <span class="mb-2 block text-sm text-slate-500">诊断结论</span>
+                    <textarea class="h-28 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">青少年近视进展期，眼轴增长趋势较上次放缓。</textarea>
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-sm text-slate-500">主要治疗手段</span>
+                    <input value="离焦镜片 + 视觉训练" class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-sm text-slate-500">治疗方案</span>
+                    <textarea class="h-28 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">继续佩戴离焦镜片，每晚保持20分钟视觉训练，一个月后复查眼轴。</textarea>
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-sm text-slate-500">推荐商品/套餐</span>
+                    <input value="离焦镜片年度方案" class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
+                  </label>
+                  <label class="block">
+                    <span class="mb-2 block text-sm text-slate-500">复查日期</span>
+                    <input type="date" value="2026-06-12" class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" />
+                  </label>
+                </div>
+              </div>
+
+              <div class="glass rounded-[30px] border border-white/70 p-5 shadow-card">
+                <div class="text-lg font-semibold text-ink">联动动作</div>
+                <div class="mt-4 space-y-3">
+                  <div class="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-700">保存后自动生成病史时间轴条目</div>
+                  <div class="rounded-2xl border border-brand/10 bg-brandSoft p-4 text-sm text-brand">可一键生成复查任务并同步进入回访管理</div>
+                  <div class="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-600">若需要收费，可保存后直接跳转到单据收银</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <div class="sticky bottom-4 mt-5 rounded-[26px] border border-slate-200 bg-white/90 p-4 shadow-card backdrop-blur">
+            <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div class="text-sm text-slate-500">当前为高保真原型：重点演示录入分组、字段保留与操作路径。</div>
+              <div class="flex flex-wrap gap-3">
+                <button class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">保存草稿</button>
+                <button data-page="followups" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">保存并发起回访</button>
+                <button class="rounded-2xl bg-brand px-5 py-3 text-sm font-medium text-white">保存并开单</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderPage() {
+        const pages = {
+          customers: renderCustomersPage,
+          tags: renderTagsPage,
+          detail: renderDetailPage,
+          appointments: renderAppointmentsPage,
+          followups: renderFollowupsPage,
+          history: renderHistoryPage,
+          "new-visit": renderNewVisitPage,
+        };
+        app.innerHTML = pages[state.page]();
+        syncNavState();
+      }
+
+      function syncNavState() {
+        document.querySelectorAll(".nav-item").forEach((item) => {
+          const active = item.dataset.page === state.page;
+          item.className = `nav-item flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left text-sm font-medium transition ${
+            active ? "bg-brand text-white shadow-soft" : "text-slate-600 hover:bg-white"
+          }`;
+        });
+      }
+
+      document.addEventListener("click", (e) => {
+        const pageEl = e.target.closest("[data-page]");
+        if (pageEl) {
+          const nextPage = pageEl.dataset.page;
+          if (pageEl.dataset.selectPatient) state.selectedPatientId = pageEl.dataset.selectPatient;
+          if (pageEl.dataset.selectVisit) {
+            state.selectedVisitId = pageEl.dataset.selectVisit;
+            state.page = "history";
+            renderPage();
+            return;
+          }
+          state.page = nextPage;
+          renderPage();
+          return;
+        }
+
+        const detailTab = e.target.closest("[data-detail-tab]");
+        if (detailTab) {
+          state.detailTab = detailTab.dataset.detailTab;
+          renderPage();
+          return;
+        }
+
+        const visitEditToggle = e.target.closest("[data-toggle-visit-edit]");
+        if (visitEditToggle) {
+          state.visitEditMode = !state.visitEditMode;
+          renderPage();
+          return;
+        }
+
+        const openTagModal = e.target.closest("[data-open-tag-modal]");
+        if (openTagModal) {
+          state.tagModalOpen = true;
+          state.tagColorDropdownOpen = false;
+          renderPage();
+          return;
+        }
+
+        const closeTagModal = e.target.closest("[data-close-tag-modal]");
+        if (closeTagModal) {
+          state.tagModalOpen = false;
+          state.tagColorDropdownOpen = false;
+          renderPage();
+          return;
+        }
+
+        const tagPage = e.target.closest("[data-tag-page]");
+        if (tagPage) {
+          state.tagPage = Number(tagPage.dataset.tagPage);
+          renderPage();
+          return;
+        }
+
+        const openTagColorDropdown = e.target.closest("[data-open-tag-color-dropdown]");
+        if (openTagColorDropdown) {
+          state.tagColorDropdownOpen = !state.tagColorDropdownOpen;
+          renderPage();
+          return;
+        }
+
+        const selectTagColor = e.target.closest("[data-select-tag-color]");
+        if (selectTagColor) {
+          state.selectedTagColor = selectTagColor.dataset.selectTagColor;
+          state.tagColorDropdownOpen = false;
+          renderPage();
+          return;
+        }
+
+        const visitItem = e.target.closest("[data-select-visit]");
+        if (visitItem) {
+          state.selectedVisitId = visitItem.dataset.selectVisit;
+          renderPage();
+          return;
+        }
+
+        const metric = e.target.closest("[data-metric]");
+        if (metric) {
+          state.selectedMetric = metric.dataset.metric;
+          renderPage();
+        }
+      });
+
+      document.addEventListener("change", (e) => {
+        const tagFilter = e.target.closest("[data-tag-filter]");
+        if (tagFilter) {
+          state.tagFilter = tagFilter.value;
+          state.tagPage = 1;
+          renderPage();
+        }
+      });
+
+      renderPage();
+    </script>
+  </body>
+</html>
