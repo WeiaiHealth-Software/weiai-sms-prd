@@ -210,6 +210,20 @@ export default function Miniprogram() {
             </div>
             <CaretRight weight="bold" className="text-gray-300" />
           </div>
+          <div className="border-b border-gray-50 p-4 flex justify-between items-center active:bg-gray-50" onClick={() => showToast("功能开发中")}>
+            <div className="flex items-center gap-3">
+              <IdentificationCard weight="fill" className="text-blue-500 w-6 text-center text-xl" />
+              <span className="text-sm font-medium text-gray-700">档案记录</span>
+            </div>
+            <CaretRight weight="bold" className="text-gray-300" />
+          </div>
+          <div className="p-4 flex justify-between items-center active:bg-gray-50" onClick={() => showToast("功能开发中")}>
+            <div className="flex items-center gap-3">
+              <Eyeglasses weight="fill" className="text-orange-400 w-6 text-center text-xl" />
+              <span className="text-sm font-medium text-gray-700">配镜记录</span>
+            </div>
+            <CaretRight weight="bold" className="text-gray-300" />
+          </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm overflow-hidden mx-2">
