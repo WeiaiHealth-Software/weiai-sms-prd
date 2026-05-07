@@ -7,6 +7,10 @@ import Room from "./pages/store/Room";
 import Schedule from "./pages/store/Schedule";
 import { GenericPlaceholder } from "./pages/generic/GenericPlaceholder";
 import { menuConfig } from "./config/menu";
+import ClientList from "./pages/crm/ClientList";
+import ClientDetail from "./pages/crm/ClientDetail";
+import ClientVisitNew from "./pages/crm/ClientVisitNew";
+import ClientFollowupNew from "./pages/crm/ClientFollowupNew";
 
 import ScreenList from "./pages/external/ScreenList";
 import Miniprogram from "./pages/external/Miniprogram";
@@ -21,6 +25,7 @@ const genericRoutes = menuConfig.flatMap((item) =>
           "/store/personnel",
           "/store/room",
           "/store/schedule",
+          "/crm/client-list",
         ].includes(sub.path)
     )
     .map((sub) => ({
@@ -58,6 +63,22 @@ export const router = createHashRouter([
             element: <Schedule />,
           },
         ],
+      },
+      {
+        path: "crm/client-list",
+        element: <ClientList />,
+      },
+      {
+        path: "crm/client/:id",
+        element: <ClientDetail />,
+      },
+      {
+        path: "crm/client/:id/visit/new",
+        element: <ClientVisitNew />,
+      },
+      {
+        path: "crm/client/:id/followup/new",
+        element: <ClientFollowupNew />,
       },
       ...genericRoutes,
       {

@@ -6,35 +6,45 @@ import { menuConfig } from "../config/menu";
 export function Header({ toggleSettings }: { toggleSettings: () => void }) {
   const location = useLocation();
 
-  let title = "仪表盘";
-  let subTitle = null;
+  const pathname = location.pathname;
+  const matchedItem =
+    menuConfig.find((item) => (item.path === "/" ? pathname === "/" : pathname === item.path || pathname.startsWith(`${item.path}/`))) ??
+    menuConfig[0];
 
-  for (const item of menuConfig) {
-    if (item.path === location.pathname) {
-      title = item.label;
-      break;
-    }
-    const sub = item.subs.find((s) => location.pathname === s.path);
-    if (sub) {
-      title = item.label;
-      subTitle = sub.label;
-      break;
-    }
-  }
+  const matchedSub =
+    matchedItem.subs.find((s) => pathname === s.path || pathname.startsWith(`${s.path}/`)) ??
+    (matchedItem.id === "crm" && pathname.startsWith("/crm/client/") ? matchedItem.subs.find((s) => s.path === "/crm/client-list") : null);
+
+  const crmPageMeta = (() => {
+    if (matchedItem.id !== "crm") return null;
+    if (pathname === "/crm/client-list") return null;
+    if (/^\/crm\/client\/[^/]+$/.test(pathname))
+      return { label: "客户档案详情", desc: "查看客户主档信息与就诊/预约/回访等记录。" };
+    if (/^\/crm\/client\/[^/]+\/visit\/new$/.test(pathname))
+      return { label: "新增就诊记录", desc: "为客户录入本次就诊信息、诊断与处理建议。" };
+    if (/^\/crm\/client\/[^/]+\/followup\/new$/.test(pathname))
+      return { label: "发起回访", desc: "创建回访任务，设置项目类型、复查日期与负责人。" };
+    return null;
+  })();
+
+  const title = matchedItem.label;
+  const subTitle = crmPageMeta?.label ?? matchedSub?.label ?? null;
+  const desc = crmPageMeta?.desc ?? null;
 
   return (
     <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-6 lg:px-8 flex-none z-40">
       {/* Left: Breadcrumb / Title */}
-      <div className="flex items-center gap-4">
-        <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-        <div className="flex items-center gap-1">
+      <div className="min-w-0">
+        <div className="flex items-center gap-2 min-w-0">
+          <h2 className="text-xl font-bold text-gray-900 whitespace-nowrap">{title}</h2>
           {subTitle && (
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-500">
-              <CaretRight weight="bold" className="text-xs" />
-              <span className="text-gray-900">{subTitle}</span>
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-500 min-w-0">
+              <CaretRight weight="bold" className="text-xs flex-none" />
+              <span className="text-gray-900 truncate">{subTitle}</span>
             </div>
           )}
         </div>
+        {desc && <div className="mt-0.5 text-xs text-gray-500 truncate">{desc}</div>}
       </div>
 
       {/* Right: Actions & User */}

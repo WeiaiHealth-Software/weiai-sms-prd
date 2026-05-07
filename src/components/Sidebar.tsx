@@ -26,15 +26,16 @@ export function Sidebar() {
   };
 
   const isL1Active = (item: any) => {
+    if (item.path === "/") return location.pathname === "/";
     if (item.subs.length === 0) return location.pathname === item.path;
-    return item.subs.some((sub: any) => location.pathname.startsWith(sub.path));
+    return location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
   };
 
   return (
     <aside
       className={clsx(
         "bg-white border-r border-gray-200 flex-none flex flex-col transition-all duration-300 z-50",
-        isCollapsed ? "w-20" : "w-72"
+        isCollapsed ? "w-20" : "w-76"
       )}
     >
       {/* Logo Area */}
@@ -50,7 +51,7 @@ export function Sidebar() {
             </svg>
           </div>
           {!isCollapsed && (
-            <span className="font-bold text-xl text-gray-900 tracking-tight">
+            <span className="font-bold text-2xl text-gray-900 tracking-tight">
               惟爱 · 门店管理系统
             </span>
           )}
@@ -119,7 +120,10 @@ export function Sidebar() {
               {hasSubs && isExpanded && !isCollapsed && (
                 <div className="ml-4 pl-4 border-l border-gray-200 space-y-1 mt-1">
                   {item.subs.map((sub) => {
-                    const isSubActive = location.pathname === sub.path;
+                    const isSubActive =
+                      location.pathname === sub.path ||
+                      location.pathname.startsWith(`${sub.path}/`) ||
+                      (sub.path === "/crm/client-list" && location.pathname.startsWith("/crm/client/"));
                     return (
                       <Link
                         key={sub.id}
