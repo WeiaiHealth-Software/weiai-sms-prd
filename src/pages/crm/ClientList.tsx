@@ -16,6 +16,16 @@ function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
+function formatFixed2(value?: number) {
+  if (value == null || Number.isNaN(value)) return "-";
+  return value.toFixed(2);
+}
+
+function getAxialDeltaTagClass(delta: number) {
+  if (delta <= 0) return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  return delta >= 0.2 ? "border-rose-200 bg-rose-50 text-rose-700" : "border-emerald-200 bg-emerald-50 text-emerald-700";
+}
+
 function getPageItems(totalPages: number, currentPage: number) {
   if (totalPages <= 7) return Array.from({ length: totalPages }, (_, idx) => idx + 1);
   const pages = new Set<number>([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
@@ -246,9 +256,8 @@ export default function ClientList() {
                 <th className="px-5 py-4 font-semibold">客户信息</th>
                 <th className="px-5 py-4 font-semibold">联系方式</th>
                 <th className="px-5 py-4 font-semibold">用户标签</th>
-                <th className="px-5 py-4 font-semibold">回访项目类型</th>
                 <th className="px-5 py-4 font-semibold">就诊日期</th>
-                <th className="px-5 py-4 font-semibold">诊断备注</th>
+                <th className="px-5 py-4 font-semibold">数据记录</th>
                 <th className="px-5 py-4 font-semibold">操作</th>
               </tr>
             </thead>
@@ -276,17 +285,43 @@ export default function ClientList() {
                     <ProfileTags profile={p.profile} />
                   </td>
                   <td className="px-5 py-4">
-                    <div className="font-semibold text-gray-800">{p.followupType || "-"}</div>
-                  </td>
-                  <td className="px-5 py-4">
                     <div className="flex items-center gap-2 text-sm">
                       <span className="font-semibold text-gray-900">{formatDateOnly(p.latestVisit)}</span>
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <div className="max-w-[240px] truncate text-sm font-semibold text-gray-600">
-                      {p.diagnosisNote || "-"}
-                    </div>
+                    {p.axial ? (
+                      <div className="max-w-[520px] truncate whitespace-nowrap text-sm font-semibold text-gray-800">
+                        <span className="text-gray-500">眼轴：</span>
+                        <span className="text-gray-900">
+                          OD {formatFixed2(p.axial.od)}{" "}
+                          {p.axialDelta?.od != null && (
+                            <span
+                              className={`ml-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${getAxialDeltaTagClass(
+                                p.axialDelta.od
+                              )}`}
+                            >
+                              <span aria-hidden="true">{p.axialDelta.od >= 0 ? "▲" : "▼"}</span>
+                              <span>{formatFixed2(Math.abs(p.axialDelta.od))}</span>
+                            </span>
+                          )}
+                          <span aria-hidden="true" className="mx-3 inline-flex h-4 w-px bg-gray-200 align-middle"></span>
+                          OS {formatFixed2(p.axial.os)}{" "}
+                          {p.axialDelta?.os != null && (
+                            <span
+                              className={`ml-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${getAxialDeltaTagClass(
+                                p.axialDelta.os
+                              )}`}
+                            >
+                              <span aria-hidden="true">{p.axialDelta.os >= 0 ? "▲" : "▼"}</span>
+                              <span>{formatFixed2(Math.abs(p.axialDelta.os))}</span>
+                            </span>
+                          )}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="text-sm font-semibold text-gray-400">-</div>
+                    )}
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-3">
@@ -308,7 +343,7 @@ export default function ClientList() {
               ))}
               {paged.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-sm text-gray-500">
+                  <td colSpan={6} className="px-5 py-12 text-center text-sm text-gray-500">
                     暂无数据
                   </td>
                 </tr>

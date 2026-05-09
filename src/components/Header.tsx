@@ -21,7 +21,7 @@ export function Header({ toggleSettings }: { toggleSettings: () => void }) {
     if (/^\/crm\/client\/[^/]+$/.test(pathname))
       return { label: "客户档案详情", desc: "查看客户主档信息与就诊/预约/回访等记录。" };
     if (/^\/crm\/client\/[^/]+\/visit\/new$/.test(pathname))
-      return { label: "新增就诊记录", desc: "为客户录入本次就诊信息、诊断与处理建议。" };
+      return { label: "新增档案", desc: "为客户录入本次就诊信息、配镜信息。" };
     if (/^\/crm\/client\/[^/]+\/followup\/new$/.test(pathname))
       return { label: "发起回访", desc: "创建回访任务，设置项目类型、复查日期与负责人。" };
     return null;

@@ -20,6 +20,8 @@ export type Patient = {
   diagnosisNote?: string;
   treatment?: string;
   followupType?: string;
+  axial?: { od: number; os: number };
+  axialDelta?: { od: number; os: number };
   tags?: string[];
   profile?: PatientProfile;
   followStatus?: string;
@@ -158,6 +160,8 @@ export const patients: Patient[] = [
     diagnosisNote: "近三个月眼轴增长趋缓，建议继续当前干预方案。",
     treatment: "离焦镜片 + 视觉训练",
     followupType: "离焦框架镜",
+    axial: { od: 25.36, os: 25.54 },
+    axialDelta: { od: 0.22, os: 0.03 },
     tags: ["复诊", "高关注", "会员"],
     profile: { memberLevel: "VIP", other: "老客户", reviewStatus: "跟进中" },
     followStatus: "跟进中",
@@ -179,6 +183,8 @@ export const patients: Patient[] = [
     diagnosisNote: "镜片配适稳定，夜戴依从性需持续观察。",
     treatment: "角膜塑形镜复查",
     followupType: "角膜塑形镜",
+    axial: { od: 24.88, os: 25.01 },
+    axialDelta: { od: 0.18, os: 0.11 },
     tags: ["OK镜", "待复查"],
     profile: { memberLevel: "普通用户", other: "老客户", reviewStatus: "待复查" },
     followStatus: "待复查",
@@ -200,6 +206,8 @@ export const patients: Patient[] = [
     diagnosisNote: "首诊后干眼指标改善，建议按计划继续回访。",
     treatment: "干眼治疗 + 训练计划",
     followupType: "定期复查",
+    axial: { od: 24.12, os: 24.28 },
+    axialDelta: { od: 0.06, os: 0.05 },
     tags: ["干眼", "会员"],
     profile: { memberLevel: "SVIP", other: "新客户", reviewStatus: "已就诊" },
     followStatus: "已就诊",
@@ -221,6 +229,8 @@ export const patients: Patient[] = [
     diagnosisNote: "近视用眼强度高，建议加强户外时长并配合训练。",
     treatment: "视觉训练",
     followupType: "视训",
+    axial: { od: 25.02, os: 25.16 },
+    axialDelta: { od: 0.21, os: 0.14 },
     tags: ["高关注"],
     profile: { memberLevel: "普通用户", other: "新客户", reviewStatus: "跟进中" },
     followStatus: "跟进中",
@@ -242,6 +252,8 @@ export const patients: Patient[] = [
     diagnosisNote: "首次筛查度数轻度，建议定期复查并完善视功能评估。",
     treatment: "视功能评估",
     followupType: "定期复查",
+    axial: { od: 23.92, os: 24.05 },
+    axialDelta: { od: 0.03, os: 0.02 },
     tags: ["首诊"],
     profile: { memberLevel: "普通用户", other: "新客户", reviewStatus: "待复查" },
     followStatus: "待复查",

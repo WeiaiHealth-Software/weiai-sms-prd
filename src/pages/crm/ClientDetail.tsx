@@ -72,6 +72,7 @@ function ProfileTags({ profile }: { profile?: PatientProfile }) {
 
 const tabs = [
   { key: "visits", label: "就诊记录" },
+  { key: "glasses", label: "配镜记录" },
   { key: "appointments", label: "预约记录" },
   { key: "followup", label: "回访记录" },
   { key: "consumption", label: "消费记录" },
@@ -132,7 +133,7 @@ export default function ClientDetail() {
               onClick={() => navigate(`/crm/client/${patient.id}/visit/new`)}
             >
               <Plus weight="bold" className="h-4 w-4" />
-              新增就诊记录
+              新增档案
             </button>
             <button
               className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:bg-gray-100"
@@ -198,9 +199,9 @@ export default function ClientDetail() {
 
         <div className="p-5">
           {activeTab === "visits" && (
-            <div className="grid gap-5 xl:grid-cols-[320px_1fr_240px] xl:items-start">
-              <aside className="self-start">
-                <div className="rounded-2xl border border-gray-100 bg-white p-4 xl:sticky xl:top-4 xl:z-10">
+            <div className="grid gap-5 xl:grid-cols-[320px_1fr_240px]">
+              <aside>
+                <div className="rounded-2xl border border-gray-100 bg-white p-4 xl:sticky xl:top-4 xl:z-10 xl:max-h-[calc(100vh-2rem)] xl:overflow-auto">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-base font-bold text-gray-900">就诊时间轴</div>
@@ -766,8 +767,8 @@ export default function ClientDetail() {
                 </div>
               </section>
 
-              <aside className="hidden xl:block self-start">
-                <div className="rounded-2xl border border-gray-100 bg-white p-4 xl:sticky xl:top-4 xl:z-10">
+              <aside className="hidden xl:block">
+                <div className="rounded-2xl border border-gray-100 bg-white p-4 xl:sticky xl:top-4 xl:z-10 xl:max-h-[calc(100vh-2rem)] xl:overflow-auto">
                   <div className="text-sm font-bold text-gray-900">目录</div>
                   <div className="mt-3 space-y-2 text-sm">
                     {[
@@ -788,6 +789,13 @@ export default function ClientDetail() {
                   </div>
                 </div>
               </aside>
+            </div>
+          )}
+
+          {activeTab === "glasses" && (
+            <div className="rounded-2xl border border-gray-100 bg-white p-6">
+              <div className="text-base font-bold text-gray-900">配镜记录</div>
+              <div className="mt-2 text-sm text-gray-500">配镜相关记录卡片内容，暂且占位，后续开发。</div>
             </div>
           )}
 
