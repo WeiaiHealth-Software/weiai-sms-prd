@@ -9,7 +9,7 @@ export function MainLayout() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   return (
-    <div className="text-gray-800 font-sans antialiased h-screen flex overflow-hidden bg-[#f3f4f6]">
+    <div className="text-gray-800 font-sans antialiased h-screen flex overflow-x-hidden bg-[#f3f4f6]">
       {/* Sidebar */}
       <Sidebar />
 
@@ -20,7 +20,7 @@ export function MainLayout() {
 
         {/* Main Content Scroll Area */}
         <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          <div className="mx-auto h-full">
+          <div className="mx-auto">
             <Outlet />
           </div>
         </main>

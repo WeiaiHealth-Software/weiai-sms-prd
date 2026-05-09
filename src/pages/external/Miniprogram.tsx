@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/static-components */
 import { useState } from "react";
 import { Eye, ShieldCheck, CalendarCheck, Eyeglasses, Stethoscope, ShoppingBag, Bell, X, MapPin, Users, User, Question, ChatCircleDots, Info, QrCode, CaretRight, WechatLogo, UsersThree, EnvelopeSimple, Crown, Plus, HouseLine, GenderMale, GenderFemale, IdentificationCard, Cake, PencilSimple } from "@phosphor-icons/react";
 import clsx from "clsx";

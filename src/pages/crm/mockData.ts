@@ -570,8 +570,9 @@ export const appointments: Appointment[] = [
 
 export const followups: Followup[] = [
   { id: "f1", patient: "顾景川", latestVisit: "2026-04-27", diagnosis: "OK镜复查", treatment: "镜片复查", reviewDate: "2026-05-15", status: "待跟进", result: "未联系", owner: "刘嘉程" },
-  { id: "f2", patient: "周沐言", latestVisit: "2026-05-01", diagnosis: "近视进展期", treatment: "离焦镜片", reviewDate: "2026-06-01", status: "已联系", result: "家长确认复诊", owner: "王懿雯" },
+  { id: "f2", patient: "周沐言", latestVisit: "2026-05-01", diagnosis: "近视进展期", treatment: "离焦镜片", reviewDate: "2026-06-01", status: "待到店", result: "家长确认复诊", owner: "王懿雯" },
   { id: "f3", patient: "赵一宁", latestVisit: "2026-04-18", diagnosis: "视疲劳", treatment: "视觉训练", reviewDate: "2026-05-08", status: "已逾期", result: "三次未接通", owner: "陈意宁" },
+  { id: "f4", patient: "林舒予", latestVisit: "2026-04-23", diagnosis: "干眼伴视疲劳", treatment: "干眼治疗", reviewDate: "2026-05-23", status: "已联系", result: "已确认复诊时间", owner: "陈意宁" },
 ];
 
 export const historyVisits: Visit[] = [
@@ -733,4 +734,3 @@ export const visitDetailRecords: Record<string, VisitDetailRecord> = {
     },
   },
 };
-

@@ -1,7 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { ArrowLeft, Plus, Phone, UserCircle } from "@phosphor-icons/react";
-import { appointments, followups, historyVisits, patients, profileTagStandard, visitDetailRecords, type VisitDetailRecord } from "./mockData";
+import {
+  appointments,
+  followups,
+  historyVisits,
+  patients,
+  profileTagStandard,
+  visitDetailRecords,
+  type PatientProfile,
+  type VisitDetailRecord,
+} from "./mockData";
 
 function formatDateOnly(value?: string) {
   if (!value) return "-";
@@ -42,12 +51,12 @@ function GenderIcon({ gender }: { gender: "男" | "女" }) {
   );
 }
 
-function ProfileTags({ profile }: { profile?: Record<string, string> }) {
+function ProfileTags({ profile }: { profile?: PatientProfile }) {
   if (!profile) return null;
   return (
     <div className="flex flex-wrap gap-2">
       {profileTagStandard.map((group) => {
-        const value = profile[group.key];
+        const value = profile[group.key as keyof PatientProfile];
         if (!value) return null;
         const option = group.options.find((o) => o.value === value);
         const className = option?.className ?? "border-slate-200 bg-white text-slate-500";
@@ -90,11 +99,6 @@ export default function ClientDetail() {
   );
   const [visitDraft, setVisitDraft] = useState<VisitDetailRecord>(effectiveVisitDetail);
   const [savedAt, setSavedAt] = useState(0);
-
-  useEffect(() => {
-    setVisitEditMode(false);
-    setVisitDraft(effectiveVisitDetail);
-  }, [effectiveVisitDetail, selectedVisitId]);
 
   const patientAppointments = useMemo(
     () => appointments.filter((a) => a.patient === patient.name),
@@ -168,12 +172,12 @@ export default function ClientDetail() {
                 </div>
               </div>
             </div>
-            <ProfileTags profile={patient.profile as any} />
+            <ProfileTags profile={patient.profile} />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
+      <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-visible">
         <div className="border-b border-gray-100 bg-gray-50 px-5 pt-4">
           <div className="flex flex-wrap items-end gap-2">
             {tabs.map((t) => (
@@ -194,36 +198,42 @@ export default function ClientDetail() {
 
         <div className="p-5">
           {activeTab === "visits" && (
-            <div className="grid gap-5 xl:grid-cols-[320px_1fr_240px]">
-              <aside className="rounded-2xl border border-gray-100 bg-white p-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="text-base font-bold text-gray-900">就诊时间轴</div>
-                    <div className="mt-1 text-sm text-gray-500">默认定位到最新一次就诊记录</div>
+            <div className="grid gap-5 xl:grid-cols-[320px_1fr_240px] xl:items-start">
+              <aside className="self-start">
+                <div className="rounded-2xl border border-gray-100 bg-white p-4 xl:sticky xl:top-4 xl:z-10">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-base font-bold text-gray-900">就诊时间轴</div>
+                      <div className="mt-1 text-sm text-gray-500">默认定位到最新一次就诊记录</div>
+                    </div>
+                    <span className="rounded-xl bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
+                      共 {historyVisits.length} 次
+                    </span>
                   </div>
-                  <span className="rounded-xl bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
-                    共 {historyVisits.length} 次
-                  </span>
-                </div>
-                <div className="mt-4 space-y-2">
-                  {historyVisits.map((v) => (
-                    <button
-                      key={v.id}
-                      onClick={() => setSelectedVisitId(v.id)}
-                      className={
-                        v.id === selectedVisitId
-                          ? "w-full rounded-xl border border-primary-100 bg-primary-50 p-3 text-left"
-                          : "w-full rounded-xl border border-gray-100 bg-white p-3 text-left hover:bg-gray-50"
-                      }
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="font-bold text-gray-900">{v.date}</div>
-                        <span className="text-xs font-semibold text-gray-500">{v.title}</span>
-                      </div>
-                      <div className="mt-2 text-sm font-semibold text-gray-700 line-clamp-1">{v.diagnosis}</div>
-                      <div className="mt-1 text-xs text-gray-500 line-clamp-1">{v.summary}</div>
-                    </button>
-                  ))}
+                  <div className="mt-4 space-y-2">
+                    {historyVisits.map((v) => (
+                      <button
+                        key={v.id}
+                        onClick={() => {
+                          setVisitEditMode(false);
+                          setVisitDraft(visitOverrides[v.id] ?? visitDetailRecords[v.id] ?? visitDetailRecords.v1);
+                          setSelectedVisitId(v.id);
+                        }}
+                        className={
+                          v.id === selectedVisitId
+                            ? "w-full rounded-xl border border-primary-100 bg-primary-50 p-3 text-left"
+                            : "w-full rounded-xl border border-gray-100 bg-white p-3 text-left hover:bg-gray-50"
+                        }
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="font-bold text-gray-900">{v.date}</div>
+                          <span className="text-xs font-semibold text-gray-500">{v.title}</span>
+                        </div>
+                        <div className="mt-2 text-sm font-semibold text-gray-700 line-clamp-1">{v.diagnosis}</div>
+                        <div className="mt-1 text-xs text-gray-500 line-clamp-1">{v.summary}</div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </aside>
 
@@ -258,7 +268,10 @@ export default function ClientDetail() {
                     {!visitEditMode ? (
                       <button
                         className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:bg-gray-100"
-                        onClick={() => setVisitEditMode(true)}
+                        onClick={() => {
+                          setVisitDraft(effectiveVisitDetail);
+                          setVisitEditMode(true);
+                        }}
                       >
                         编辑内容
                       </button>
@@ -613,30 +626,34 @@ export default function ClientDetail() {
                       <div className="rounded-2xl bg-gray-50 p-5">
                         <div className="text-sm font-bold text-gray-900">处方</div>
                         <div className="mt-4 grid gap-4 sm:grid-cols-4">
-                          {[
-                            { key: "drug", label: "药品名" },
-                            { key: "quantity", label: "数量" },
-                            { key: "spec", label: "规格" },
-                            { key: "unit", label: "单位" },
-                          ].map((f) => (
+                          {(
+                            [
+                              { key: "drug", label: "药品名" },
+                              { key: "quantity", label: "数量" },
+                              { key: "spec", label: "规格" },
+                              { key: "unit", label: "单位" },
+                            ] as const
+                          ).map((f) => (
                             <div key={f.key}>
                               <div className="text-xs font-semibold text-gray-400">{f.label}</div>
                               <div className="mt-2 text-sm font-semibold text-gray-900">
-                                {(effectiveVisitDetail.treatment.prescription as any)[f.key] || (f.key === "quantity" ? "0" : "无数据")}
+                                {effectiveVisitDetail.treatment.prescription[f.key] || (f.key === "quantity" ? "0" : "无数据")}
                               </div>
                             </div>
                           ))}
                         </div>
                         <div className="mt-4 grid gap-4 sm:grid-cols-3">
-                          {[
-                            { key: "price", label: "单价" },
-                            { key: "eye", label: "眼别" },
-                            { key: "usage", label: "用法" },
-                          ].map((f) => (
+                          {(
+                            [
+                              { key: "price", label: "单价" },
+                              { key: "eye", label: "眼别" },
+                              { key: "usage", label: "用法" },
+                            ] as const
+                          ).map((f) => (
                             <div key={f.key}>
                               <div className="text-xs font-semibold text-gray-400">{f.label}</div>
                               <div className="mt-2 text-sm font-semibold text-gray-900">
-                                {(effectiveVisitDetail.treatment.prescription as any)[f.key] || "无数据"}
+                                {effectiveVisitDetail.treatment.prescription[f.key] || "无数据"}
                               </div>
                             </div>
                           ))}
@@ -749,27 +766,25 @@ export default function ClientDetail() {
                 </div>
               </section>
 
-              <aside className="hidden xl:block">
-                <div className="sticky top-4">
-                  <div className="rounded-2xl border border-gray-100 bg-white p-4">
-                    <div className="text-sm font-bold text-gray-900">目录</div>
-                    <div className="mt-3 space-y-2 text-sm">
-                      {[
-                        { id: "visit-overview", label: "本次就诊详情" },
-                        { id: "visit-basic", label: "基本信息 / 诊断" },
-                        { id: "visit-chief", label: "主诉与病史" },
-                        { id: "visit-exams", label: "检查" },
-                        { id: "visit-treatment", label: "处理" },
-                      ].map((item) => (
-                        <button
-                          key={item.id}
-                          className="block w-full rounded-xl border border-gray-100 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 hover:bg-gray-100 active:bg-gray-200"
-                          onClick={() => document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
+              <aside className="hidden xl:block self-start">
+                <div className="rounded-2xl border border-gray-100 bg-white p-4 xl:sticky xl:top-4 xl:z-10">
+                  <div className="text-sm font-bold text-gray-900">目录</div>
+                  <div className="mt-3 space-y-2 text-sm">
+                    {[
+                      { id: "visit-overview", label: "本次就诊详情" },
+                      { id: "visit-basic", label: "基本信息 / 诊断" },
+                      { id: "visit-chief", label: "主诉与病史" },
+                      { id: "visit-exams", label: "检查" },
+                      { id: "visit-treatment", label: "处理" },
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        className="block w-full rounded-xl border border-gray-100 bg-gray-50 px-3 py-2 text-left font-semibold text-gray-700 hover:bg-gray-100 active:bg-gray-200"
+                        onClick={() => document.getElementById(item.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </aside>
@@ -883,4 +898,3 @@ export default function ClientDetail() {
     </div>
   );
 }
-

@@ -147,27 +147,9 @@ export default function ClientList() {
   const pageItems = getPageItems(totalPages, currentPage);
 
   return (
-    <div className="h-full flex flex-col gap-6">
+    <div className="min-h-full flex flex-col gap-6">
       <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
         <div className="border-b border-gray-100">
-          <div className="flex flex-col gap-4 p-5 xl:flex-row xl:items-center xl:justify-between">
-            <div>
-              <div className="text-lg font-bold text-gray-900">客户列表</div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
-                <DownloadSimple weight="bold" className="h-4 w-4" />
-                导出
-              </button>
-              <button className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600 active:bg-primary-700">
-                <Plus weight="bold" className="h-4 w-4" />
-                新增档案
-              </button>
-            </div>
-          </div>
-
-          <div className="border-b border-gray-100"></div>
-
           <div className="p-5 grid gap-3 xl:grid-cols-[1.42fr_0.66fr_0.82fr_1.42fr_auto] xl:items-center">
             <input
               value={keyword}
@@ -244,6 +226,15 @@ export default function ClientList() {
               >
                 搜索
               </button>
+              <span aria-hidden="true" className="h-6 w-px bg-gray-200"></span>
+              <button className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 active:bg-gray-100">
+                <DownloadSimple weight="bold" className="h-4 w-4" />
+                导出
+              </button>
+              <button className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-600 active:bg-primary-700">
+                <Plus weight="bold" className="h-4 w-4" />
+                新增档案
+              </button>
             </div>
           </div>
         </div>
@@ -289,12 +280,7 @@ export default function ClientList() {
                   </td>
                   <td className="px-5 py-4">
                     <div className="flex items-center gap-2 text-sm">
-                      <span className="text-gray-500">本次:</span>
                       <span className="font-semibold text-gray-900">{formatDateOnly(p.latestVisit)}</span>
-                    </div>
-                    <div className="mt-2 flex items-center gap-2 text-sm">
-                      <span className="text-gray-500">复查:</span>
-                      <span className="font-semibold text-gray-800">{formatDateOnly(p.nextReview)}</span>
                     </div>
                   </td>
                   <td className="px-5 py-4">
@@ -410,4 +396,3 @@ export default function ClientList() {
     </div>
   );
 }
-

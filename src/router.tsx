@@ -11,6 +11,8 @@ import ClientList from "./pages/crm/ClientList";
 import ClientDetail from "./pages/crm/ClientDetail";
 import ClientVisitNew from "./pages/crm/ClientVisitNew";
 import ClientFollowupNew from "./pages/crm/ClientFollowupNew";
+import Booking from "./pages/crm/Booking";
+import Followup from "./pages/crm/Followup";
 
 import ScreenList from "./pages/external/ScreenList";
 import Miniprogram from "./pages/external/Miniprogram";
@@ -26,6 +28,8 @@ const genericRoutes = menuConfig.flatMap((item) =>
           "/store/room",
           "/store/schedule",
           "/crm/client-list",
+          "/crm/booking",
+          "/crm/followup",
         ].includes(sub.path)
     )
     .map((sub) => ({
@@ -67,6 +71,14 @@ export const router = createHashRouter([
       {
         path: "crm/client-list",
         element: <ClientList />,
+      },
+      {
+        path: "crm/booking",
+        element: <Booking />,
+      },
+      {
+        path: "crm/followup",
+        element: <Followup />,
       },
       {
         path: "crm/client/:id",
