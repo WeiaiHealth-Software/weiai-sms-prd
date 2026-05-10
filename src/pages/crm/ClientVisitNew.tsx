@@ -20,7 +20,6 @@ export default function ClientVisitNew() {
 
   const [doctor, setDoctor] = useState(seed.basicInfo.doctor);
   const [optometrist, setOptometrist] = useState(seed.basicInfo.optometrist);
-  const [cycloplegia, setCycloplegia] = useState(seed.basicInfo.cycloplegia);
   const [eye, setEye] = useState(seed.chiefHistory.eye);
   const [symptom, setSymptom] = useState(seed.chiefHistory.symptom);
   const [duration, setDuration] = useState(seed.chiefHistory.duration);
@@ -88,7 +87,7 @@ export default function ClientVisitNew() {
           </section>
           <section className="rounded-2xl border border-gray-100 bg-white p-5">
             <div className="text-base font-bold text-gray-900">基本信息</div>
-            <div className="mt-4 grid gap-4 lg:grid-cols-3">
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
               <div>
                 <div className="text-sm text-gray-500">医生</div>
                 <input
@@ -102,14 +101,6 @@ export default function ClientVisitNew() {
                 <input
                   value={optometrist}
                   onChange={(e) => setOptometrist(e.target.value)}
-                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                />
-              </div>
-              <div>
-                <div className="text-sm text-gray-500">散瞳</div>
-                <input
-                  value={cycloplegia}
-                  onChange={(e) => setCycloplegia(e.target.value)}
                   className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
                 />
               </div>
@@ -127,8 +118,8 @@ export default function ClientVisitNew() {
                   className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
                 >
                   <option value="双眼">双眼</option>
-                  <option value="右眼">右眼</option>
-                  <option value="左眼">左眼</option>
+                  <option value="右眼">右眼（OD）</option>
+                  <option value="左眼">左眼（OS）</option>
                 </select>
               </div>
               <div>
@@ -224,4 +215,3 @@ export default function ClientVisitNew() {
     </div>
   );
 }
-

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 
 import { Link, useLocation, useNavigate } from "react-router";
@@ -39,8 +40,8 @@ export function Sidebar() {
       )}
     >
       {/* Logo Area */}
-      <div className="h-20 flex items-center px-6 border-b border-gray-100 flex-none">
-        <div className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
+      <div className="h-20 flex items-center px-4 border-b border-gray-100 flex-none">
+        <div className="flex items-center justify-center gap-3 overflow-hidden whitespace-nowrap">
           <div className="w-8 h-8 flex-none text-primary-500">
             <svg
               className="w-full h-full"
@@ -155,26 +156,25 @@ export function Sidebar() {
       >
         {!isCollapsed && (
           <div className="flex items-center gap-3 overflow-hidden transition-all duration-300 ease-in-out">
-            <button className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-500 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition flex-none shadow-sm bg-white group">
+            <button className="w-10 h-10 rounded-xl border border-gray-200 flex items-center justify-center text-gray-600 hover:text-primary-600 hover:border-primary-200 hover:bg-primary-50 transition flex-none shadow-sm bg-white group">
               <ArrowsClockwise
-                weight="bold"
                 className="text-lg group-hover:rotate-180 transition-transform duration-500"
               />
             </button>
             <div className="flex flex-col whitespace-nowrap overflow-hidden">
-              <span className="font-normal text-gray-900 text-sm leading-none">v1.0.0</span>
-              <span className="text-xs text-gray-400 mt-1 font-mono">ReactVer</span>
+              <span className="font-normal text-gray-800 text-sm leading-none">v1.0.0</span>
+              <span className="text-xs text-gray-400 mt-1 font-mono">commitid:xjk6k98</span>
             </div>
           </div>
         )}
         <button
           onClick={toggleSidebar}
-          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition flex-none"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-600 hover:bg-primary-50 hover:text-primary-600 transition flex-none"
         >
           {isCollapsed ? (
-            <ArrowLineRight weight="bold" className="text-xl" />
+            <ArrowLineRight className="text-xl" />
           ) : (
-            <ArrowLineLeft weight="bold" className="text-xl" />
+            <ArrowLineLeft className="text-xl" />
           )}
         </button>
       </div>

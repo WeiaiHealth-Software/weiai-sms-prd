@@ -26,6 +26,23 @@ function getAxialDeltaTagClass(delta: number) {
   return delta >= 0.2 ? "border-rose-200 bg-rose-50 text-rose-700" : "border-emerald-200 bg-emerald-50 text-emerald-700";
 }
 
+function AxialDeltaTag({ delta }: { delta?: number | null }) {
+  const missing = delta == null || Number.isNaN(delta);
+  const className = missing ? "border-gray-200 bg-gray-50 text-gray-500" : getAxialDeltaTagClass(delta);
+  return (
+    <span className={`ml-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${className}`}>
+      {missing ? (
+        <span>--</span>
+      ) : (
+        <>
+          <span aria-hidden="true">{delta >= 0 ? "▲" : "▼"}</span>
+          <span>{formatFixed2(Math.abs(delta))}</span>
+        </>
+      )}
+    </span>
+  );
+}
+
 function getPageItems(totalPages: number, currentPage: number) {
   if (totalPages <= 7) return Array.from({ length: totalPages }, (_, idx) => idx + 1);
   const pages = new Set<number>([1, totalPages, currentPage - 1, currentPage, currentPage + 1]);
@@ -79,6 +96,7 @@ function ProfileTags({ profile }: { profile?: PatientProfile }) {
   return (
     <div className="flex flex-wrap gap-2">
       {profileTagStandard.map((group) => {
+        if (group.key === "reviewStatus") return null;
         const value = profile[group.key as keyof PatientProfile];
         if (!value) return null;
         const option = group.options.find((o) => o.value === value);
@@ -97,7 +115,6 @@ export default function ClientList() {
   const navigate = useNavigate();
   const [data, setData] = useState<Patient[]>(patients);
   const [keyword, setKeyword] = useState("");
-  const [followStatus, setFollowStatus] = useState("全部跟进状态");
   const [followupType, setFollowupType] = useState("回访项目类型");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -105,7 +122,6 @@ export default function ClientList() {
   const [deleteCandidate, setDeleteCandidate] = useState<Patient | null>(null);
   const [applied, setApplied] = useState({
     keyword: "",
-    followStatus: "全部跟进状态",
     followupType: "回访项目类型",
     startDate: "",
     endDate: "",
@@ -120,11 +136,6 @@ export default function ClientList() {
       if (query) {
         const haystack = normalizeForSearch(`${p.name}${p.mobile}${p.no}`);
         if (!haystack.includes(query)) return false;
-      }
-
-      if (applied.followStatus !== "全部跟进状态") {
-        const status = p.profile?.reviewStatus ?? "";
-        if (status !== applied.followStatus) return false;
       }
 
       if (applied.followupType !== "回访项目类型") {
@@ -160,24 +171,13 @@ export default function ClientList() {
     <div className="min-h-full flex flex-col gap-6">
       <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
         <div className="border-b border-gray-100">
-          <div className="p-5 grid gap-3 xl:grid-cols-[1.42fr_0.66fr_0.82fr_1.42fr_auto] xl:items-center">
+          <div className="p-5 grid gap-3 xl:grid-cols-[1.42fr_0.82fr_1.42fr_auto] xl:items-center">
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none placeholder:text-gray-400 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
               placeholder="搜索姓名 / 手机号 / 患者编号"
             />
-            <select
-              value={followStatus}
-              onChange={(e) => setFollowStatus(e.target.value)}
-              className="rounded-xl border border-gray-200 bg-white px-3.5 py-3 text-sm text-gray-700 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-            >
-              <option>全部跟进状态</option>
-              <option>跟进中</option>
-              <option>待复查</option>
-              <option>已终止</option>
-              <option>已就诊</option>
-            </select>
             <select
               value={followupType}
               onChange={(e) => setFollowupType(e.target.value)}
@@ -210,13 +210,11 @@ export default function ClientList() {
               <button
                 onClick={() => {
                   setKeyword("");
-                  setFollowStatus("全部跟进状态");
                   setFollowupType("回访项目类型");
                   setStartDate("");
                   setEndDate("");
                   setApplied({
                     keyword: "",
-                    followStatus: "全部跟进状态",
                     followupType: "回访项目类型",
                     startDate: "",
                     endDate: "",
@@ -229,7 +227,7 @@ export default function ClientList() {
               </button>
               <button
                 onClick={() => {
-                  setApplied({ keyword, followStatus, followupType, startDate, endDate });
+                  setApplied({ keyword, followupType, startDate, endDate });
                   setPage(1);
                 }}
                 className="rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-600 active:bg-primary-700"
@@ -254,10 +252,10 @@ export default function ClientList() {
             <thead className="bg-gray-50 text-xs uppercase tracking-[0.18em] text-gray-400">
               <tr>
                 <th className="px-5 py-4 font-semibold">客户信息</th>
-                <th className="px-5 py-4 font-semibold">联系方式</th>
                 <th className="px-5 py-4 font-semibold">用户标签</th>
                 <th className="px-5 py-4 font-semibold">就诊日期</th>
                 <th className="px-5 py-4 font-semibold">数据记录</th>
+                <th className="px-5 py-4 font-semibold">诊断</th>
                 <th className="px-5 py-4 font-semibold">操作</th>
               </tr>
             </thead>
@@ -273,13 +271,10 @@ export default function ClientList() {
                             <span className="font-bold text-gray-900 hover:text-primary-600">{p.name}</span>
                             <span className="text-xs text-gray-400">{p.age}岁</span>
                           </div>
-                          <div className="mt-1 text-xs text-gray-500">{p.no}</div>
+                          <div className="mt-1 text-xs text-gray-500">{p.mobile}</div>
                         </div>
                       </div>
                     </button>
-                  </td>
-                  <td className="px-5 py-4 whitespace-nowrap">
-                    <div className="font-semibold text-gray-800">{p.mobile}</div>
                   </td>
                   <td className="px-5 py-4">
                     <ProfileTags profile={p.profile} />
@@ -294,30 +289,21 @@ export default function ClientList() {
                       <div className="max-w-[520px] truncate whitespace-nowrap text-sm font-semibold text-gray-800">
                         <span className="text-gray-500">眼轴：</span>
                         <span className="text-gray-900">
-                          OD {formatFixed2(p.axial.od)}{" "}
-                          {p.axialDelta?.od != null && (
-                            <span
-                              className={`ml-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${getAxialDeltaTagClass(
-                                p.axialDelta.od
-                              )}`}
-                            >
-                              <span aria-hidden="true">{p.axialDelta.od >= 0 ? "▲" : "▼"}</span>
-                              <span>{formatFixed2(Math.abs(p.axialDelta.od))}</span>
-                            </span>
-                          )}
+                          OD {formatFixed2(p.axial.od)}
+                          <AxialDeltaTag delta={p.axialDelta?.od} />
                           <span aria-hidden="true" className="mx-3 inline-flex h-4 w-px bg-gray-200 align-middle"></span>
-                          OS {formatFixed2(p.axial.os)}{" "}
-                          {p.axialDelta?.os != null && (
-                            <span
-                              className={`ml-1 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${getAxialDeltaTagClass(
-                                p.axialDelta.os
-                              )}`}
-                            >
-                              <span aria-hidden="true">{p.axialDelta.os >= 0 ? "▲" : "▼"}</span>
-                              <span>{formatFixed2(Math.abs(p.axialDelta.os))}</span>
-                            </span>
-                          )}
+                          OS {formatFixed2(p.axial.os)}
+                          <AxialDeltaTag delta={p.axialDelta?.os} />
                         </span>
+                      </div>
+                    ) : (
+                      <div className="text-sm font-semibold text-gray-400">-</div>
+                    )}
+                  </td>
+                  <td className="px-5 py-4">
+                    {p.diagnosisNote ? (
+                      <div className="max-w-[420px] truncate whitespace-nowrap text-sm font-semibold text-gray-800">
+                        {p.diagnosisNote}
                       </div>
                     ) : (
                       <div className="text-sm font-semibold text-gray-400">-</div>

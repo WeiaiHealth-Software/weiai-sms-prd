@@ -192,7 +192,7 @@
               <div class="flex items-center gap-3">
                 <div class="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 xl:flex">
                   <div class="text-xs text-slate-500">当前门店</div>
-                  <div class="font-medium text-ink">惟爱上海海华医院</div>
+                  <div class="font-medium text-ink">徐汇旗舰店</div>
                 </div>
                 <div class="hidden items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 lg:flex">
                   <div class="text-xs text-slate-500">今日提醒</div>
@@ -227,7 +227,7 @@
           gender: "女",
           age: 12,
           mobile: "138 1712 0291",
-          store: "惟爱上海海华医院",
+          store: "徐汇旗舰店",
           owner: "王懿雯",
           latestVisit: "2026-05-01 10:20",
           nextReview: "2026-06-01",
@@ -298,7 +298,7 @@
       ];
 
       const appointments = [
-        { id: "a1", patient: "周沐言", time: "09:00-09:30", date: "2026-05-12", store: "惟爱上海海华医院", room: "2号诊室", source: "小程序预约", issue: "复查视力变化", solution: "验光检查", status: "已确认", tags: "复诊 / 会员", note: "需家长陪同" },
+        { id: "a1", patient: "周沐言", time: "09:00-09:30", date: "2026-05-12", store: "徐汇旗舰店", room: "2号诊室", source: "小程序预约", issue: "复查视力变化", solution: "验光检查", status: "已确认", tags: "复诊 / 会员", note: "需家长陪同" },
         { id: "a2", patient: "顾景川", time: "10:30-11:00", date: "2026-05-12", store: "静安门店", room: "1号诊室", source: "后台代预约", issue: "OK镜复查", solution: "复查+镜片检查", status: "待到诊", tags: "OK镜", note: "需测角膜曲率" },
         { id: "a3", patient: "林舒予", time: "14:00-14:30", date: "2026-05-12", store: "浦东中心店", room: "3号诊室", source: "小程序预约", issue: "干眼回访", solution: "复诊复评", status: "已改期", tags: "干眼 / 会员", note: "已改到周三" },
       ];
@@ -310,9 +310,9 @@
       ];
 
       const historyVisits = [
-        { id: "v1", date: "2026-05-01", title: "复查 · 惟爱上海海华医院", diagnosis: "青少年近视进展期", treatment: "离焦镜片 + 视觉训练", axial: "24.22mm", va: "4.8 / 4.9", summary: "眼轴增长较上次减缓，建议维持离焦方案并继续每晚训练。", review: "2026-06-01" },
-        { id: "v2", date: "2026-03-28", title: "复诊 · 惟爱上海海华医院", diagnosis: "近视控制中", treatment: "离焦镜片", axial: "24.17mm", va: "4.9 / 4.9", summary: "配镜适应良好，家长反馈配戴依从性高。", review: "2026-05-01" },
-        { id: "v3", date: "2026-02-14", title: "首诊 · 惟爱上海海华医院", diagnosis: "青少年近视", treatment: "离焦镜片评估", axial: "24.05mm", va: "4.7 / 4.8", summary: "完成首诊评估，建议进入近视防控方案。", review: "2026-03-28" },
+        { id: "v1", date: "2026-05-01", title: "复查 · 徐汇旗舰店", diagnosis: "青少年近视进展期", treatment: "离焦镜片 + 视觉训练", axial: "24.22mm", va: "4.8 / 4.9", summary: "眼轴增长较上次减缓，建议维持离焦方案并继续每晚训练。", review: "2026-06-01" },
+        { id: "v2", date: "2026-03-28", title: "复诊 · 徐汇旗舰店", diagnosis: "近视控制中", treatment: "离焦镜片", axial: "24.17mm", va: "4.9 / 4.9", summary: "配镜适应良好，家长反馈配戴依从性高。", review: "2026-05-01" },
+        { id: "v3", date: "2026-02-14", title: "首诊 · 徐汇旗舰店", diagnosis: "青少年近视", treatment: "离焦镜片评估", axial: "24.05mm", va: "4.7 / 4.8", summary: "完成首诊评估，建议进入近视防控方案。", review: "2026-03-28" },
       ];
 
       const visitDetailRecords = {
@@ -476,6 +476,10 @@
         selectedVisitId: "v1",
         selectedMetric: "axial",
         visitEditMode: false,
+        archiveFlowMode: "create", // create | encounter
+        archiveSelectedModules: { clinic: true, training: false, fitting: false, billing: false },
+        archiveModuleExpanded: { clinic: true, training: false, fitting: false, billing: false },
+        archiveModuleStatus: { clinic: "草稿", training: "未录入", fitting: "未录入", billing: "未录入" },
         tagFilter: "全部类型",
         tagModalOpen: false,
         tagPage: 1,
@@ -750,8 +754,8 @@
             "把客户档案做成真正的工作入口",
             "保留旧系统核心字段不变，但通过更清晰的筛选、更顺滑的详情联动和更高频的快捷动作，让验光师能在一个页面完成建档、预约、回访和档案查看。",
             [
-              { label: "新增档案" },
-              { label: "新增预约", page: "appointments", primary: true },
+              { label: "新增档案", page: "new-archive", primary: true },
+              { label: "新增预约", page: "appointments" },
             ]
           )}
 
@@ -828,7 +832,7 @@
                     </svg>
                     导出
                   </button>
-                  <button class="inline-flex items-center gap-2 rounded-2xl bg-brand px-4 py-2 text-sm font-medium text-white">
+                  <button data-page="new-archive" data-flow="create" class="inline-flex items-center gap-2 rounded-2xl bg-brand px-4 py-2 text-sm font-medium text-white">
                     <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
                       <path d="M10 4v12"></path>
                       <path d="M4 10h12"></path>
@@ -944,7 +948,7 @@
                         <td class="px-5 py-4">
                           <div class="flex min-w-[132px] flex-col gap-2">
                             <button data-select-patient="${p.id}" data-page="detail" class="w-full rounded-xl bg-brandSoft px-3 py-2 text-xs font-medium text-brand">查看档案</button>
-                            <button data-select-patient="${p.id}" data-page="new-visit" class="w-full rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">新增就诊记录</button>
+                            <button data-select-patient="${p.id}" data-page="new-archive" data-flow="encounter" class="w-full rounded-xl bg-slate-100 px-3 py-2 text-xs font-medium text-slate-600">新增就诊单</button>
                             <button data-page="followups" class="w-full rounded-xl bg-rose-50 px-3 py-2 text-xs font-medium text-rose-600">发起回访</button>
                           </div>
                         </td>
@@ -1428,14 +1432,14 @@
               </div>
             </div>
             <div class="grid grid-cols-2 gap-3 xl:grid-cols-2">
-              <button data-page="new-visit" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:shadow-soft">
+              <button data-page="new-archive" data-flow="encounter" data-select-patient="${patient.id}" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:shadow-soft">
                 <span class="inline-flex h-5 w-5 items-center justify-center text-white">
                   <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path d="M10 4v12"></path>
                     <path d="M4 10h12"></path>
                   </svg>
                 </span>
-                <span>新增档案</span>
+                <span>新增就诊单</span>
               </button>
               <button data-page="appointments" class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-brand px-4 py-3 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:shadow-soft">
                 <span class="inline-flex h-5 w-5 items-center justify-center text-white">
@@ -1639,6 +1643,274 @@
         `;
       }
 
+      function renderNewArchivePage() {
+        const flowMode = state.archiveFlowMode || "create";
+        const isEncounter = flowMode === "encounter";
+        const patient = isEncounter ? patients.find((p) => p.id === state.selectedPatientId) || patients[0] : null;
+        pageTitle.textContent = isEncounter ? "新增就诊单" : "新增档案";
+
+        const modules = [
+          { key: "clinic", label: "就诊档案", desc: "检查 / 诊断 / 处理 / 复查建议" },
+          { key: "training", label: "视光训练", desc: "视训项目与训练数据" },
+          { key: "fitting", label: "配镜记录", desc: "处方与配镜参数" },
+          { key: "billing", label: "收费详情", desc: "收费单与支付状态" },
+        ];
+
+        const selected = state.archiveSelectedModules || {};
+        const expanded = state.archiveModuleExpanded || {};
+        const status = state.archiveModuleStatus || {};
+        const anySelected = modules.some((m) => selected[m.key]);
+
+        function modulePill(m) {
+          const active = !!selected[m.key];
+          return `
+            <button data-toggle-archive-module="${m.key}" class="inline-flex items-center gap-2 rounded-2xl border px-3 py-2 text-sm font-medium transition ${
+              active ? "border-brand/15 bg-brandSoft text-brand" : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+            }">
+              <span class="inline-flex h-4 w-4 items-center justify-center rounded-md border ${active ? "border-brand bg-brand text-white" : "border-slate-300 bg-white text-slate-400"}">
+                ${active ? "✓" : ""}
+              </span>
+              <span>${m.label}</span>
+            </button>
+          `;
+        }
+
+        function moduleCard(m) {
+          const active = !!selected[m.key];
+          const isExpanded = !!expanded[m.key];
+          const moduleStatus = status[m.key] || (active ? "草稿" : "未录入");
+
+          const header = `
+            <div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div>
+                <div class="flex items-center gap-3">
+                  <div class="text-lg font-semibold text-ink">${m.label}</div>
+                  <span class="inline-flex rounded-full border px-3 py-1 text-xs ${tagClass(moduleStatus)}">${moduleStatus}</span>
+                </div>
+                <div class="mt-1 text-sm text-slate-500">${m.desc}</div>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                ${
+                  active
+                    ? `
+                      <button data-complete-archive-module="${m.key}" class="rounded-2xl bg-slate-100 px-3 py-2 text-sm text-slate-600">
+                        ${moduleStatus === "已完成" ? "设为草稿" : "标记完成"}
+                      </button>
+                      <button data-toggle-archive-expand="${m.key}" class="rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-600">
+                        ${isExpanded ? "收起" : "展开"}
+                      </button>
+                      <button data-remove-archive-module="${m.key}" class="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-600">
+                        移除
+                      </button>
+                    `
+                    : `<button data-toggle-archive-module="${m.key}" class="rounded-2xl bg-brand px-3 py-2 text-sm font-medium text-white">添加录入</button>`
+                }
+              </div>
+            </div>
+          `;
+
+          if (!active) {
+            return `<div class="glass rounded-[28px] border border-white/70 p-5 shadow-card">${header}</div>`;
+          }
+
+          const bodyClinic = `
+            <div class="grid gap-4 md:grid-cols-2">
+              ${visitInput("主诉与病史", "", "textarea")}
+              ${visitInput("诊断", "", "textarea")}
+              ${visitInput("处理/医生建议", "", "textarea")}
+              <div class="grid gap-4 md:grid-cols-2">
+                ${visitInput("下次复查日期", "", "date")}
+                ${visitInput("回访项目类型", "离焦框架镜")}
+              </div>
+            </div>
+          `;
+
+          const bodyTraining = `
+            <div class="grid gap-4 md:grid-cols-2">
+              <label class="block">
+                <span class="mb-2 block text-sm text-slate-500">训练项目</span>
+                <select class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                  <option>视训</option>
+                  <option>哺光仪</option>
+                  <option>定期复查</option>
+                </select>
+              </label>
+              ${visitInput("训练时长（分钟）", "20")}
+              ${visitInput("训练完成度（%）", "90")}
+              ${visitInput("训练备注", "", "textarea")}
+            </div>
+          `;
+
+          const bodyFitting = `
+            <div class="grid gap-4 md:grid-cols-2">
+              <label class="block">
+                <span class="mb-2 block text-sm text-slate-500">镜片类型</span>
+                <select class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                  <option>离焦框架镜</option>
+                  <option>角膜塑形镜</option>
+                  <option>离焦软镜</option>
+                </select>
+              </label>
+              ${visitInput("配镜备注", "", "textarea")}
+              <div class="md:col-span-2 grid gap-4 md:grid-cols-4">
+                ${visitInput("右眼球镜", "-1.00")}
+                ${visitInput("右眼柱镜", "-0.50")}
+                ${visitInput("左眼球镜", "-1.50")}
+                ${visitInput("左眼柱镜", "-0.75")}
+              </div>
+            </div>
+          `;
+
+          const bodyBilling = `
+            <div class="grid gap-4 md:grid-cols-2">
+              ${visitInput("应收金额（元）", "0")}
+              ${visitInput("实收金额（元）", "0")}
+              <label class="block">
+                <span class="mb-2 block text-sm text-slate-500">支付方式</span>
+                <select class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                  <option>待支付</option>
+                  <option>微信支付</option>
+                  <option>支付宝</option>
+                  <option>现金</option>
+                </select>
+              </label>
+              <label class="block">
+                <span class="mb-2 block text-sm text-slate-500">收费状态</span>
+                <select class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                  <option>草稿</option>
+                  <option>已开单</option>
+                  <option>已支付</option>
+                  <option>已退款</option>
+                </select>
+              </label>
+            </div>
+          `;
+
+          const contentByKey = {
+            clinic: bodyClinic,
+            training: bodyTraining,
+            fitting: bodyFitting,
+            billing: bodyBilling,
+          }[m.key];
+
+          const summary = `
+            <div class="mt-4 rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
+              当前模块已选择录入。你可以继续编辑字段，也可以标记完成；本次服务单至少完成 1 个模块即可提交。
+            </div>
+          `;
+
+          return `
+            <div class="glass rounded-[28px] border border-white/70 p-5 shadow-card">
+              ${header}
+              ${isExpanded ? `<div class="mt-5 space-y-4">${contentByKey}</div>` : summary}
+            </div>
+          `;
+        }
+
+        const archiveInfo = isEncounter
+          ? `
+            <section class="mb-5 glass rounded-[30px] border border-white/70 p-5 shadow-card">
+              <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <div class="text-lg font-semibold text-ink">关联档案</div>
+                  <div class="mt-1 text-sm text-slate-500">本次为老客户新增“就诊单/服务单”，档案信息从客户档案详情带入。</div>
+                </div>
+                <button data-page="detail" data-select-patient="${patient?.id || "p1"}" class="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">返回档案详情</button>
+              </div>
+              <div class="mt-5 rounded-[26px] border border-slate-200 bg-white p-5">
+                <div class="flex flex-wrap items-center gap-3">
+                  <div class="display-font text-2xl text-ink">${patient?.name || "-"}</div>
+                  <div class="flex flex-wrap gap-2">${patient ? renderProfileTags(patient.profile) : ""}</div>
+                </div>
+                <div class="mt-2 text-sm text-slate-500">${patient?.no || "-"} · ${patient?.gender || "-"} · ${patient?.age || "-"}岁 · ${patient?.mobile || "-"}</div>
+              </div>
+            </section>
+          `
+          : `
+            <section class="mb-5 glass rounded-[30px] border border-white/70 p-5 shadow-card">
+              <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                <div>
+                  <div class="text-lg font-semibold text-ink">档案基础信息</div>
+                  <div class="mt-1 text-sm text-slate-500">先建档，再选择是否同时录入本次服务单（可选就诊/视训/配镜/收费）。</div>
+                </div>
+                <button data-page="customers" class="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">返回档案列表</button>
+              </div>
+              <div class="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                ${visitInput("姓名", "")}
+                ${visitInput("手机号", "")}
+                <label class="block">
+                  <span class="mb-2 block text-sm text-slate-500">性别</span>
+                  <select class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                    <option>女</option>
+                    <option>男</option>
+                  </select>
+                </label>
+                ${visitInput("出生日期", "", "date")}
+                <label class="block">
+                  <span class="mb-2 block text-sm text-slate-500">客户来源</span>
+                  <select class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                    <option>自然</option>
+                    <option>徐蔚</option>
+                    <option>美团</option>
+                    <option>小红书</option>
+                    <option>海华</option>
+                    <option>其他</option>
+                  </select>
+                </label>
+                <label class="block">
+                  <span class="mb-2 block text-sm text-slate-500">会员类型</span>
+                  <select class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700">
+                    <option>普通用户</option>
+                    <option>VIP</option>
+                    <option>SVIP</option>
+                  </select>
+                </label>
+              </div>
+            </section>
+          `;
+
+        return `
+          ${topHero(
+            isEncounter ? "新增就诊单（支持一次录多项）" : "新增档案（支持一次录多项）",
+            "把门店一次到院的录入从“分散四次填写”收敛为“1 张就诊单 + 可选模块”。你可以只录其中一项，也可以一次录入就诊/视训/配镜/收费。",
+            []
+          )}
+
+          ${archiveInfo}
+
+          <section class="mb-5 glass rounded-[30px] border border-white/70 p-5 shadow-card">
+            <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+              <div>
+                <div class="text-lg font-semibold text-ink">本次服务单（可选）</div>
+                <div class="mt-1 text-sm text-slate-500">支持单独录入一个模块，也支持一次录入多个模块。默认已勾选“就诊档案”。</div>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button data-archive-modules-all class="rounded-2xl bg-slate-100 px-4 py-2 text-sm text-slate-600">完整录入</button>
+                <button data-archive-modules-clear class="rounded-2xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-600">只建档</button>
+              </div>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-2">
+              ${modules.map(modulePill).join("")}
+            </div>
+            <div class="mt-5 space-y-4">
+              ${modules.map(moduleCard).join("")}
+            </div>
+          </section>
+
+          <div class="sticky bottom-4 mt-5 rounded-[26px] border border-slate-200 bg-white/90 p-4 shadow-card backdrop-blur">
+            <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+              <div class="text-sm text-slate-500">
+                ${anySelected ? "提示：至少完成 1 个模块即可提交就诊单；也可以只建档不创建服务单。" : "当前未选择任何模块：将只创建档案（不生成本次服务单）。"}
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <button data-archive-save class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-600">保存草稿</button>
+                <button data-archive-finish class="rounded-2xl bg-brand px-5 py-3 text-sm font-medium text-white">完成并返回</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
       function renderAppointmentsPage() {
         pageTitle.textContent = "预约管理";
         return `
@@ -1711,7 +1983,7 @@
               </div>
               <div class="mt-4 flex flex-wrap gap-2">
                 <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">今日视图</span>
-                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">惟爱上海海华医院</span>
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">徐汇旗舰店</span>
                 <span class="rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">待到诊 14</span>
               </div>
             </div>
@@ -2157,7 +2429,7 @@
                 <div class="text-lg font-semibold text-ink">就诊与检查数据</div>
                 <div class="mt-5 grid gap-4 md:grid-cols-2">
                   <label class="block"><span class="mb-2 block text-sm text-slate-500">就诊日期</span><input type="datetime-local" class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm" value="2026-05-12T10:30" /></label>
-                  <label class="block"><span class="mb-2 block text-sm text-slate-500">接诊门店</span><select class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm"><option>惟爱上海海华医院</option></select></label>
+                  <label class="block"><span class="mb-2 block text-sm text-slate-500">接诊门店</span><select class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm"><option>徐汇旗舰店</option></select></label>
                   <label class="block"><span class="mb-2 block text-sm text-slate-500">接诊验光师</span><select class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm"><option>王懿雯</option></select></label>
                   <label class="block"><span class="mb-2 block text-sm text-slate-500">就诊类型</span><select class="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm"><option>复查</option><option>首诊</option><option>复诊</option></select></label>
                   <label class="block md:col-span-2"><span class="mb-2 block text-sm text-slate-500">主诉</span><textarea class="h-24 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm">复查视力变化，家长关心眼轴控制效果。</textarea></label>
@@ -2241,6 +2513,7 @@
         const pages = {
           customers: renderCustomersPage,
           tags: renderTagsPage,
+          "new-archive": renderNewArchivePage,
           detail: renderDetailPage,
           appointments: renderAppointmentsPage,
           followups: renderFollowupsPage,
@@ -2265,6 +2538,14 @@
         if (pageEl) {
           const nextPage = pageEl.dataset.page;
           if (pageEl.dataset.selectPatient) state.selectedPatientId = pageEl.dataset.selectPatient;
+          if (nextPage === "new-archive") {
+            const flow = pageEl.dataset.flow || (pageEl.dataset.selectPatient ? "encounter" : "create");
+            state.archiveFlowMode = flow;
+            if (flow === "create") state.selectedPatientId = null;
+            state.archiveSelectedModules = { clinic: true, training: false, fitting: false, billing: false };
+            state.archiveModuleExpanded = { clinic: true, training: false, fitting: false, billing: false };
+            state.archiveModuleStatus = { clinic: "草稿", training: "未录入", fitting: "未录入", billing: "未录入" };
+          }
           if (pageEl.dataset.selectVisit) {
             state.selectedVisitId = pageEl.dataset.selectVisit;
             state.page = "history";
@@ -2302,6 +2583,76 @@
         if (closeTagModal) {
           state.tagModalOpen = false;
           state.tagColorDropdownOpen = false;
+          renderPage();
+          return;
+        }
+
+        const toggleArchiveModule = e.target.closest("[data-toggle-archive-module]");
+        if (toggleArchiveModule) {
+          const key = toggleArchiveModule.dataset.toggleArchiveModule;
+          const next = !state.archiveSelectedModules?.[key];
+          state.archiveSelectedModules = { ...state.archiveSelectedModules, [key]: next };
+          state.archiveModuleExpanded = { ...state.archiveModuleExpanded, [key]: next ? true : false };
+          state.archiveModuleStatus = { ...state.archiveModuleStatus, [key]: next ? "草稿" : "未录入" };
+          renderPage();
+          return;
+        }
+
+        const toggleArchiveExpand = e.target.closest("[data-toggle-archive-expand]");
+        if (toggleArchiveExpand) {
+          const key = toggleArchiveExpand.dataset.toggleArchiveExpand;
+          state.archiveModuleExpanded = { ...state.archiveModuleExpanded, [key]: !state.archiveModuleExpanded?.[key] };
+          renderPage();
+          return;
+        }
+
+        const removeArchiveModule = e.target.closest("[data-remove-archive-module]");
+        if (removeArchiveModule) {
+          const key = removeArchiveModule.dataset.removeArchiveModule;
+          state.archiveSelectedModules = { ...state.archiveSelectedModules, [key]: false };
+          state.archiveModuleExpanded = { ...state.archiveModuleExpanded, [key]: false };
+          state.archiveModuleStatus = { ...state.archiveModuleStatus, [key]: "未录入" };
+          renderPage();
+          return;
+        }
+
+        const completeArchiveModule = e.target.closest("[data-complete-archive-module]");
+        if (completeArchiveModule) {
+          const key = completeArchiveModule.dataset.completeArchiveModule;
+          const cur = state.archiveModuleStatus?.[key] || "草稿";
+          state.archiveModuleStatus = { ...state.archiveModuleStatus, [key]: cur === "已完成" ? "草稿" : "已完成" };
+          renderPage();
+          return;
+        }
+
+        const archiveAll = e.target.closest("[data-archive-modules-all]");
+        if (archiveAll) {
+          state.archiveSelectedModules = { clinic: true, training: true, fitting: true, billing: true };
+          state.archiveModuleExpanded = { clinic: true, training: true, fitting: false, billing: false };
+          state.archiveModuleStatus = { clinic: "草稿", training: "草稿", fitting: "草稿", billing: "草稿" };
+          renderPage();
+          return;
+        }
+
+        const archiveClear = e.target.closest("[data-archive-modules-clear]");
+        if (archiveClear) {
+          state.archiveSelectedModules = { clinic: false, training: false, fitting: false, billing: false };
+          state.archiveModuleExpanded = { clinic: false, training: false, fitting: false, billing: false };
+          state.archiveModuleStatus = { clinic: "未录入", training: "未录入", fitting: "未录入", billing: "未录入" };
+          renderPage();
+          return;
+        }
+
+        const archiveSave = e.target.closest("[data-archive-save]");
+        if (archiveSave) {
+          // 原型：仅保留状态，不做真实提交
+          renderPage();
+          return;
+        }
+
+        const archiveFinish = e.target.closest("[data-archive-finish]");
+        if (archiveFinish) {
+          state.page = state.archiveFlowMode === "encounter" ? "detail" : "customers";
           renderPage();
           return;
         }

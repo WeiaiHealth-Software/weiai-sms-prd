@@ -75,7 +75,7 @@ export function Header({ toggleSettings }: { toggleSettings: () => void }) {
           />
           <div className="hidden lg:block leading-tight">
             <p className="font-bold text-sm text-gray-900">张店长</p>
-            <p className="text-gray-500 text-[10px]">北京旗舰店</p>
+            <p className="text-gray-500 text-[10px]">惟爱 · 上海海华医院</p>
           </div>
         </div>
       </div>

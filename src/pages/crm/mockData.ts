@@ -59,13 +59,15 @@ export type Followup = {
 export type Visit = {
   id: string;
   date: string;
-  title: string;
+  personType: '初诊' | '复诊';
+  store: string;
   diagnosis: string;
   treatment: string;
   axial: string;
   va: string;
   summary: string;
   review: string;
+  visitTypes?: Array<"就诊" | "配镜" | "视光训练">;
 };
 
 export type VisitExamRow = {
@@ -76,7 +78,7 @@ export type VisitExamRow = {
 };
 
 export type VisitDetailRecord = {
-  basicInfo: { doctor: string; optometrist: string; cycloplegia: string };
+  basicInfo: { doctor: string; optometrist: string };
   chiefHistory: {
     eye: string;
     symptom: string;
@@ -152,7 +154,7 @@ export const patients: Patient[] = [
     gender: "女",
     age: 12,
     mobile: "138 1712 0291",
-    store: "徐汇旗舰店",
+    store: "惟爱 · 上海海华医院",
     owner: "王懿雯",
     latestVisit: "2026-05-01 10:20",
     nextReview: "2026-06-01",
@@ -207,7 +209,6 @@ export const patients: Patient[] = [
     treatment: "干眼治疗 + 训练计划",
     followupType: "定期复查",
     axial: { od: 24.12, os: 24.28 },
-    axialDelta: { od: 0.06, os: 0.05 },
     tags: ["干眼", "会员"],
     profile: { memberLevel: "SVIP", other: "新客户", reviewStatus: "已就诊" },
     followStatus: "已就诊",
@@ -221,7 +222,7 @@ export const patients: Patient[] = [
     gender: "女",
     age: 11,
     mobile: "137 2031 4489",
-    store: "徐汇旗舰店",
+    store: "惟爱 · 上海海华医院",
     owner: "王懿雯",
     latestVisit: "2026-04-18 11:05",
     nextReview: "2026-05-18",
@@ -230,7 +231,6 @@ export const patients: Patient[] = [
     treatment: "视觉训练",
     followupType: "视训",
     axial: { od: 25.02, os: 25.16 },
-    axialDelta: { od: 0.21, os: 0.14 },
     tags: ["高关注"],
     profile: { memberLevel: "普通用户", other: "新客户", reviewStatus: "跟进中" },
     followStatus: "跟进中",
@@ -253,7 +253,6 @@ export const patients: Patient[] = [
     treatment: "视功能评估",
     followupType: "定期复查",
     axial: { od: 23.92, os: 24.05 },
-    axialDelta: { od: 0.03, os: 0.02 },
     tags: ["首诊"],
     profile: { memberLevel: "普通用户", other: "新客户", reviewStatus: "待复查" },
     followStatus: "待复查",
@@ -275,6 +274,8 @@ export const patients: Patient[] = [
     diagnosisNote: "离焦镜片依从性良好，建议继续并记录每日佩戴时长。",
     treatment: "离焦镜片随访",
     followupType: "离焦框架镜",
+    axial: { od: 24.64, os: 24.79 },
+    axialDelta: { od: 0.08, os: -0.02 },
     tags: ["复诊"],
     profile: { memberLevel: "VIP", other: "老客户", reviewStatus: "跟进中" },
     followStatus: "跟进中",
@@ -296,6 +297,7 @@ export const patients: Patient[] = [
     diagnosisNote: "角膜曲率稳定，可进入OK镜试戴流程。",
     treatment: "OK镜试戴",
     followupType: "角膜塑形镜",
+    axial: { od: 23.74, os: 23.88 },
     tags: ["OK镜"],
     profile: { memberLevel: "SVIP", other: "新客户", reviewStatus: "跟进中" },
     followStatus: "跟进中",
@@ -309,7 +311,7 @@ export const patients: Patient[] = [
     gender: "女",
     age: 15,
     mobile: "136 9021 3370",
-    store: "徐汇旗舰店",
+    store: "惟爱 · 上海海华医院",
     owner: "王懿雯",
     latestVisit: "2026-04-02 10:05",
     nextReview: "2026-05-02",
@@ -317,6 +319,8 @@ export const patients: Patient[] = [
     diagnosisNote: "症状波动，建议规律热敷并配合人工泪液。",
     treatment: "用药 + 护理",
     followupType: "用药",
+    axial: { od: 25.1, os: 25.18 },
+    axialDelta: { od: 0.04, os: 0.01 },
     tags: ["干眼"],
     profile: { memberLevel: "VIP", other: "老客户", reviewStatus: "已就诊" },
     followStatus: "已就诊",
@@ -338,6 +342,8 @@ export const patients: Patient[] = [
     diagnosisNote: "佩戴舒适度可，需强化护理流程与复查频率。",
     treatment: "离焦软镜随访",
     followupType: "离焦软镜",
+    axial: { od: 24.42, os: 24.58 },
+    axialDelta: { od: 0.23, os: 0.17 },
     tags: ["复诊"],
     profile: { memberLevel: "普通用户", other: "老客户", reviewStatus: "待复查" },
     followStatus: "待复查",
@@ -351,7 +357,7 @@ export const patients: Patient[] = [
     gender: "男",
     age: 12,
     mobile: "139 7833 0422",
-    store: "徐汇旗舰店",
+    store: "惟爱 · 上海海华医院",
     owner: "王懿雯",
     latestVisit: "2026-04-15 09:50",
     nextReview: "2026-05-15",
@@ -359,6 +365,8 @@ export const patients: Patient[] = [
     diagnosisNote: "近两个月度数增长明显，建议调整干预组合方案。",
     treatment: "离焦镜片 + 训练",
     followupType: "离焦框架镜",
+    axial: { od: 25.6, os: 25.71 },
+    axialDelta: { od: 0.28, os: 0.19 },
     tags: ["高关注"],
     profile: { memberLevel: "SVIP", other: "老客户", reviewStatus: "跟进中" },
     followStatus: "跟进中",
@@ -380,6 +388,7 @@ export const patients: Patient[] = [
     diagnosisNote: "训练依从性一般，建议家长配合监督并调整训练内容。",
     treatment: "训练计划调整",
     followupType: "视训",
+    axial: { od: 22.91, os: 23.05 },
     tags: ["视训"],
     profile: { memberLevel: "VIP", other: "新客户", reviewStatus: "跟进中" },
     followStatus: "跟进中",
@@ -401,6 +410,8 @@ export const patients: Patient[] = [
     diagnosisNote: "症状缓解但仍反复，建议继续护理并排查诱因。",
     treatment: "用药随访",
     followupType: "用药",
+    axial: { od: 24.03, os: 24.19 },
+    axialDelta: { od: -0.01, os: 0.02 },
     tags: ["复诊", "干眼"],
     profile: { memberLevel: "普通用户", other: "老客户", reviewStatus: "已就诊" },
     followStatus: "已就诊",
@@ -414,7 +425,7 @@ export const patients: Patient[] = [
     gender: "男",
     age: 9,
     mobile: "136 1177 0933",
-    store: "徐汇旗舰店",
+    store: "惟爱 · 上海海华医院",
     owner: "王懿雯",
     latestVisit: "2026-04-21 15:25",
     nextReview: "2026-05-21",
@@ -422,6 +433,8 @@ export const patients: Patient[] = [
     diagnosisNote: "家长反馈使用频次不足，需强调使用规范与记录。",
     treatment: "哺光仪管理",
     followupType: "哺光仪",
+    axial: { od: 24.9, os: 25.05 },
+    axialDelta: { od: 0.12, os: 0.05 },
     tags: ["高关注"],
     profile: { memberLevel: "VIP", other: "老客户", reviewStatus: "待复查" },
     followStatus: "待复查",
@@ -443,6 +456,8 @@ export const patients: Patient[] = [
     diagnosisNote: "连续两次未按期复查，建议电话跟进确认原因。",
     treatment: "回访跟进",
     followupType: "定期复查",
+    axial: { od: 24.2, os: 24.36 },
+    axialDelta: { od: 0, os: 0.03 },
     tags: ["待复查"],
     profile: { memberLevel: "普通用户", other: "老客户", reviewStatus: "已终止" },
     followStatus: "已终止",
@@ -464,6 +479,8 @@ export const patients: Patient[] = [
     diagnosisNote: "镜片定位良好，角膜染色阴性，继续观察。",
     treatment: "角膜塑形镜复查",
     followupType: "角膜塑形镜",
+    axial: { od: 25.08, os: 25.22 },
+    axialDelta: { od: 0.07, os: 0.21 },
     tags: ["OK镜", "复诊"],
     profile: { memberLevel: "SVIP", other: "老客户", reviewStatus: "已就诊" },
     followStatus: "已就诊",
@@ -477,7 +494,7 @@ export const patients: Patient[] = [
     gender: "男",
     age: 14,
     mobile: "135 9088 2704",
-    store: "徐汇旗舰店",
+    store: "惟爱 · 上海海华医院",
     owner: "王懿雯",
     latestVisit: "2026-04-29 18:05",
     nextReview: "2026-05-29",
@@ -485,6 +502,7 @@ export const patients: Patient[] = [
     diagnosisNote: "适配度良好，建议完善护理培训并制定复查计划。",
     treatment: "护理培训",
     followupType: "离焦软镜",
+    axial: { od: 24.66, os: 24.82 },
     tags: ["首诊"],
     profile: { memberLevel: "VIP", other: "新客户", reviewStatus: "跟进中" },
     followStatus: "跟进中",
@@ -506,6 +524,7 @@ export const patients: Patient[] = [
     diagnosisNote: "评估后建议先进行视功能训练，再决定光学方案。",
     treatment: "训练评估",
     followupType: "视训",
+    axial: { od: 23.55, os: 23.71 },
     tags: ["新客户"],
     profile: { memberLevel: "普通用户", other: "新客户", reviewStatus: "待复查" },
     followStatus: "待复查",
@@ -527,6 +546,8 @@ export const patients: Patient[] = [
     diagnosisNote: "近期阅读姿势需纠正，建议配合用眼行为干预。",
     treatment: "行为干预",
     followupType: "定期复查",
+    axial: { od: 24.34, os: 24.48 },
+    axialDelta: { od: 0.16, os: 0.09 },
     tags: ["复诊"],
     profile: { memberLevel: "VIP", other: "老客户", reviewStatus: "跟进中" },
     followStatus: "跟进中",
@@ -541,7 +562,7 @@ export const appointments: Appointment[] = [
     patient: "周沐言",
     time: "09:00-09:30",
     date: "2026-05-12",
-    store: "徐汇旗舰店",
+    store: "惟爱 · 上海海华医院",
     room: "2号诊室",
     source: "小程序预约",
     issue: "复查视力变化",
@@ -588,14 +609,50 @@ export const followups: Followup[] = [
 ];
 
 export const historyVisits: Visit[] = [
-  { id: "v1", date: "2026-05-01", title: "复查 · 徐汇旗舰店", diagnosis: "青少年近视进展期", treatment: "离焦镜片 + 视觉训练", axial: "24.22mm", va: "4.8 / 4.9", summary: "眼轴增长较上次减缓，建议维持离焦方案并继续每晚训练。", review: "2026-06-01" },
-  { id: "v2", date: "2026-03-28", title: "复诊 · 徐汇旗舰店", diagnosis: "近视控制中", treatment: "离焦镜片", axial: "24.17mm", va: "4.9 / 4.9", summary: "配镜适应良好，家长反馈配戴依从性高。", review: "2026-05-01" },
-  { id: "v3", date: "2026-02-14", title: "首诊 · 徐汇旗舰店", diagnosis: "青少年近视", treatment: "离焦镜片评估", axial: "24.05mm", va: "4.7 / 4.8", summary: "完成首诊评估，建议进入近视防控方案。", review: "2026-03-28" },
+  {
+    id: "v1",
+    date: "2026-05-01",
+    personType: '复诊',
+    store: "惟爱 · 上海海华医院",
+    diagnosis: "青少年近视进展期",
+    treatment: "离焦镜片 + 视觉训练",
+    axial: "24.22mm",
+    va: "4.8 / 4.9",
+    summary: "眼轴增长较上次减缓，建议维持离焦方案并继续每晚训练。",
+    review: "2026-06-01",
+    visitTypes: ["就诊", "视光训练"],
+  },
+  {
+    id: "v2",
+    date: "2026-03-28",
+    personType: '复诊',
+    store: "惟爱 · 上海海华医院",
+    diagnosis: "近视控制中",
+    treatment: "离焦镜片",
+    axial: "24.17mm",
+    va: "4.9 / 4.9",
+    summary: "配镜适应良好，家长反馈配戴依从性高。",
+    review: "2026-05-01",
+    visitTypes: ["就诊", "配镜"],
+  },
+  {
+    id: "v3",
+    date: "2026-02-14",
+    personType: '初诊',
+    store: "惟爱 · 上海海华医院",
+    diagnosis: "青少年近视",
+    treatment: "离焦镜片评估",
+    axial: "24.05mm",
+    va: "4.7 / 4.8",
+    summary: "完成首诊评估，建议进入近视防控方案。",
+    review: "2026-03-28",
+    visitTypes: ["就诊"],
+  },
 ];
 
 export const visitDetailRecords: Record<string, VisitDetailRecord> = {
   v1: {
-    basicInfo: { doctor: "吴丽颖", optometrist: "/", cycloplegia: "/" },
+    basicInfo: { doctor: "吴丽颖", optometrist: "/" },
     chiefHistory: {
       eye: "双眼",
       symptom: "视力下降",
@@ -646,7 +703,7 @@ export const visitDetailRecords: Record<string, VisitDetailRecord> = {
     },
   },
   v2: {
-    basicInfo: { doctor: "吴丽颖", optometrist: "/", cycloplegia: "/" },
+    basicInfo: { doctor: "吴丽颖", optometrist: "/" },
     chiefHistory: {
       eye: "双眼",
       symptom: "复诊随访",
@@ -696,7 +753,7 @@ export const visitDetailRecords: Record<string, VisitDetailRecord> = {
     },
   },
   v3: {
-    basicInfo: { doctor: "吴丽颖", optometrist: "/", cycloplegia: "散瞳后" },
+    basicInfo: { doctor: "吴丽颖", optometrist: "/" },
     chiefHistory: {
       eye: "双眼",
       symptom: "首诊评估",

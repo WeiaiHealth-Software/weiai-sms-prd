@@ -17,6 +17,12 @@ function formatDateOnly(value?: string) {
   return String(value).split(" ")[0];
 }
 
+function formatEyeLabel(value: string) {
+  if (value === "右眼") return "右眼（OD）";
+  if (value === "左眼") return "左眼（OS）";
+  return value;
+}
+
 function GenderIcon({ gender }: { gender: "男" | "女" }) {
   const isMale = gender === "男";
   const toneClass = isMale
@@ -201,14 +207,21 @@ export default function ClientDetail() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-base font-bold text-gray-900">就诊时间轴</div>
-                      <div className="mt-1 text-sm text-gray-500">默认定位到最新一次就诊记录</div>
                     </div>
                     <span className="rounded-xl bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
                       共 {historyVisits.length} 次
                     </span>
                   </div>
                   <div className="mt-4 space-y-2">
-                    {historyVisits.map((v) => (
+                    {historyVisits.map((v, idx) => {
+                      const isInitial = idx === historyVisits.length - 1;
+                      const tagClass = isInitial
+                        ? "border-sky-200 bg-sky-50 text-sky-700"
+                        : "border-emerald-200 bg-emerald-50 text-emerald-700";
+                      const tagLabel = isInitial ? "初诊" : "复诊";
+                      const store = v.store;
+                      const visitTypeText = (v.visitTypes?.length ? v.visitTypes : ["就诊"]).join(" · ");
+                      return (
                       <button
                         key={v.id}
                         onClick={() => {
@@ -224,12 +237,19 @@ export default function ClientDetail() {
                       >
                         <div className="flex items-center justify-between gap-3">
                           <div className="font-bold text-gray-900">{v.date}</div>
-                          <span className="text-xs font-semibold text-gray-500">{v.title}</span>
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[11px] font-semibold ${tagClass}`}>
+                              {tagLabel}
+                            </span>
+                          </div>
                         </div>
-                        <div className="mt-2 text-sm font-semibold text-gray-700 line-clamp-1">{v.diagnosis}</div>
-                        <div className="mt-1 text-xs text-gray-500 line-clamp-1">{v.summary}</div>
+                        <div className="flex items-center justify-between mt-2">
+                          <span className="text-sm font-semibold text-gray-700 line-clamp-1">{visitTypeText}</span>
+                          <span className="text-xs font-semibold text-gray-500">{store}</span>
+                        </div>
                       </button>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </aside>
@@ -306,7 +326,7 @@ export default function ClientDetail() {
                 <div id="visit-basic" className="scroll-mt-6 mt-5 grid gap-4 lg:grid-cols-2">
                   <div className="rounded-2xl border border-gray-100 bg-white p-5">
                     <div className="text-sm font-bold text-gray-900">基本信息</div>
-                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
                       <div className="rounded-2xl bg-gray-50 p-4">
                         <div className="text-sm text-gray-500">接诊医生</div>
                         {visitEditMode ? (
@@ -339,23 +359,6 @@ export default function ClientDetail() {
                           />
                         ) : (
                           <div className="mt-2 font-semibold text-gray-900">{effectiveVisitDetail.basicInfo.optometrist || "/"}</div>
-                        )}
-                      </div>
-                      <div className="rounded-2xl bg-gray-50 p-4">
-                        <div className="text-sm text-gray-500">散瞳</div>
-                        {visitEditMode ? (
-                          <input
-                            value={visitDraft.basicInfo.cycloplegia}
-                            onChange={(e) =>
-                              setVisitDraft((prev) => ({
-                                ...prev,
-                                basicInfo: { ...prev.basicInfo, cycloplegia: e.target.value },
-                              }))
-                            }
-                            className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                          />
-                        ) : (
-                          <div className="mt-2 font-semibold text-gray-900">{effectiveVisitDetail.basicInfo.cycloplegia || "/"}</div>
                         )}
                       </div>
                     </div>
@@ -393,11 +396,11 @@ export default function ClientDetail() {
                           className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
                         >
                           <option value="双眼">双眼</option>
-                          <option value="右眼">右眼</option>
-                          <option value="左眼">左眼</option>
+                          <option value="右眼">右眼（OD）</option>
+                          <option value="左眼">左眼（OS）</option>
                         </select>
                       ) : (
-                        <div className="mt-2 font-semibold text-gray-900">{effectiveVisitDetail.chiefHistory.eye}</div>
+                        <div className="mt-2 font-semibold text-gray-900">{formatEyeLabel(effectiveVisitDetail.chiefHistory.eye)}</div>
                       )}
                     </div>
                     <div className="rounded-2xl bg-gray-50 p-4">
@@ -485,8 +488,8 @@ export default function ClientDetail() {
                         <thead className="text-xs uppercase tracking-[0.18em] text-gray-400">
                           <tr>
                             <th className="px-5 py-4 font-semibold">检查项目</th>
-                            <th className="px-5 py-4 font-semibold">右眼</th>
-                            <th className="px-5 py-4 font-semibold">左眼</th>
+                            <th className="px-5 py-4 font-semibold">右眼（OD）</th>
+                            <th className="px-5 py-4 font-semibold">左眼（OS）</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -543,8 +546,8 @@ export default function ClientDetail() {
                         <thead className="text-xs uppercase tracking-[0.18em] text-gray-400">
                           <tr>
                             <th className="px-5 py-4 font-semibold">检查项目</th>
-                            <th className="px-5 py-4 font-semibold">右眼</th>
-                            <th className="px-5 py-4 font-semibold">左眼</th>
+                            <th className="px-5 py-4 font-semibold">右眼（OD）</th>
+                            <th className="px-5 py-4 font-semibold">左眼（OS）</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -789,7 +792,7 @@ export default function ClientDetail() {
           {activeTab === "glasses" && (
             <div className="rounded-2xl border border-gray-100 bg-white p-6">
               <div className="text-base font-bold text-gray-900">配镜记录</div>
-              <div className="mt-2 text-sm text-gray-500">配镜相关记录卡片内容，暂且占位，后续开发。</div>
+              <div className="mt-2 text-sm text-gray-500">配镜相关记录卡片内容，与配镜管理相关联，暂且占位，后续开发。</div>
             </div>
           )}
 
@@ -842,7 +845,7 @@ export default function ClientDetail() {
               <div className="border-b border-gray-100 p-4 flex items-center justify-between">
                 <div>
                   <div className="text-base font-bold text-gray-900">回访记录</div>
-                  <div className="mt-1 text-sm text-gray-500">按原型示例数据展示该客户相关回访。</div>
+                  <div className="mt-1 text-sm text-gray-500">按原型示例数据展示该客户相关回访，就诊档案完成的同时自动创建回访记录以及提醒日期。</div>
                 </div>
                 <button
                   className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600 active:bg-primary-700"
@@ -892,7 +895,7 @@ export default function ClientDetail() {
           {activeTab === "consumption" && (
             <div className="rounded-2xl border border-gray-100 bg-white p-6">
               <div className="text-base font-bold text-gray-900">消费记录</div>
-              <div className="mt-2 text-sm text-gray-500">该模块后续按原型与接口清单补齐，这里先占位。</div>
+              <div className="mt-2 text-sm text-gray-500">该模块后续按原型与接口清单补齐，与消费管理页面关联，这里先占位。</div>
             </div>
           )}
         </div>
