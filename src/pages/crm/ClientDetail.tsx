@@ -7,6 +7,7 @@ import {
   historyVisits,
   patients,
   profileTagStandard,
+  trainingRecords,
   visitDetailRecords,
   type PatientProfile,
   type VisitDetailRecord,
@@ -78,6 +79,7 @@ function ProfileTags({ profile }: { profile?: PatientProfile }) {
 
 const tabs = [
   { key: "visits", label: "就诊记录" },
+  { key: "training", label: "视光训练记录" },
   { key: "glasses", label: "配镜记录" },
   { key: "appointments", label: "预约记录" },
   { key: "followup", label: "回访记录" },
@@ -106,6 +108,8 @@ export default function ClientDetail() {
   );
   const [visitDraft, setVisitDraft] = useState<VisitDetailRecord>(effectiveVisitDetail);
   const [savedAt, setSavedAt] = useState(0);
+  const [trainingRows, setTrainingRows] = useState(trainingRecords);
+  const [selectedTrainingId, setSelectedTrainingId] = useState<string | null>(null);
 
   const patientAppointments = useMemo(
     () => appointments.filter((a) => a.patient === patient.name),
@@ -114,6 +118,14 @@ export default function ClientDetail() {
   const patientFollowups = useMemo(
     () => followups.filter((f) => f.patient === patient.name),
     [patient.name]
+  );
+  const patientTrainingRecords = useMemo(
+    () => trainingRows.filter((item) => item.patient === patient.name),
+    [patient.name, trainingRows]
+  );
+  const selectedTrainingRecord = useMemo(
+    () => patientTrainingRecords.find((item) => item.id === selectedTrainingId) ?? patientTrainingRecords[0] ?? null,
+    [patientTrainingRecords, selectedTrainingId]
   );
 
   return (
@@ -793,6 +805,103 @@ export default function ClientDetail() {
             <div className="rounded-2xl border border-gray-100 bg-white p-6">
               <div className="text-base font-bold text-gray-900">配镜记录</div>
               <div className="mt-2 text-sm text-gray-500">配镜相关记录卡片内容，与配镜管理相关联，暂且占位，后续开发。</div>
+            </div>
+          )}
+
+          {activeTab === "training" && (
+            <div className="space-y-4">
+              <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden">
+                <div className="border-b border-gray-100 p-4">
+                  <div className="text-base font-bold text-gray-900">视光训练记录</div>
+                  <div className="mt-1 text-sm text-gray-500">按客户维度展示历史视训记录，支持查看详情与本地删除。</div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full text-left">
+                    <thead className="bg-gray-50 text-xs uppercase tracking-[0.18em] text-gray-400">
+                      <tr>
+                        <th className="px-4 py-3 font-semibold">视训时间</th>
+                        <th className="px-4 py-3 font-semibold">视训师</th>
+                        <th className="px-4 py-3 font-semibold">门店</th>
+                        <th className="px-4 py-3 font-semibold">备注</th>
+                        <th className="px-4 py-3 font-semibold">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-sm">
+                      {patientTrainingRecords.map((record) => (
+                        <tr key={record.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 font-semibold text-gray-900">{record.trainingTime}</td>
+                          <td className="px-4 py-3 text-gray-700">{record.trainer}</td>
+                          <td className="px-4 py-3 text-gray-700">{record.store}</td>
+                          <td className="px-4 py-3 text-gray-500">{record.note}</td>
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <button
+                                className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 font-semibold text-gray-700 hover:bg-gray-50"
+                                onClick={() => setSelectedTrainingId(record.id)}
+                              >
+                                查看
+                              </button>
+                              <button
+                                className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-1.5 font-semibold text-rose-600 hover:bg-rose-100"
+                                onClick={() => {
+                                  if (!window.confirm("确认删除该条视光训练记录吗？")) return;
+                                  setTrainingRows((prev) => prev.filter((item) => item.id !== record.id));
+                                  setSelectedTrainingId((prev) => (prev === record.id ? null : prev));
+                                }}
+                              >
+                                删除
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                      {patientTrainingRecords.length === 0 && (
+                        <tr>
+                          <td colSpan={5} className="px-4 py-12 text-center text-sm text-gray-500">
+                            暂无数据
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {selectedTrainingRecord && (
+                <section className="rounded-2xl border border-gray-100 bg-white p-5">
+                  <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+                    <div>
+                      <div className="text-base font-bold text-gray-900">视训详情</div>
+                      <div className="mt-1 text-sm text-gray-500">展示本次训练的核心信息，便于在档案页快速查看。</div>
+                    </div>
+                    <span className="rounded-full border border-primary-100 bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-600">
+                      {selectedTrainingRecord.project}
+                    </span>
+                  </div>
+                  <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                    <div className="rounded-2xl bg-gray-50 p-4">
+                      <div className="text-sm text-gray-500">视训时间</div>
+                      <div className="mt-2 font-semibold text-gray-900">{selectedTrainingRecord.trainingTime}</div>
+                    </div>
+                    <div className="rounded-2xl bg-gray-50 p-4">
+                      <div className="text-sm text-gray-500">视训师</div>
+                      <div className="mt-2 font-semibold text-gray-900">{selectedTrainingRecord.trainer}</div>
+                    </div>
+                    <div className="rounded-2xl bg-gray-50 p-4">
+                      <div className="text-sm text-gray-500">训练时长</div>
+                      <div className="mt-2 font-semibold text-gray-900">{selectedTrainingRecord.duration} 分钟</div>
+                    </div>
+                    <div className="rounded-2xl bg-gray-50 p-4">
+                      <div className="text-sm text-gray-500">完成度</div>
+                      <div className="mt-2 font-semibold text-gray-900">{selectedTrainingRecord.completion}%</div>
+                    </div>
+                  </div>
+                  <div className="mt-4 rounded-2xl bg-gray-50 p-4">
+                    <div className="text-sm text-gray-500">备注</div>
+                    <div className="mt-2 text-sm leading-7 text-gray-700">{selectedTrainingRecord.note}</div>
+                  </div>
+                </section>
+              )}
             </div>
           )}
 
