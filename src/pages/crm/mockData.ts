@@ -56,10 +56,22 @@ export type Followup = {
   owner: string;
 };
 
+export type TrainingRecord = {
+  id: string;
+  patient: string;
+  trainingTime: string;
+  trainer: string;
+  store: string;
+  note: string;
+  project: string;
+  duration: string;
+  completion: string;
+};
+
 export type Visit = {
   id: string;
   date: string;
-  personType: '初诊' | '复诊';
+  personType: "初诊" | "复诊";
   store: string;
   diagnosis: string;
   treatment: string;
@@ -99,6 +111,13 @@ export type VisitDetailRecord = {
     reminderDate: string;
   };
 };
+
+export type ArchiveModuleKey = "clinic" | "training" | "fitting" | "billing";
+
+export const archiveGenderOptions = ["男", "女"] as const;
+export const archiveSourceOptions = ["自然", "小红书", "美团", "海华", "其他"] as const;
+export const archiveMemberOptions = ["普通用户", "VIP", "SVIP"] as const;
+export const archivePaymentStatusOptions = ["未收费", "待支付", "已支付"] as const;
 
 export const profileTagStandard = [
   {
@@ -608,11 +627,58 @@ export const followups: Followup[] = [
   { id: "f4", patient: "林舒予", latestVisit: "2026-04-23", diagnosis: "干眼伴视疲劳", treatment: "干眼治疗", reviewDate: "2026-05-23", status: "已联系", result: "已确认复诊时间", owner: "陈意宁" },
 ];
 
+export const trainingRecords: TrainingRecord[] = [
+  {
+    id: "t1",
+    patient: "周沐言",
+    trainingTime: "2026-05-01 11:20",
+    trainer: "苏雨晴",
+    store: "惟爱 · 上海海华医院",
+    note: "完成双眼调节训练，状态稳定。",
+    project: "调节灵敏度训练",
+    duration: "20",
+    completion: "90",
+  },
+  {
+    id: "t2",
+    patient: "周沐言",
+    trainingTime: "2026-03-28 10:40",
+    trainer: "苏雨晴",
+    store: "惟爱 · 上海海华医院",
+    note: "家长配合度较高，建议继续保持家庭训练。",
+    project: "集合训练",
+    duration: "25",
+    completion: "95",
+  },
+  {
+    id: "t3",
+    patient: "赵一宁",
+    trainingTime: "2026-04-18 11:50",
+    trainer: "李嘉怡",
+    store: "惟爱 · 上海海华医院",
+    note: "首训完成，后续需观察依从性。",
+    project: "视疲劳舒缓训练",
+    duration: "15",
+    completion: "80",
+  },
+  {
+    id: "t4",
+    patient: "高梓萱",
+    trainingTime: "2026-04-26 14:10",
+    trainer: "孙子琪",
+    store: "静安门店",
+    note: "训练中注意力一般，建议缩短单次时长。",
+    project: "弱视精细训练",
+    duration: "20",
+    completion: "70",
+  },
+];
+
 export const historyVisits: Visit[] = [
   {
     id: "v1",
     date: "2026-05-01",
-    personType: '复诊',
+    personType: "复诊",
     store: "惟爱 · 上海海华医院",
     diagnosis: "青少年近视进展期",
     treatment: "离焦镜片 + 视觉训练",
@@ -625,7 +691,7 @@ export const historyVisits: Visit[] = [
   {
     id: "v2",
     date: "2026-03-28",
-    personType: '复诊',
+    personType: "复诊",
     store: "惟爱 · 上海海华医院",
     diagnosis: "近视控制中",
     treatment: "离焦镜片",
@@ -638,7 +704,7 @@ export const historyVisits: Visit[] = [
   {
     id: "v3",
     date: "2026-02-14",
-    personType: '初诊',
+    personType: "初诊",
     store: "惟爱 · 上海海华医院",
     diagnosis: "青少年近视",
     treatment: "离焦镜片评估",
