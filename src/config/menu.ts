@@ -45,6 +45,7 @@ export const menuConfig = [
     path: "/crm",
     subs: [
       { id: "client_list", label: "档案管理", path: "/crm/client-list", features: ["全量客户查询", "高级筛选 (年龄/度数/来源)", "客户画像 360视图", "导出 Excel"] },
+      { id: "tag_management", label: "标签管理", path: "/crm/tag-management", features: ["标签类别筛选", "标签列表分页", "新增标签弹窗", "颜色与标签值配置"] },
       { id: "booking", label: "预约管理", path: "/crm/booking", features: ["日历视图排班", "预约创建与修改", "医生/设备资源占用", "预约短信通知"] },
       { id: "followup", label: "回访管理", path: "/crm/followup", features: ["新增回访记录", "筛选条件（姓名、电话、日期、回访项目类型）", "复诊回访列表", "回访统计、复查完成率统计"] },
       { id: "optometry", label: "配镜管理", path: "/crm/optometry", features: ["验光单据查询", "历史光度趋势对比", "处方打印", "视觉训练记录"] },
