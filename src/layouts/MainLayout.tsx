@@ -19,8 +19,8 @@ export function MainLayout() {
         <Header toggleSettings={() => setIsSettingsOpen(true)} />
 
         {/* Main Content Scroll Area */}
-        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
-          <div className="mx-auto">
+        <main className="flex-1 p-4 lg:p-6 flex flex-col min-h-0 overflow-y-auto">
+          <div className="mx-auto w-full h-full">
             <Outlet />
           </div>
         </main>
