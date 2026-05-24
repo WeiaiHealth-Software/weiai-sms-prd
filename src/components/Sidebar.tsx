@@ -75,7 +75,7 @@ export function Sidebar() {
                   else navigate(item.path);
                 }}
                 className={clsx(
-                  "flex items-center gap-3 px-3 py-2.5 transition-colors duration-200 group w-full text-left border-l-4",
+                  "flex items-center gap-3 px-3 py-3 transition-colors duration-200 group w-full text-left border-l-4",
                   isExactL1
                     ? "bg-primary-50 text-primary-600 border-primary-500"
                     : isActive
@@ -96,7 +96,7 @@ export function Sidebar() {
                 {!isCollapsed && (
                   <span
                     className={clsx(
-                      "font-medium whitespace-nowrap flex-1",
+                      "flex-1 whitespace-nowrap text-[15px] font-semibold leading-6",
                       isExactL1
                         ? "text-primary-600 font-semibold"
                         : isActive
@@ -130,7 +130,7 @@ export function Sidebar() {
                         key={sub.id}
                         to={sub.path}
                         className={clsx(
-                          "block w-full text-left px-3 py-2 text-sm transition-colors border-l-2",
+                          "block w-full text-left px-3 py-2.5 text-[14px] leading-6 transition-colors border-l-2",
                           isSubActive
                             ? "border-primary-500 text-primary-700 font-semibold bg-primary-50"
                             : "border-transparent text-gray-500 hover:text-gray-900 hover:bg-gray-50 hover:border-primary-300"

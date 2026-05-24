@@ -5,6 +5,7 @@ import {
   Users,
   Package,
   Receipt,
+  Palette,
 } from "@phosphor-icons/react";
 
 export const menuConfig = [
@@ -13,6 +14,13 @@ export const menuConfig = [
     icon: SquaresFour,
     label: "仪表盘",
     path: "/",
+    subs: [],
+  },
+  {
+    id: "ui_spec",
+    icon: Palette,
+    label: "系统 UI 组件规范",
+    path: "/ui-spec",
     subs: [],
   },
   {
@@ -45,12 +53,12 @@ export const menuConfig = [
     path: "/crm",
     subs: [
       { id: "client_list", label: "档案管理", path: "/crm/client-list", features: ["全量客户查询", "高级筛选 (年龄/度数/来源)", "客户画像 360视图", "导出 Excel"] },
-      { id: "tag_management", label: "标签管理", path: "/crm/tag-management", features: ["标签类别筛选", "标签列表分页", "新增标签弹窗", "颜色与标签值配置"] },
       { id: "booking", label: "预约管理", path: "/crm/booking", features: ["日历视图排班", "预约创建与修改", "医生/设备资源占用", "预约短信通知"] },
       { id: "followup", label: "回访管理", path: "/crm/followup", features: ["新增回访记录", "筛选条件（姓名、电话、日期、回访项目类型）", "复诊回访列表", "回访统计、复查完成率统计"] },
       { id: "optometry", label: "配镜管理", path: "/crm/optometry", features: ["验光单据查询", "历史光度趋势对比", "处方打印", "视觉训练记录"] },
       { id: "member", label: "会员管理", path: "/crm/member", features: ["会员等级规则配置", "积分兑换记录", "会员专属权益设置", "家庭档案绑定"] },
       { id: "consumer", label: "消费管理", path: "/crm/consumer", features: ["消费记录列表（高级筛选）", "新增销售开单", "收费项目列表", "新增收费项目"] },
+      { id: "tag_management", label: "标签管理", path: "/crm/tag-management", features: ["标签类别筛选", "标签列表分页", "新增标签弹窗", "颜色与标签值配置"] },
     ],
   },
   {

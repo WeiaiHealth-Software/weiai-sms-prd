@@ -14,6 +14,7 @@ import ClientFollowupNew from "./pages/crm/ClientFollowupNew";
 import Booking from "./pages/crm/Booking";
 import Followup from "./pages/crm/Followup";
 import TagManagement from "./pages/crm/TagManagement";
+import UiSpec from "./pages/system/UiSpec";
 
 import ScreenList from "./pages/external/ScreenList";
 import Miniprogram from "./pages/external/Miniprogram";
@@ -48,6 +49,10 @@ export const router = createHashRouter([
       {
         index: true,
         element: <Dashboard />,
+      },
+      {
+        path: "ui-spec",
+        element: <UiSpec />,
       },
       {
         path: "store",
