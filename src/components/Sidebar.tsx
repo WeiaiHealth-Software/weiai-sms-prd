@@ -75,7 +75,7 @@ export function Sidebar() {
                   else navigate(item.path);
                 }}
                 className={clsx(
-                  "flex items-center gap-3 px-3 py-3 transition-colors duration-200 group w-full text-left border-l-4",
+                  "flex items-center gap-3 px-3 py-3 transition-colors duration-200 group cursor-pointer w-full text-left border-l-4",
                   isExactL1
                     ? "bg-primary-50 text-primary-600 border-primary-500"
                     : isActive
@@ -96,7 +96,7 @@ export function Sidebar() {
                 {!isCollapsed && (
                   <span
                     className={clsx(
-                      "flex-1 whitespace-nowrap text-[15px] font-semibold leading-6",
+                      "flex-1 whitespace-nowrap text-md font-semibold leading-6",
                       isExactL1
                         ? "text-primary-600 font-semibold"
                         : isActive

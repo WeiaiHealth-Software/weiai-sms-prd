@@ -17,13 +17,6 @@ export const menuConfig = [
     subs: [],
   },
   {
-    id: "ui_spec",
-    icon: Palette,
-    label: "系统 UI 组件规范",
-    path: "/ui-spec",
-    subs: [],
-  },
-  {
     id: "store_mgmt",
     icon: Storefront,
     label: "门店管理",
@@ -83,5 +76,12 @@ export const menuConfig = [
       { id: "cashier", label: "收银台", path: "/pos/cashier", features: ["快速开单 (选人->选品)", "验光数据关联", "套餐/折扣应用", "聚合支付结算"] },
       { id: "orders", label: "消费记录", path: "/pos/orders", features: ["历史订单查询", "退款/冲红操作", "补打小票", "电子发票开具"] },
     ],
+  },
+  {
+    id: "ui_spec",
+    icon: Palette,
+    label: "系统 UI 组件规范",
+    path: "/ui-spec",
+    subs: [],
   },
 ];
