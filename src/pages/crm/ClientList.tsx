@@ -2,6 +2,9 @@ import { useMemo, useState } from "react";
 import { DownloadSimple, Plus } from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
 import { patients, profileTagStandard, type Patient, type PatientProfile } from "./mockData";
+import { DatePicker } from "antd";
+import dayjs, { type Dayjs } from "dayjs";
+import Select from "../../components/form/Select";
 
 function formatDateOnly(value?: string) {
   if (!value) return "-";
@@ -113,11 +116,11 @@ function ProfileTags({ profile }: { profile?: PatientProfile }) {
 
 export default function ClientList() {
   const navigate = useNavigate();
+  const { RangePicker } = DatePicker;
   const [data, setData] = useState<Patient[]>(patients);
   const [keyword, setKeyword] = useState("");
   const [followupType, setFollowupType] = useState("回访项目类型");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
   const [page, setPage] = useState(1);
   const [deleteCandidate, setDeleteCandidate] = useState<Patient | null>(null);
   const [applied, setApplied] = useState({
@@ -178,32 +181,31 @@ export default function ClientList() {
               className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm outline-none placeholder:text-gray-400 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
               placeholder="搜索姓名 / 手机号 / 患者编号"
             />
-            <select
-              value={followupType}
-              onChange={(e) => setFollowupType(e.target.value)}
-              className="rounded-xl border border-gray-200 bg-white px-3.5 py-3 text-sm text-gray-700 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-            >
-              <option>回访项目类型</option>
-              <option>角膜塑形镜</option>
-              <option>离焦框架镜</option>
-              <option>离焦软镜</option>
-              <option>哺光仪</option>
-              <option>视训</option>
-              <option>用药</option>
-              <option>定期复查</option>
-            </select>
+            <Select
+              value={followupType === "回访项目类型" ? undefined : followupType}
+              onChange={(next) => setFollowupType(next)}
+              placeholder="回访项目类型"
+              className="w-full"
+              triggerClassName="border-gray-200 text-gray-700 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              options={[
+                { value: "角膜塑形镜", label: "角膜塑形镜" },
+                { value: "离焦框架镜", label: "离焦框架镜" },
+                { value: "离焦软镜", label: "离焦软镜" },
+                { value: "哺光仪", label: "哺光仪" },
+                { value: "视训", label: "视训" },
+                { value: "用药", label: "用药" },
+                { value: "定期复查", label: "定期复查" },
+              ]}
+            />
             <div className="grid grid-cols-2 gap-3">
-              <input
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                type="date"
-                className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-              />
-              <input
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                type="date"
-                className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+              <RangePicker
+                size="large"
+                className="col-span-2 w-full"
+                value={dateRange}
+                onChange={(next) => setDateRange((next as [Dayjs | null, Dayjs | null]) ?? [null, null])}
+                placeholder={["开始日期", "结束日期"]}
+                format="YYYY/MM/DD"
+                allowEmpty={[true, true]}
               />
             </div>
             <div className="flex items-center justify-end gap-3">
@@ -211,8 +213,7 @@ export default function ClientList() {
                 onClick={() => {
                   setKeyword("");
                   setFollowupType("回访项目类型");
-                  setStartDate("");
-                  setEndDate("");
+                  setDateRange([null, null]);
                   setApplied({
                     keyword: "",
                     followupType: "回访项目类型",
@@ -227,7 +228,13 @@ export default function ClientList() {
               </button>
               <button
                 onClick={() => {
-                  setApplied({ keyword, followupType, startDate, endDate });
+                  const [start, end] = dateRange;
+                  setApplied({
+                    keyword,
+                    followupType,
+                    startDate: start ? dayjs(start).format("YYYY-MM-DD") : "",
+                    endDate: end ? dayjs(end).format("YYYY-MM-DD") : "",
+                  });
                   setPage(1);
                 }}
                 className="rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-600 active:bg-primary-700"

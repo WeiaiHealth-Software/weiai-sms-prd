@@ -3,6 +3,7 @@ import {
   DotsThree,
 } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
+import Select from "../../components/form/Select";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -144,60 +145,55 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="flex h-full min-h-0 flex-col gap-4">
       <div className="flex-none">
-        <div className="flex items-center justify-between mb-3">
+        <div className="mb-3 flex items-center justify-between">
           <h3 className="text-gray-900 font-bold text-lg">门店指标</h3>
-          <select
+          <Select
             value={storeRange}
-            onChange={(e) => setStoreRange(e.target.value as TimeRangeValue)}
-            className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:border-primary-500 outline-none bg-white text-gray-700 font-bold"
-          >
-            {timeRangeOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            onChange={(next) => setStoreRange(next as TimeRangeValue)}
+            options={timeRangeOptions}
+            className="w-28"
+          />
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="bg-primary-500 rounded-2xl p-4 lg:p-6 2xl:p-8 relative overflow-hidden card-shadow flex flex-col justify-between group transition hover:translate-y-[-2px]">
-            <div className="flex justify-between items-start mb-6 lg:mb-8 2xl:mb-10 relative z-10">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+          <div className="bg-primary-500 rounded-2xl p-4 lg:p-5 xl:p-6 relative overflow-hidden card-shadow flex flex-col justify-between group transition hover:translate-y-[-2px]">
+            <div className="flex justify-between items-start mb-5 lg:mb-6 relative z-10">
               <div className="flex items-center justify-center">
-                <p className="text-2xl text-white font-bold">营收</p>
+                <p className="text-xl xl:text-2xl text-white font-bold">营收</p>
               </div>
               <div className="bg-white/20 text-white text-md font-bold px-2 py-1 rounded-md flex items-center gap-1">
                 <ArrowUpRight weight="bold" /> +17%
               </div>
             </div>
             <div>
-              <p className="text-4xl font-bold text-white tracking-tight">¥ {formatNumber(storeMetrics.revenue)}</p>
+              <p className="text-3xl xl:text-4xl font-bold text-white tracking-tight">¥ {formatNumber(storeMetrics.revenue)}</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 lg:p-6 2xl:p-8 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
-            <div className="flex justify-between items-start mb-6 lg:mb-8 2xl:mb-10 relative z-10">
+          <div className="bg-white rounded-2xl p-4 lg:p-5 xl:p-6 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
+            <div className="flex justify-between items-start mb-5 lg:mb-6 relative z-10">
               <div className="flex items-center justify-center text-gray-900">
-                <p className="text-2xl text-gray-900 font-bold">成交单数</p>
+                <p className="text-xl xl:text-2xl text-gray-900 font-bold">成交单数</p>
               </div>
               <div className="bg-primary-50 text-primary-600 text-md font-bold px-2 py-1 rounded-md flex items-center gap-1">
                 <ArrowUpRight weight="bold" /> +8%
               </div>
             </div>
             <div>
-              <p className="text-4xl font-bold text-gray-900 tracking-tight">
+              <p className="text-3xl xl:text-4xl font-bold text-gray-900 tracking-tight">
                 {formatNumber(storeMetrics.deals)} <span className="text-sm font-normal text-gray-400">单</span>
               </p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 lg:p-6 2xl:p-8 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
-            <div className="flex justify-between items-center mb-4 lg:mb-6 2xl:mb-8 relative z-10">
-              <p className="text-2xl text-gray-900 font-bold">销售目标</p>
+          <div className="bg-white rounded-2xl p-4 lg:p-5 xl:p-6 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
+            <div className="flex justify-between items-center mb-4 lg:mb-5 relative z-10">
+              <p className="text-xl xl:text-2xl text-gray-900 font-bold">销售目标</p>
               <DotsThree weight="bold" className="text-gray-400" />
             </div>
             <div>
-              <p className="text-3xl font-bold text-gray-900 mb-4 lg:mb-6 2xl:mb-8 tracking-tight">
+              <p className="text-2xl xl:text-3xl font-bold text-gray-900 mb-4 lg:mb-5 tracking-tight">
                 ¥ {formatNumber(storeMetrics.goalAchieved)}{" "}
                 <span className="text-sm text-gray-400 font-normal">/ ¥{formatNumber(storeMetrics.goalTarget)}</span>
               </p>
@@ -210,79 +206,74 @@ export default function Dashboard() {
       </div>
 
       <div className="flex-none">
-        <div className="flex items-center justify-between mb-3">
+        <div className="mb-3 flex items-center justify-between">
           <h3 className="text-gray-900 font-bold text-lg">客户档案指标</h3>
-          <select
+          <Select
             value={crmRange}
-            onChange={(e) => setCrmRange(e.target.value as TimeRangeValue)}
-            className="text-sm border border-gray-200 rounded-lg px-3 py-2 focus:border-primary-500 outline-none bg-white text-gray-700 font-bold"
-          >
-            {timeRangeOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+            onChange={(next) => setCrmRange(next as TimeRangeValue)}
+            options={timeRangeOptions}
+            className="w-28"
+          />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-2xl p-4 lg:p-6 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+          <div className="bg-white rounded-2xl p-4 lg:p-5 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
             <div className="flex justify-between items-start">
               <p className="text-md text-gray-500 font-bold">客户总数</p>
               <div className="bg-primary-50 text-primary-600 text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
                 <ArrowUpRight weight="bold" /> +6%
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-3xl font-bold text-gray-900 tracking-tight">{formatNumber(crmMetrics.customerTotal)}</p>
+            <div className="mt-3">
+              <p className="text-[28px] font-bold text-gray-900 tracking-tight">{formatNumber(crmMetrics.customerTotal)}</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 lg:p-6 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
+          <div className="bg-white rounded-2xl p-4 lg:p-5 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
             <div className="flex justify-between items-start">
               <p className="text-md text-gray-500 font-bold">新增客户</p>
               <div className="bg-primary-50 text-primary-600 text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
                 <ArrowUpRight weight="bold" /> +9%
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-3xl font-bold text-gray-900 tracking-tight">{formatNumber(crmMetrics.newCustomers)}</p>
+            <div className="mt-3">
+              <p className="text-[28px] font-bold text-gray-900 tracking-tight">{formatNumber(crmMetrics.newCustomers)}</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 lg:p-6 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
+          <div className="bg-white rounded-2xl p-4 lg:p-5 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
             <div className="flex justify-between items-start">
               <p className="text-md text-gray-500 font-bold">待回访</p>
               <div className="bg-red-50 text-red-600 text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
                 <ArrowUpRight weight="bold" /> +9%
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-3xl font-bold text-gray-900 tracking-tight">{formatNumber(crmMetrics.pendingFollowups)}</p>
+            <div className="mt-3">
+              <p className="text-[28px] font-bold text-gray-900 tracking-tight">{formatNumber(crmMetrics.pendingFollowups)}</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 lg:p-6 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
+          <div className="bg-white rounded-2xl p-4 lg:p-5 card-shadow flex flex-col justify-between transition hover:translate-y-[-2px]">
             <div className="flex justify-between items-start">
               <p className="text-md text-gray-500 font-bold">预约人数</p>
               <div className="bg-primary-50 text-primary-600 text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1">
                 <ArrowUpRight weight="bold" /> +11%
               </div>
             </div>
-            <div className="mt-4">
-              <p className="text-3xl font-bold text-gray-900 tracking-tight">{formatNumber(crmMetrics.bookings)}</p>
+            <div className="mt-3">
+              <p className="text-[28px] font-bold text-gray-900 tracking-tight">{formatNumber(crmMetrics.bookings)}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* 图表区域 */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
-        <div className="bg-white rounded-2xl p-6 card-shadow flex flex-col justify-between h-full">
+      <div className="flex-1 grid min-h-0 grid-cols-1 gap-5 lg:grid-cols-3">
+        <div className="bg-white rounded-2xl p-5 card-shadow flex min-h-0 flex-col overflow-hidden">
           <div>
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="text-gray-900 font-bold text-2xl">客户满意度</h3>
-                <p className="text-gray-400 text-md mt-1">最高正面反馈</p>
+                <h3 className="text-gray-900 font-bold text-xl">客户满意度</h3>
+                <p className="text-gray-400 text-sm mt-1">最高正面反馈</p>
               </div>
               <button className="text-gray-400 hover:text-gray-600">
                 <DotsThree weight="bold" className="text-xl" />
@@ -290,55 +281,55 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex-1 relative flex items-center justify-center my-2">
-            <div className="w-48 h-40 lg:w-64 lg:h-48 xl:w-80 xl:h-64 relative flex items-center justify-center">
+          <div className="relative my-2 flex min-h-0 flex-1 items-center justify-center">
+            <div className="relative flex aspect-[4/3] w-full max-w-[220px] items-center justify-center lg:max-w-[240px] xl:max-w-[260px]">
               <Doughnut data={doughnutData} options={doughnutOptions} />
               <div className="absolute inset-0 flex flex-col items-center justify-center pt-4 pointer-events-none">
-                <p className="text-3xl font-bold text-gray-900 tracking-tight">250</p>
+                <p className="text-2xl font-bold text-gray-900 tracking-tight">250</p>
                 <p className="text-gray-400 text-xs mt-1">答复数</p>
               </div>
             </div>
           </div>
 
           {/* Legend */}
-          <div className="flex justify-center gap-4 mb-6">
+          <div className="mb-4 flex flex-wrap justify-center gap-x-4 gap-y-2">
             <div className="flex items-center gap-1.5">
               <span className="w-4 h-4 rounded-full bg-primary-500"></span>
-              <span className="text-md font-bold text-gray-600">满意</span>
+              <span className="text-sm font-bold text-gray-600">满意</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-4 h-4 rounded-full bg-primary-200"></span>
-              <span className="text-md font-bold text-gray-600">中规中矩</span>
+              <span className="text-sm font-bold text-gray-600">中规中矩</span>
             </div>
             <div className="flex items-center gap-1.5">
               <span className="w-4 h-4 rounded-full bg-gray-200"></span>
-              <span className="text-md font-bold text-gray-600">不满意</span>
+              <span className="text-sm font-bold text-gray-600">不满意</span>
             </div>
           </div>
 
           {/* Stats & Description */}
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-2.5">
             <div className="flex items-center gap-3 bg-gray-50 rounded-full p-1 pr-4 w-full">
               <div className="bg-primary-100 text-primary-600 text-xs font-bold px-3 py-2 rounded-full flex items-center gap-1 whitespace-nowrap">
                 <ArrowUpRight weight="bold" /> +12%
               </div>
-              <span className="text-md text-gray-500 font-medium truncate">
+              <span className="text-sm text-gray-500 font-medium truncate">
                 客户满意度 (CSAT): 4.7/5
               </span>
             </div>
-            <p className="text-center text-lg font-bold text-gray-900">卓越的支持和快速的响应</p>
+            <p className="text-center text-base font-bold text-gray-900">卓越的支持和快速的响应</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-7 card-shadow lg:col-span-2 flex flex-col">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="text-gray-900 font-bold text-2xl">营收趋势分析</h3>
+        <div className="bg-white rounded-2xl p-5 card-shadow lg:col-span-2 flex min-h-0 flex-col overflow-hidden">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-gray-900 font-bold text-xl">营收趋势分析</h3>
             <div className="flex bg-gray-100 p-0.5 rounded-lg">
               <button className="px-3 py-1 bg-white shadow-sm rounded-md text-xs font-bold text-gray-900">月视图</button>
               <button className="px-3 py-1 text-xs text-gray-500">年视图</button>
             </div>
           </div>
-          <div className="flex-1 relative w-full h-full min-h-[240px]">
+          <div className="relative min-h-[200px] flex-1">
             <Bar data={barData} options={barOptions} />
           </div>
         </div>
