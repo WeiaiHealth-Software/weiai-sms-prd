@@ -1,5 +1,7 @@
+import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
+import { Alarm } from "@phosphor-icons/react";
 import { followups, patients, type Followup as FollowupItem } from "./mockData";
 
 function normalizeForSearch(value: string) {
@@ -8,6 +10,13 @@ function normalizeForSearch(value: string) {
 
 function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
+}
+
+function isDateDue(value?: string) {
+  if (!value) return false;
+  const parsed = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return false;
+  return parsed.getTime() <= Date.now();
 }
 
 function getPageItems(totalPages: number, currentPage: number) {
@@ -255,6 +264,7 @@ export default function Followup() {
                 <th className="px-5 py-4 font-semibold">最近就诊</th>
                 <th className="px-5 py-4 font-semibold">诊断 / 治疗</th>
                 <th className="px-5 py-4 font-semibold">应复查日期</th>
+                <th className="px-5 py-4 font-semibold">提醒时间</th>
                 <th className="px-5 py-4 font-semibold">联系结果</th>
                 <th className="px-5 py-4 font-semibold">责任人</th>
                 <th className="px-5 py-4 font-semibold">操作</th>
@@ -265,6 +275,7 @@ export default function Followup() {
                 const patient = patientByName.get(item.patient);
                 const patientId = patient?.id ?? "";
                 const canNavigate = Boolean(patientId);
+                const due = isDateDue(item.reminderDate);
                 return (
                   <tr key={item.id} className="hover:bg-gray-50">
                     <td className="px-5 py-4">
@@ -284,6 +295,22 @@ export default function Followup() {
                       <span className={`mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${statusClass(item.status)}`}>
                         {item.status}
                       </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      {item.reminderDate ? (
+                        <span className="inline-flex items-center gap-2 font-semibold">
+                          <Alarm
+                            weight="bold"
+                            className={clsx(
+                              "h-4 w-4 origin-top",
+                              due ? "text-red-500 animate-[alarm-shake_0.6s_ease-in-out_infinite]" : "text-gray-300"
+                            )}
+                          />
+                          <span className={due ? "text-red-600" : "text-gray-700"}>{item.reminderDate}</span>
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
                     </td>
                     <td className="px-5 py-4">
                       <div className="font-semibold text-gray-700">{item.result}</div>
@@ -322,7 +349,7 @@ export default function Followup() {
               })}
               {paged.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-sm text-gray-500">
+                  <td colSpan={8} className="px-5 py-12 text-center text-sm text-gray-500">
                     暂无数据
                   </td>
                 </tr>

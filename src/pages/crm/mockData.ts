@@ -51,6 +51,7 @@ export type Followup = {
   diagnosis: string;
   treatment: string;
   reviewDate: string;
+  reminderDate?: string;
   status: string;
   result: string;
   owner: string;
@@ -621,6 +622,27 @@ export const appointments: Appointment[] = [
 ];
 
 export const followups: Followup[] = [
+  (() => {
+    const now = new Date();
+    const reminder = new Date(now);
+    reminder.setDate(now.getDate() - 2);
+    const yyyy = reminder.getFullYear();
+    const mm = String(reminder.getMonth() + 1).padStart(2, "0");
+    const dd = String(reminder.getDate()).padStart(2, "0");
+    const reminderDate = `${yyyy}-${mm}-${dd}`;
+    return {
+      id: "f-alarm",
+      patient: "周沐言",
+      latestVisit: "2026-05-01",
+      diagnosis: "复查提醒（演示）",
+      treatment: "到店复查",
+      reviewDate: "2026-06-01",
+      reminderDate,
+      status: "待跟进",
+      result: "未联系",
+      owner: "王懿雯",
+    };
+  })(),
   { id: "f1", patient: "顾景川", latestVisit: "2026-04-27", diagnosis: "OK镜复查", treatment: "镜片复查", reviewDate: "2026-05-15", status: "待跟进", result: "未联系", owner: "刘嘉程" },
   { id: "f2", patient: "周沐言", latestVisit: "2026-05-01", diagnosis: "近视进展期", treatment: "离焦镜片", reviewDate: "2026-06-01", status: "待到店", result: "家长确认复诊", owner: "王懿雯" },
   { id: "f3", patient: "赵一宁", latestVisit: "2026-04-18", diagnosis: "视疲劳", treatment: "视觉训练", reviewDate: "2026-05-08", status: "已逾期", result: "三次未接通", owner: "陈意宁" },

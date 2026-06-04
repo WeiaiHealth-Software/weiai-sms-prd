@@ -1,6 +1,8 @@
-import { useMemo, useState } from "react";
+import clsx from "clsx";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { ArrowLeft, FloppyDisk } from "@phosphor-icons/react";
+import { ArrowLeft, Cake, CaretDown, FloppyDisk, Phone, PencilSimple } from "@phosphor-icons/react";
+import Select, { type SelectOption } from "../../components/form/Select";
 import {
   archiveGenderOptions,
   archiveMemberOptions,
@@ -10,21 +12,321 @@ import {
   patients,
   visitDetailRecords,
   type ArchiveModuleKey,
+  type Followup,
+  type Visit,
+  type VisitDetailRecord,
+  type VisitExamRow,
 } from "./mockData";
+
+const archiveEyeOptions: SelectOption[] = [
+  { value: "双眼", label: "双眼" },
+  { value: "右眼", label: "右眼（OD）" },
+  { value: "左眼", label: "左眼（OS）" },
+];
+
+const archiveDurationUnitOptions: SelectOption[] = [
+  { value: "日", label: "日" },
+  { value: "周", label: "周" },
+  { value: "月", label: "月" },
+  { value: "年", label: "年" },
+];
 
 function formatDateOnly(value?: string) {
   if (!value) return "-";
   return String(value).split(" ")[0];
 }
 
+function formatTodayISO() {
+  const now = new Date();
+  const yyyy = now.getFullYear();
+  const mm = String(now.getMonth() + 1).padStart(2, "0");
+  const dd = String(now.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 function inferBirthday(age: number) {
   return `${new Date().getFullYear() - age}-01-01`;
+}
+
+function calculateAge(birthday: string) {
+  if (!birthday) return null;
+  const normalized = birthday.includes("/") ? birthday.replaceAll("/", "-") : birthday;
+  const parsed = new Date(normalized);
+  if (Number.isNaN(parsed.getTime())) return null;
+  const today = new Date();
+  let age = today.getFullYear() - parsed.getFullYear();
+  const monthDelta = today.getMonth() - parsed.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < parsed.getDate())) {
+    age -= 1;
+  }
+  return age < 0 ? null : age;
+}
+
+type FollowupCycleValue = {
+  unit: "日" | "周" | "月" | "年";
+  count: string;
+};
+
+function parseFollowupCycle(value?: string): FollowupCycleValue {
+  const fallback: FollowupCycleValue = { unit: "月", count: "1" };
+  if (!value) return fallback;
+  const cleaned = value.replaceAll(" ", "").replaceAll("次", "");
+  const normalized = cleaned.includes("/") ? cleaned : cleaned.replaceAll("每", "").replaceAll("·", "/");
+  const parts = normalized.split("/");
+  if (parts.length !== 2) return fallback;
+  const count = parts[0] || fallback.count;
+  const unit = parts[1] as FollowupCycleValue["unit"];
+  if (!["日", "周", "月", "年"].includes(unit)) return fallback;
+  if (!/^\d+$/.test(count)) return fallback;
+  return { unit, count: String(Math.max(1, Math.min(10, Number(count)))) };
+}
+
+function FollowupCycleCascader({
+  value,
+  onChange,
+}: {
+  value: FollowupCycleValue;
+  onChange: (value: FollowupCycleValue) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const [activeUnit, setActiveUnit] = useState<FollowupCycleValue["unit"]>(value.unit);
+
+  useEffect(() => {
+    setActiveUnit(value.unit);
+  }, [value.unit]);
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (wrapperRef.current && !wrapperRef.current.contains(target)) {
+        setOpen(false);
+      }
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [open, wrapperRef]);
+
+  const unitOptions: Array<FollowupCycleValue["unit"]> = ["日", "周", "月", "年"];
+  const countOptions = Array.from({ length: 10 }, (_, index) => String(index + 1));
+  const label = `${value.count}/${value.unit}`;
+
+  return (
+    <div
+      ref={(el) => {
+        wrapperRef.current = el;
+      }}
+      className="relative"
+    >
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((prev) => !prev)}
+        className={clsx(
+          "flex h-11 w-full items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 text-left text-sm text-gray-800",
+          "outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+        )}
+      >
+        <span className="min-w-0 flex-1 truncate">{label}</span>
+        <span className={clsx("text-gray-400 transition-transform", open && "rotate-180")}>▾</span>
+      </button>
+
+      {open && (
+        <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg">
+          <div className="grid grid-cols-2">
+            <div className="max-h-64 overflow-auto p-1 border-r border-gray-100">
+              {unitOptions.map((unit) => {
+                const active = unit === activeUnit;
+                return (
+                  <button
+                    key={unit}
+                    type="button"
+                    onClick={() => setActiveUnit(unit)}
+                    className={clsx(
+                      "w-full rounded-lg px-3 py-2 text-left text-sm transition-colors",
+                      active ? "bg-primary-50 text-primary-700 font-semibold" : "text-gray-700 hover:bg-gray-50"
+                    )}
+                  >
+                    {unit}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="max-h-64 overflow-auto p-1">
+              {countOptions.map((count) => {
+                const selected = value.unit === activeUnit && value.count === count;
+                return (
+                  <button
+                    key={count}
+                    type="button"
+                    onClick={() => {
+                      onChange({ unit: activeUnit, count });
+                      setOpen(false);
+                    }}
+                    className={clsx(
+                      "w-full rounded-lg px-3 py-2 text-left text-sm transition-colors flex items-center justify-between",
+                      selected ? "bg-primary-50 text-primary-700 font-semibold" : "text-gray-700 hover:bg-gray-50"
+                    )}
+                  >
+                    <span>{count}</span>
+                    <span className="text-gray-300">›</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Switch({ checked, onChange }: { checked: boolean; onChange: (checked: boolean) => void }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={clsx(
+        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+        checked ? "bg-primary-500" : "bg-gray-200"
+      )}
+    >
+      <span
+        className={clsx(
+          "inline-block h-5 w-5 transform rounded-full bg-white shadow-sm transition-transform",
+          checked ? "translate-x-5" : "translate-x-1"
+        )}
+      />
+    </button>
+  );
+}
+
+function ExamTable({
+  title,
+  rows,
+  onChange,
+}: {
+  title: string;
+  rows: VisitExamRow[];
+  onChange: (rows: VisitExamRow[]) => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden">
+      <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">{title}</div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full text-left text-sm">
+          <thead className="text-xs uppercase tracking-[0.18em] text-gray-400">
+            <tr>
+              <th className="px-5 py-4 font-semibold">检查项目</th>
+              <th className="px-5 py-4 font-semibold">右眼（OD）</th>
+              <th className="px-5 py-4 font-semibold">左眼（OS）</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {rows.map((row, idx) => {
+              const rightNow = row.right ?? "";
+              const leftNow = row.left ?? "";
+              const isBoolean = row.type === "boolean";
+              const rightChecked = rightNow === "阳性";
+              const leftChecked = leftNow === "阳性";
+              return (
+                <tr key={`${row.label}-${idx}`} className="hover:bg-gray-50">
+                  <td className="px-5 py-4 font-semibold text-gray-700 whitespace-nowrap">{row.label}</td>
+                  <td className="px-5 py-4">
+                    {isBoolean ? (
+                      <div className="flex items-center gap-2">
+                        <span className={clsx("text-sm font-semibold", !rightChecked ? "text-primary-600" : "text-gray-400")}>
+                          阴性
+                        </span>
+                        <Switch
+                          checked={rightChecked}
+                          onChange={(checked) => {
+                            onChange(rows.map((r, i) => (i === idx ? { ...r, right: checked ? "阳性" : "阴性" } : r)));
+                          }}
+                        />
+                        <span className={clsx("text-sm font-semibold", rightChecked ? "text-primary-600" : "text-gray-400")}>
+                          阳性
+                        </span>
+                      </div>
+                    ) : (
+                      <input
+                        value={rightNow}
+                        onChange={(e) => {
+                          onChange(rows.map((r, i) => (i === idx ? { ...r, right: e.target.value } : r)));
+                        }}
+                        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                      />
+                    )}
+                  </td>
+                  <td className="px-5 py-4">
+                    {isBoolean ? (
+                      <div className="flex items-center gap-2">
+                        <span className={clsx("text-sm font-semibold", !leftChecked ? "text-primary-600" : "text-gray-400")}>
+                          阴性
+                        </span>
+                        <Switch
+                          checked={leftChecked}
+                          onChange={(checked) => {
+                            onChange(rows.map((r, i) => (i === idx ? { ...r, left: checked ? "阳性" : "阴性" } : r)));
+                          }}
+                        />
+                        <span className={clsx("text-sm font-semibold", leftChecked ? "text-primary-600" : "text-gray-400")}>
+                          阳性
+                        </span>
+                      </div>
+                    ) : (
+                      <input
+                        value={leftNow}
+                        onChange={(e) => {
+                          onChange(rows.map((r, i) => (i === idx ? { ...r, left: e.target.value } : r)));
+                        }}
+                        className="w-full rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                      />
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function getMemberTagClass(value: string) {
+  if (value === "VIP") return "border-violet-100 bg-violet-50 text-violet-700";
+  if (value === "SVIP") return "border-fuchsia-100 bg-fuchsia-50 text-fuchsia-700";
+  return "border-slate-200 bg-slate-100 text-slate-600";
+}
+
+function getSourceTagClass(value: string) {
+  if (value === "自然") return "border-emerald-100 bg-emerald-50 text-emerald-700";
+  if (value === "美团") return "border-amber-100 bg-amber-50 text-amber-700";
+  if (value === "小红书") return "border-rose-100 bg-rose-50 text-rose-700";
+  if (value === "海华") return "border-teal-100 bg-teal-50 text-teal-700";
+  return "border-slate-200 bg-slate-100 text-slate-600";
 }
 
 function ModuleStatusBadge({ status }: { status: string }) {
   const className =
     status === "已录入"
-      ? "border-emerald-100 bg-emerald-50 text-emerald-700"
+      ? "border-green-100 bg-green-50 text-green-700"
+      : status === "已保存"
+        ? "border-indigo-100 bg-indigo-50 text-indigo-700"
       : status === "草稿"
         ? "border-amber-100 bg-amber-50 text-amber-700"
         : "border-slate-200 bg-slate-100 text-slate-600";
@@ -45,11 +347,41 @@ export default function ClientVisitNew() {
   const navigate = useNavigate();
   const params = useParams();
   const id = String(params.id ?? "");
-  const patient = useMemo(() => patients.find((p) => p.id === id) ?? patients[0], [id]);
+  const isNewClient = id === "new";
+  const patient = useMemo(() => {
+    if (isNewClient) return null;
+    return patients.find((p) => p.id === id) ?? patients[0] ?? null;
+  }, [id, isNewClient]);
   const seed = useMemo(() => {
+    if (isNewClient) {
+      const template = visitDetailRecords.v1 ?? Object.values(visitDetailRecords)[0];
+      return {
+        basicInfo: { doctor: "", optometrist: "" },
+        chiefHistory: {
+          eye: "双眼",
+          symptom: "",
+          duration: "",
+          durationUnit: "日",
+          description: "",
+        },
+        eyeExam: (template?.eyeExam ?? []).map((row) => ({ ...row, right: "", left: "" })),
+        auxExam: (template?.auxExam ?? []).map((row) => ({ ...row, right: "", left: "" })),
+        diagnosis: "",
+        treatment: {
+          advice: "",
+          followupCycle: "",
+          estimatedDate: "",
+          reminderDate: "",
+        },
+      };
+    }
     const latest = historyVisits[0]?.id ?? "v1";
     return visitDetailRecords[latest] ?? visitDetailRecords.v1;
-  }, []);
+  }, [isNewClient]);
+  const draftStorageKey = useMemo(
+    () => `clientVisitDraft:${isNewClient ? "new" : patient?.id ?? id}`,
+    [id, isNewClient, patient?.id]
+  );
 
   const moduleMeta: Array<{ key: ArchiveModuleKey; label: string; desc: string }> = [
     { key: "clinic", label: "就诊档案", desc: "检查 / 诊断 / 处理 / 复查建议" },
@@ -58,16 +390,30 @@ export default function ClientVisitNew() {
     { key: "billing", label: "收费详情", desc: "收费单与支付状态" },
   ];
 
-  const [basicForm, setBasicForm] = useState({
-    name: patient.name,
-    mobile: patient.mobile.replace(/\s+/g, ""),
-    gender: patient.gender,
-    birthday: inferBirthday(patient.age),
-    source: patient.profile?.source ?? "自然",
-    memberLevel: patient.profile?.memberLevel ?? "普通用户",
+  const [isBasicEditing, setIsBasicEditing] = useState(false);
+  const [basicForm, setBasicForm] = useState<{
+    name: string;
+    mobile: string;
+    gender?: "男" | "女";
+    birthday: string;
+    source?: string;
+    memberLevel?: string;
+  }>({
+    name: "",
+    mobile: "",
+    gender: undefined,
+    birthday: "",
+    source: undefined,
+    memberLevel: undefined,
   });
   const [selectedModules, setSelectedModules] = useState<Record<ArchiveModuleKey, boolean>>({
     clinic: true,
+    training: false,
+    fitting: false,
+    billing: false,
+  });
+  const [collapsedModules, setCollapsedModules] = useState<Record<ArchiveModuleKey, boolean>>({
+    clinic: false,
     training: false,
     fitting: false,
     billing: false,
@@ -79,42 +425,156 @@ export default function ClientVisitNew() {
     billing: "未录入",
   });
   const [clinicForm, setClinicForm] = useState({
-    doctor: seed.basicInfo.doctor,
-    optometrist: seed.basicInfo.optometrist,
-    eye: seed.chiefHistory.eye,
-    symptom: seed.chiefHistory.symptom,
-    duration: seed.chiefHistory.duration,
-    durationUnit: seed.chiefHistory.durationUnit,
-    description: seed.chiefHistory.description,
-    diagnosis: seed.diagnosis,
-    advice: seed.treatment.advice,
-    followupCycle: seed.treatment.followupCycle,
-    estimatedDate: seed.treatment.estimatedDate,
-    reminderDate: seed.treatment.reminderDate,
+    visitDate: formatTodayISO(),
+    doctor: "",
+    optometrist: "",
+    eye: "双眼",
+    symptom: "",
+    duration: "",
+    durationUnit: "日",
+    description: "",
+    eyeExam: [] as VisitExamRow[],
+    auxExam: [] as VisitExamRow[],
+    diagnosis: "",
+    advice: "",
+    followupUnit: "月" as FollowupCycleValue["unit"],
+    followupCount: "1",
+    enableReminder: false,
+    estimatedDate: "",
+    reminderDate: "",
   });
   const [trainingForm, setTrainingForm] = useState({
-    trainingTime: `${formatDateOnly(patient.latestVisit)} 11:20`,
-    trainer: patient.owner ?? "苏雨晴",
-    store: patient.store ?? "惟爱 · 上海海华医院",
-    project: "调节灵敏度训练",
-    duration: "20",
-    completion: "90",
-    note: "本次训练配合度良好，可继续当前计划。",
+    trainingDate: formatTodayISO(),
+    trainer: "",
+    store: "",
+    project: "",
+    duration: "",
+    completion: "",
+    note: "",
   });
   const [fittingForm, setFittingForm] = useState({
-    prescriptionType: "离焦框架镜",
-    productInfo: "1.56 离焦镜片 + 轻量镜架",
-    fittingNote: "沿用上次配镜方案，微调镜片参数。",
+    fittingDate: formatTodayISO(),
+    prescriptionType: "",
+    productInfo: "",
+    fittingNote: "",
   });
   const [billingForm, setBillingForm] = useState({
-    item: "复查套餐",
-    amount: "320",
-    paymentStatus: "待支付",
-    note: "支持与本次服务单一并收款。",
+    billingDate: formatTodayISO(),
+    item: "",
+    amount: "",
+    paymentStatus: "未收费",
+    note: "",
   });
   const [savedMessage, setSavedMessage] = useState("");
 
+  useEffect(() => {
+    const rawDraft = window.localStorage.getItem(draftStorageKey);
+    if (rawDraft) {
+      try {
+        const parsed = JSON.parse(rawDraft) as {
+          version: number;
+          isBasicEditing?: boolean;
+          basicForm?: typeof basicForm;
+          selectedModules?: typeof selectedModules;
+          collapsedModules?: typeof collapsedModules;
+          moduleStatus?: typeof moduleStatus;
+          clinicForm?: typeof clinicForm;
+          trainingForm?: typeof trainingForm;
+          fittingForm?: typeof fittingForm;
+          billingForm?: typeof billingForm;
+        };
+        if (parsed.version === 1) {
+          setIsBasicEditing(parsed.isBasicEditing ?? (isNewClient || !patient));
+          setBasicForm(
+            parsed.basicForm ?? {
+              name: "",
+              mobile: "",
+              gender: undefined,
+              birthday: "",
+              source: undefined,
+              memberLevel: undefined,
+            }
+          );
+          setSelectedModules(parsed.selectedModules ?? { clinic: true, training: false, fitting: false, billing: false });
+          setCollapsedModules(parsed.collapsedModules ?? { clinic: false, training: false, fitting: false, billing: false });
+          setModuleStatus(parsed.moduleStatus ?? { clinic: "草稿", training: "未录入", fitting: "未录入", billing: "未录入" });
+          setClinicForm((prev) => ({
+            ...prev,
+            ...parsed.clinicForm,
+            eyeExam: parsed.clinicForm?.eyeExam ?? prev.eyeExam,
+            auxExam: parsed.clinicForm?.auxExam ?? prev.auxExam,
+          }));
+          setTrainingForm((prev) => ({ ...prev, ...parsed.trainingForm }));
+          setFittingForm((prev) => ({ ...prev, ...parsed.fittingForm }));
+          setBillingForm((prev) => ({ ...prev, ...parsed.billingForm }));
+          setSavedMessage("已恢复上次草稿");
+          return;
+        }
+      } catch {}
+    }
+
+    if (isNewClient || !patient) {
+      setIsBasicEditing(true);
+      setBasicForm({
+        name: "",
+        mobile: "",
+        gender: undefined,
+        birthday: "",
+        source: undefined,
+        memberLevel: undefined,
+      });
+    } else {
+      setIsBasicEditing(false);
+      setBasicForm({
+        name: patient.name,
+        mobile: patient.mobile.replace(/\s+/g, ""),
+        gender: patient.gender,
+        birthday: inferBirthday(patient.age),
+        source: patient.profile?.source ?? "自然",
+        memberLevel: patient.profile?.memberLevel ?? "普通用户",
+      });
+    }
+
+    setSelectedModules({ clinic: true, training: false, fitting: false, billing: false });
+    setCollapsedModules({ clinic: false, training: false, fitting: false, billing: false });
+    setModuleStatus({ clinic: "草稿", training: "未录入", fitting: "未录入", billing: "未录入" });
+    const followup = parseFollowupCycle(seed.treatment.followupCycle);
+    const enableReminder = Boolean(seed.treatment.estimatedDate || seed.treatment.reminderDate);
+    setClinicForm({
+      visitDate: formatTodayISO(),
+      doctor: seed.basicInfo.doctor,
+      optometrist: seed.basicInfo.optometrist,
+      eye: seed.chiefHistory.eye,
+      symptom: seed.chiefHistory.symptom,
+      duration: seed.chiefHistory.duration,
+      durationUnit: seed.chiefHistory.durationUnit,
+      description: seed.chiefHistory.description,
+      eyeExam: seed.eyeExam,
+      auxExam: seed.auxExam,
+      diagnosis: seed.diagnosis,
+      advice: seed.treatment.advice,
+      followupUnit: followup.unit,
+      followupCount: followup.count,
+      enableReminder,
+      estimatedDate: enableReminder ? seed.treatment.estimatedDate || formatTodayISO() : seed.treatment.estimatedDate,
+      reminderDate: enableReminder ? seed.treatment.reminderDate || formatTodayISO() : seed.treatment.reminderDate,
+    });
+    setTrainingForm({
+      trainingDate: formatTodayISO(),
+      trainer: patient?.owner ?? "",
+      store: patient?.store ?? "",
+      project: "",
+      duration: "",
+      completion: "",
+      note: "",
+    });
+    setFittingForm({ fittingDate: formatTodayISO(), prescriptionType: "", productInfo: "", fittingNote: "" });
+    setBillingForm({ billingDate: formatTodayISO(), item: "", amount: "", paymentStatus: "未收费", note: "" });
+    setSavedMessage("");
+  }, [draftStorageKey, id, isNewClient, patient, seed]);
+
   function markModuleDraft(module: ArchiveModuleKey) {
+    setSavedMessage("");
     setModuleStatus((prev) => ({
       ...prev,
       [module]: prev[module] === "已录入" ? "已录入" : "草稿",
@@ -122,11 +582,19 @@ export default function ClientVisitNew() {
   }
 
   function toggleModule(module: ArchiveModuleKey) {
+    setSavedMessage("");
     setSelectedModules((prev) => {
       const nextSelected = !prev[module];
+      if (nextSelected) {
+        setCollapsedModules((collapsedPrev) => ({ ...collapsedPrev, [module]: false }));
+      }
       setModuleStatus((statusPrev) => ({
         ...statusPrev,
-        [module]: nextSelected ? (statusPrev[module] === "已录入" ? "已录入" : "草稿") : "未录入",
+        [module]: nextSelected
+          ? statusPrev[module] === "未录入"
+            ? "草稿"
+            : statusPrev[module]
+          : "未录入",
       }));
       return { ...prev, [module]: nextSelected };
     });
@@ -134,17 +602,19 @@ export default function ClientVisitNew() {
 
   function handleSelectAll() {
     setSelectedModules({ clinic: true, training: true, fitting: true, billing: true });
+    setCollapsedModules({ clinic: false, training: false, fitting: false, billing: false });
     setModuleStatus((prev) => ({
-      clinic: prev.clinic === "已录入" ? "已录入" : "草稿",
-      training: prev.training === "已录入" ? "已录入" : "草稿",
-      fitting: prev.fitting === "已录入" ? "已录入" : "草稿",
-      billing: prev.billing === "已录入" ? "已录入" : "草稿",
+      clinic: prev.clinic === "未录入" ? "草稿" : prev.clinic,
+      training: prev.training === "未录入" ? "草稿" : prev.training,
+      fitting: prev.fitting === "未录入" ? "草稿" : prev.fitting,
+      billing: prev.billing === "未录入" ? "草稿" : prev.billing,
     }));
     setSavedMessage("");
   }
 
   function handleProfileOnly() {
     setSelectedModules({ clinic: false, training: false, fitting: false, billing: false });
+    setCollapsedModules({ clinic: false, training: false, fitting: false, billing: false });
     setModuleStatus({
       clinic: "未录入",
       training: "未录入",
@@ -155,40 +625,163 @@ export default function ClientVisitNew() {
   }
 
   function handleSaveDraft() {
-    setSavedMessage("草稿已保存（本地 mock）");
-    setModuleStatus((prev) => ({
-      clinic: selectedModules.clinic ? "草稿" : prev.clinic,
-      training: selectedModules.training ? "草稿" : prev.training,
-      fitting: selectedModules.fitting ? "草稿" : prev.fitting,
-      billing: selectedModules.billing ? "草稿" : prev.billing,
-    }));
+    const nextModuleStatus: Record<ArchiveModuleKey, string> = {
+      clinic: selectedModules.clinic ? (moduleStatus.clinic === "已录入" ? "已录入" : "已保存") : moduleStatus.clinic,
+      training: selectedModules.training
+        ? moduleStatus.training === "已录入"
+          ? "已录入"
+          : "已保存"
+        : moduleStatus.training,
+      fitting: selectedModules.fitting ? (moduleStatus.fitting === "已录入" ? "已录入" : "已保存") : moduleStatus.fitting,
+      billing: selectedModules.billing ? (moduleStatus.billing === "已录入" ? "已录入" : "已保存") : moduleStatus.billing,
+    };
+    window.localStorage.setItem(
+      draftStorageKey,
+      JSON.stringify({
+        version: 1,
+        isBasicEditing,
+        basicForm,
+        selectedModules,
+        collapsedModules,
+        moduleStatus: nextModuleStatus,
+        clinicForm,
+        trainingForm,
+        fittingForm,
+        billingForm,
+      })
+    );
+    setModuleStatus(nextModuleStatus);
+    setSavedMessage("草稿已保存");
   }
 
   function handleFinish() {
-    setSavedMessage("新增档案已完成，正在返回客户详情...");
+    setSavedMessage(isNewClient ? "新增档案已完成，正在返回档案列表..." : "新增档案已完成，正在返回客户详情...");
     setModuleStatus((prev) => ({
       clinic: selectedModules.clinic ? "已录入" : prev.clinic,
       training: selectedModules.training ? "已录入" : prev.training,
       fitting: selectedModules.fitting ? "已录入" : prev.fitting,
       billing: selectedModules.billing ? "已录入" : prev.billing,
     }));
-    window.setTimeout(() => navigate(`/crm/client/${patient.id}`), 600);
+    if (patient) {
+      const visitId = `local-${Date.now()}`;
+      const visitTypes: NonNullable<Visit["visitTypes"]> = [];
+      if (selectedModules.clinic) visitTypes.push("就诊");
+      if (selectedModules.training) visitTypes.push("视光训练");
+      if (selectedModules.fitting) visitTypes.push("配镜");
+      const visit: Visit = {
+        id: visitId,
+        date: clinicForm.visitDate || formatTodayISO(),
+        personType: patient.latestVisit ? "复诊" : "初诊",
+        store: patient.store ?? "",
+        diagnosis: clinicForm.diagnosis || "-",
+        treatment: clinicForm.advice || "-",
+        axial: "-",
+        va: "-",
+        summary: clinicForm.description || "-",
+        review: clinicForm.enableReminder ? clinicForm.estimatedDate || "-" : "-",
+        visitTypes,
+      };
+
+      const detail: VisitDetailRecord = {
+        basicInfo: { doctor: clinicForm.doctor, optometrist: clinicForm.optometrist },
+        chiefHistory: {
+          eye: clinicForm.eye,
+          symptom: clinicForm.symptom,
+          duration: clinicForm.duration,
+          durationUnit: clinicForm.durationUnit,
+          description: clinicForm.description,
+        },
+        eyeExam: clinicForm.eyeExam,
+        auxExam: clinicForm.auxExam,
+        diagnosis: clinicForm.diagnosis,
+        treatment: {
+          inspection: { item: "", quantity: "", unit: "", price: "", total: "" },
+          prescription: { drug: "", quantity: "", spec: "", unit: "", price: "", eye: "", usage: "", total: "" },
+          therapy: { item: "", quantity: "", unit: "", price: "", total: "" },
+          advice: clinicForm.advice,
+          followupCycle: `${clinicForm.followupCount}/${clinicForm.followupUnit}`,
+          estimatedDate: clinicForm.enableReminder ? clinicForm.estimatedDate : "",
+          reminderDate: clinicForm.enableReminder ? clinicForm.reminderDate : "",
+        },
+      };
+
+      const visitsKey = `clientVisits:${patient.id}`;
+      const detailsKey = `clientVisitDetails:${patient.id}`;
+      const followupsKey = `clientFollowups:${patient.id}`;
+
+      const prevVisits = (JSON.parse(window.localStorage.getItem(visitsKey) ?? "[]") as Visit[]).filter(Boolean);
+      window.localStorage.setItem(visitsKey, JSON.stringify([visit, ...prevVisits]));
+
+      const prevDetails = JSON.parse(window.localStorage.getItem(detailsKey) ?? "{}") as Record<string, VisitDetailRecord>;
+      window.localStorage.setItem(detailsKey, JSON.stringify({ ...prevDetails, [visitId]: detail }));
+
+      if (clinicForm.enableReminder && clinicForm.estimatedDate) {
+        const followup: Followup = {
+          id: `lf-${Date.now()}`,
+          patient: patient.name,
+          latestVisit: visit.date,
+          diagnosis: clinicForm.diagnosis || "复查回访",
+          treatment: clinicForm.advice || "-",
+          reviewDate: clinicForm.estimatedDate,
+          reminderDate: clinicForm.reminderDate || clinicForm.estimatedDate,
+          status: "待跟进",
+          result: "未联系",
+          owner: patient.owner ?? "",
+        };
+        const prevFollowups = (JSON.parse(window.localStorage.getItem(followupsKey) ?? "[]") as Followup[]).filter(Boolean);
+        window.localStorage.setItem(followupsKey, JSON.stringify([followup, ...prevFollowups]));
+      }
+    }
+    window.localStorage.removeItem(draftStorageKey);
+    window.setTimeout(() => {
+      if (isNewClient) navigate("/crm/client-list");
+      else if (patient) navigate(`/crm/client/${patient.id}`);
+      else navigate("/crm/client-list");
+    }, 600);
   }
 
   const hasSelectedModule = Object.values(selectedModules).some(Boolean);
 
+  const genderOptions = useMemo<SelectOption[]>(
+    () => archiveGenderOptions.map((item) => ({ value: item, label: item })),
+    []
+  );
+  const sourceOptions = useMemo<SelectOption[]>(
+    () => archiveSourceOptions.map((item) => ({ value: item, label: item })),
+    []
+  );
+  const memberOptions = useMemo<SelectOption[]>(
+    () => archiveMemberOptions.map((item) => ({ value: item, label: item })),
+    []
+  );
+  const paymentStatusOptions = useMemo<SelectOption[]>(
+    () => archivePaymentStatusOptions.map((item) => ({ value: item, label: item })),
+    []
+  );
+
+  const basicAge = useMemo(() => {
+    const derived = calculateAge(basicForm.birthday);
+    if (derived != null) return String(derived);
+    if (patient) return String(patient.age);
+    return "";
+  }, [basicForm.birthday, patient]);
+
   return (
-    <div className="h-full flex flex-col gap-6">
+    <div className="min-h-full flex flex-col gap-6">
       <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
         <div className="border-b border-gray-100 p-5">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-start gap-3">
               <button
                 className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:bg-gray-100"
-                onClick={() => navigate(`/crm/client/${patient.id}`)}
+                onClick={() => {
+                  if (isNewClient) navigate("/crm/client-list");
+                  else if (patient) navigate(`/crm/client/${patient.id}`);
+                  else navigate("/crm/client-list");
+                }}
               >
                 <ArrowLeft weight="bold" className="h-4 w-4" />
-                返回详情
+                {isNewClient ? "返回列表" : "返回详情"}
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -218,82 +811,158 @@ export default function ClientVisitNew() {
           <section className="rounded-2xl border border-gray-100 bg-white p-5">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <SectionHint title="档案基础信息" desc="先建档，再选择是否录入本次服务单，可选就诊 / 视训 / 配镜 / 收费。" />
-              <button
-                className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-                onClick={() => navigate("/crm/client-list")}
-              >
-                返回档案列表
-              </button>
+              {isNewClient ? (
+                <button
+                  className="inline-flex items-center justify-center rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                  onClick={() => navigate("/crm/client-list")}
+                >
+                  返回档案列表
+                </button>
+              ) : (
+                <button
+                  className="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 active:bg-gray-100"
+                  onClick={() => {
+                    if (isBasicEditing) {
+                      setIsBasicEditing(false);
+                      if (patient) {
+                        setBasicForm({
+                          name: patient.name,
+                          mobile: patient.mobile.replace(/\s+/g, ""),
+                          gender: patient.gender,
+                          birthday: inferBirthday(patient.age),
+                          source: patient.profile?.source ?? "自然",
+                          memberLevel: patient.profile?.memberLevel ?? "普通用户",
+                        });
+                      }
+                      return;
+                    }
+                    setIsBasicEditing(true);
+                  }}
+                >
+                  <PencilSimple weight="bold" className="h-4 w-4" />
+                  {isBasicEditing ? "取消编辑" : "编辑信息"}
+                </button>
+              )}
             </div>
-            <div className="mt-4 grid gap-4 lg:grid-cols-3">
-              <div>
-                <div className="text-sm text-gray-500">姓名</div>
-                <input
-                  value={basicForm.name}
-                  onChange={(e) => setBasicForm((prev) => ({ ...prev, name: e.target.value }))}
-                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                />
+            {!isNewClient && patient && !isBasicEditing ? (
+              <div className="mt-4 rounded-2xl border border-gray-100 bg-gray-50/60 p-4">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={
+                        basicForm.gender === "男"
+                          ? "inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-sky-200 bg-sky-50 text-sky-700"
+                          : "inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-rose-200 bg-rose-50 text-rose-700"
+                      }
+                    >
+                      <span className="text-xl font-bold">{basicForm.gender === "男" ? "♂" : "♀"}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-xl font-bold text-gray-900 truncate">{basicForm.name || "-"}</span>
+                        <span className="text-xs text-gray-400">{basicAge ? `${basicAge}岁` : "-"}</span>
+                      </div>
+                      <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-gray-600">
+                        <span className="inline-flex items-center gap-2">
+                          <Phone weight="bold" className="h-4 w-4 text-gray-400" />
+                          <span className="font-semibold text-gray-700">{basicForm.mobile || "-"}</span>
+                        </span>
+                        <span className="inline-flex items-center gap-2">
+                          <Cake weight="bold" className="h-4 w-4 text-gray-400" />
+                          <span className="font-semibold text-gray-700">{basicForm.birthday || "-"}</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    {basicForm.memberLevel ? (
+                      <span
+                        className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${getMemberTagClass(
+                          basicForm.memberLevel
+                        )}`}
+                      >
+                        {basicForm.memberLevel}
+                      </span>
+                    ) : null}
+                    {basicForm.source ? (
+                      <span
+                        className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${getSourceTagClass(
+                          basicForm.source
+                        )}`}
+                      >
+                        {basicForm.source}
+                      </span>
+                    ) : null}
+                  </div>
+                </div>
               </div>
-              <div>
-                <div className="text-sm text-gray-500">手机号</div>
-                <input
-                  value={basicForm.mobile}
-                  onChange={(e) => setBasicForm((prev) => ({ ...prev, mobile: e.target.value }))}
-                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                />
+            ) : (
+              <div className="mt-4 grid gap-4 lg:grid-cols-3">
+                <div>
+                  <div className="text-sm text-gray-500">姓名</div>
+                  <input
+                    value={basicForm.name}
+                    onChange={(e) => setBasicForm((prev) => ({ ...prev, name: e.target.value }))}
+                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500">手机号</div>
+                  <input
+                    value={basicForm.mobile}
+                    onChange={(e) => setBasicForm((prev) => ({ ...prev, mobile: e.target.value }))}
+                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500">性别</div>
+                  <Select
+                    className="mt-2"
+                    value={basicForm.gender}
+                    onChange={(next) => setBasicForm((prev) => ({ ...prev, gender: next as "男" | "女" }))}
+                    options={genderOptions}
+                    triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500">出生日期</div>
+                  <input
+                    type="date"
+                    value={basicForm.birthday}
+                    onChange={(e) => setBasicForm((prev) => ({ ...prev, birthday: e.target.value }))}
+                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500">年龄</div>
+                  <input
+                    readOnly
+                    value={basicAge}
+                    className="mt-2 w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-800 outline-none"
+                  />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500">客户来源</div>
+                  <Select
+                    className="mt-2"
+                    value={basicForm.source}
+                    onChange={(next) => setBasicForm((prev) => ({ ...prev, source: next }))}
+                    options={sourceOptions}
+                    triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500">会员类型</div>
+                  <Select
+                    className="mt-2"
+                    value={basicForm.memberLevel}
+                    onChange={(next) => setBasicForm((prev) => ({ ...prev, memberLevel: next }))}
+                    options={memberOptions}
+                    triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
+                </div>
               </div>
-              <div>
-                <div className="text-sm text-gray-500">性别</div>
-                <select
-                  value={basicForm.gender}
-                  onChange={(e) => setBasicForm((prev) => ({ ...prev, gender: e.target.value as "男" | "女" }))}
-                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                >
-                  {archiveGenderOptions.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500">出生日期</div>
-                <input
-                  type="date"
-                  value={basicForm.birthday}
-                  onChange={(e) => setBasicForm((prev) => ({ ...prev, birthday: e.target.value }))}
-                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                />
-              </div>
-              <div>
-                <div className="text-sm text-gray-500">客户来源</div>
-                <select
-                  value={basicForm.source}
-                  onChange={(e) => setBasicForm((prev) => ({ ...prev, source: e.target.value }))}
-                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                >
-                  {archiveSourceOptions.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <div className="text-sm text-gray-500">会员类型</div>
-                <select
-                  value={basicForm.memberLevel}
-                  onChange={(e) => setBasicForm((prev) => ({ ...prev, memberLevel: e.target.value }))}
-                  className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                >
-                  {archiveMemberOptions.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+            )}
           </section>
 
           <section className="rounded-2xl border border-gray-100 bg-white p-5">
@@ -314,15 +983,13 @@ export default function ClientVisitNew() {
                 </button>
               </div>
             </div>
-            <div className="mt-4 space-y-4">
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               {moduleMeta.map((module) => (
                 <button
                   key={module.key}
-                  className={
-                    selectedModules[module.key]
-                      ? "flex w-full items-center justify-between rounded-2xl border border-primary-100 bg-primary-50 px-4 py-4 text-left"
-                      : "flex w-full items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4 text-left hover:bg-white"
-                  }
+                  className={selectedModules[module.key]
+                    ? "flex w-full items-start justify-between rounded-2xl border border-primary-100 bg-primary-50 px-4 py-4 text-left"
+                    : "flex w-full items-start justify-between rounded-2xl border border-gray-100 bg-gray-50 px-4 py-4 text-left hover:bg-white"}
                   onClick={() => toggleModule(module.key)}
                 >
                   <div className="flex items-start gap-3">
@@ -348,174 +1015,279 @@ export default function ClientVisitNew() {
 
           {selectedModules.clinic && (
             <section className="rounded-2xl border border-gray-100 bg-white p-5">
-              <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                className="flex w-full items-start justify-between gap-3 text-left"
+                onClick={() => setCollapsedModules((prev) => ({ ...prev, clinic: !prev.clinic }))}
+              >
                 <SectionHint title="就诊档案" desc="检查 / 诊断 / 处理 / 复查建议" />
-                <ModuleStatusBadge status={moduleStatus.clinic} />
-              </div>
-              <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                <div>
-                  <div className="text-sm text-gray-500">医生</div>
-                  <input
-                    value={clinicForm.doctor}
-                    onChange={(e) => {
-                      setClinicForm((prev) => ({ ...prev, doctor: e.target.value }));
-                      markModuleDraft("clinic");
-                    }}
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                <div className="flex items-center gap-2">
+                  <ModuleStatusBadge status={moduleStatus.clinic} />
+                  <CaretDown
+                    weight="bold"
+                    className={clsx(
+                      "h-4 w-4 text-gray-400 transition-transform",
+                      collapsedModules.clinic ? "-rotate-90" : "rotate-0"
+                    )}
                   />
                 </div>
-                <div>
-                  <div className="text-sm text-gray-500">验光师</div>
-                  <input
-                    value={clinicForm.optometrist}
-                    onChange={(e) => {
-                      setClinicForm((prev) => ({ ...prev, optometrist: e.target.value }));
-                      markModuleDraft("clinic");
-                    }}
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                  />
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">眼别</div>
-                  <select
-                    value={clinicForm.eye}
-                    onChange={(e) => {
-                      setClinicForm((prev) => ({ ...prev, eye: e.target.value }));
-                      markModuleDraft("clinic");
-                    }}
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                  >
-                    <option value="双眼">双眼</option>
-                    <option value="右眼">右眼（OD）</option>
-                    <option value="左眼">左眼（OS）</option>
-                  </select>
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">症状</div>
-                  <input
-                    value={clinicForm.symptom}
-                    onChange={(e) => {
-                      setClinicForm((prev) => ({ ...prev, symptom: e.target.value }));
-                      markModuleDraft("clinic");
-                    }}
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                  />
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">病程</div>
-                  <div className="mt-2 grid grid-cols-[1fr_120px] gap-3">
-                    <input
-                      value={clinicForm.duration}
-                      onChange={(e) => {
-                        setClinicForm((prev) => ({ ...prev, duration: e.target.value }));
-                        markModuleDraft("clinic");
-                      }}
-                      className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                    />
-                    <select
-                      value={clinicForm.durationUnit}
-                      onChange={(e) => {
-                        setClinicForm((prev) => ({ ...prev, durationUnit: e.target.value }));
-                        markModuleDraft("clinic");
-                      }}
-                      className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                    >
-                      <option value="日">日</option>
-                      <option value="周">周</option>
-                      <option value="月">月</option>
-                      <option value="年">年</option>
-                    </select>
+              </button>
+              {!collapsedModules.clinic && <div className="mt-4 space-y-4">
+                <div className="rounded-2xl border border-gray-100 bg-white">
+                  <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">
+                    就诊信息
+                  </div>
+                  <div className="p-5">
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                      <div>
+                        <div className="text-sm text-gray-500">就诊日期</div>
+                        <input
+                          type="date"
+                          value={clinicForm.visitDate}
+                          onChange={(e) => {
+                            setClinicForm((prev) => ({ ...prev, visitDate: e.target.value }));
+                            markModuleDraft("clinic");
+                          }}
+                          className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-500">接诊医生</div>
+                        <input
+                          value={clinicForm.doctor}
+                          onChange={(e) => {
+                            setClinicForm((prev) => ({ ...prev, doctor: e.target.value }));
+                            markModuleDraft("clinic");
+                          }}
+                          className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-500">验光师</div>
+                        <input
+                          value={clinicForm.optometrist}
+                          onChange={(e) => {
+                            setClinicForm((prev) => ({ ...prev, optometrist: e.target.value }));
+                            markModuleDraft("clinic");
+                          }}
+                          className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                        />
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <div className="text-sm text-gray-500">复查周期</div>
-                  <input
-                    value={clinicForm.followupCycle}
-                    onChange={(e) => {
-                      setClinicForm((prev) => ({ ...prev, followupCycle: e.target.value }));
-                      markModuleDraft("clinic");
-                    }}
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                  />
+
+                <div className="rounded-2xl border border-gray-100 bg-white">
+                  <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">
+                    主诉与病史
+                  </div>
+                  <div className="p-5">
+                    <div className="grid gap-4 md:grid-cols-12">
+                      <div className="md:col-span-3">
+                        <div className="text-sm text-gray-500">眼别</div>
+                        <Select
+                          className="mt-2"
+                          value={clinicForm.eye}
+                          onChange={(next) => {
+                            setClinicForm((prev) => ({ ...prev, eye: next }));
+                            markModuleDraft("clinic");
+                          }}
+                          options={archiveEyeOptions}
+                          triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                        />
+                      </div>
+                      <div className="md:col-span-6">
+                        <div className="text-sm text-gray-500">主诉</div>
+                        <input
+                          value={clinicForm.symptom}
+                          onChange={(e) => {
+                            setClinicForm((prev) => ({ ...prev, symptom: e.target.value }));
+                            markModuleDraft("clinic");
+                          }}
+                          className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                        />
+                      </div>
+                      <div className="md:col-span-3">
+                        <div className="text-sm text-gray-500">持续时长</div>
+                        <div className="mt-2 grid grid-cols-[1fr_120px] gap-3">
+                          <input
+                            value={clinicForm.duration}
+                            onChange={(e) => {
+                              setClinicForm((prev) => ({ ...prev, duration: e.target.value }));
+                              markModuleDraft("clinic");
+                            }}
+                            className="rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                          />
+                          <Select
+                            value={clinicForm.durationUnit}
+                            onChange={(next) => {
+                              setClinicForm((prev) => ({ ...prev, durationUnit: next }));
+                              markModuleDraft("clinic");
+                            }}
+                            options={archiveDurationUnitOptions}
+                            triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <div className="text-sm text-gray-500">病史描述</div>
+                      <textarea
+                        value={clinicForm.description}
+                        onChange={(e) => {
+                          setClinicForm((prev) => ({ ...prev, description: e.target.value }));
+                          markModuleDraft("clinic");
+                        }}
+                        className="mt-2 w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-4">
-                <div className="text-sm text-gray-500">描述</div>
-                <textarea
-                  value={clinicForm.description}
-                  onChange={(e) => {
-                    setClinicForm((prev) => ({ ...prev, description: e.target.value }));
+
+                <ExamTable
+                  title="眼部检查"
+                  rows={clinicForm.eyeExam}
+                  onChange={(rows) => {
+                    setClinicForm((prev) => ({ ...prev, eyeExam: rows }));
                     markModuleDraft("clinic");
                   }}
-                  className="mt-2 w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
                 />
-              </div>
-              <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                <div>
-                  <div className="text-sm text-gray-500">诊断</div>
-                  <textarea
-                    value={clinicForm.diagnosis}
-                    onChange={(e) => {
-                      setClinicForm((prev) => ({ ...prev, diagnosis: e.target.value }));
-                      markModuleDraft("clinic");
-                    }}
-                    className="mt-2 w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                  />
+
+                <ExamTable
+                  title="辅助检查"
+                  rows={clinicForm.auxExam}
+                  onChange={(rows) => {
+                    setClinicForm((prev) => ({ ...prev, auxExam: rows }));
+                    markModuleDraft("clinic");
+                  }}
+                />
+
+                <div className="rounded-2xl border border-gray-100 bg-white">
+                  <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">
+                    诊断与建议
+                  </div>
+                  <div className="p-5">
+                    <div className="grid gap-4 xl:grid-cols-2">
+                      <div>
+                        <div className="text-sm text-gray-500">诊断</div>
+                        <textarea
+                          value={clinicForm.diagnosis}
+                          onChange={(e) => {
+                            setClinicForm((prev) => ({ ...prev, diagnosis: e.target.value }));
+                            markModuleDraft("clinic");
+                          }}
+                          className="mt-2 w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-500">医生建议</div>
+                        <textarea
+                          value={clinicForm.advice}
+                          onChange={(e) => {
+                            setClinicForm((prev) => ({ ...prev, advice: e.target.value }));
+                            markModuleDraft("clinic");
+                          }}
+                          className="mt-2 w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-sm text-gray-500">处理意见</div>
-                  <textarea
-                    value={clinicForm.advice}
-                    onChange={(e) => {
-                      setClinicForm((prev) => ({ ...prev, advice: e.target.value }));
-                      markModuleDraft("clinic");
-                    }}
-                    className="mt-2 w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                  />
+
+                <div className="rounded-2xl border border-gray-100 bg-white">
+                  <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 flex items-center justify-between gap-4">
+                    <div className="text-sm font-bold text-gray-900">随访与复查</div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-semibold text-gray-700">{clinicForm.enableReminder ? "已开启" : "未开启"}</span>
+                      <Switch
+                        checked={clinicForm.enableReminder}
+                        onChange={(checked) => {
+                          setClinicForm((prev) => ({
+                            ...prev,
+                            enableReminder: checked,
+                            estimatedDate: checked ? prev.estimatedDate || formatTodayISO() : prev.estimatedDate,
+                            reminderDate: checked ? prev.reminderDate || formatTodayISO() : prev.reminderDate,
+                          }));
+                          markModuleDraft("clinic");
+                        }}
+                      />
+                    </div>
+                  </div>
+                  {clinicForm.enableReminder && (
+                    <div className="p-5 space-y-4">
+                      <div className="grid gap-4 md:grid-cols-3">
+                        <div>
+                          <div className="text-sm text-gray-500">随访周期</div>
+                          <div className="mt-2">
+                            <FollowupCycleCascader
+                              value={{ unit: clinicForm.followupUnit, count: clinicForm.followupCount }}
+                              onChange={(next) => {
+                                setClinicForm((prev) => ({ ...prev, followupUnit: next.unit, followupCount: next.count }));
+                                markModuleDraft("clinic");
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-500">复查日期</div>
+                          <input
+                            type="date"
+                            value={clinicForm.estimatedDate}
+                            onChange={(e) => {
+                              setClinicForm((prev) => ({ ...prev, estimatedDate: e.target.value }));
+                              markModuleDraft("clinic");
+                            }}
+                            className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                          />
+                        </div>
+                        <div>
+                          <div className="text-sm text-gray-500">提醒日期</div>
+                          <input
+                            type="date"
+                            value={clinicForm.reminderDate}
+                            onChange={(e) => {
+                              setClinicForm((prev) => ({ ...prev, reminderDate: e.target.value }));
+                              markModuleDraft("clinic");
+                            }}
+                            className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-              <div className="mt-4 grid gap-4 lg:grid-cols-2">
-                <div>
-                  <div className="text-sm text-gray-500">预计复查日期</div>
-                  <input
-                    type="date"
-                    value={clinicForm.estimatedDate}
-                    onChange={(e) => {
-                      setClinicForm((prev) => ({ ...prev, estimatedDate: e.target.value }));
-                      markModuleDraft("clinic");
-                    }}
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                  />
-                </div>
-                <div>
-                  <div className="text-sm text-gray-500">提醒日期</div>
-                  <input
-                    type="date"
-                    value={clinicForm.reminderDate}
-                    onChange={(e) => {
-                      setClinicForm((prev) => ({ ...prev, reminderDate: e.target.value }));
-                      markModuleDraft("clinic");
-                    }}
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                  />
-                </div>
-              </div>
+              </div>}
             </section>
           )}
 
           {selectedModules.training && (
             <section className="rounded-2xl border border-gray-100 bg-white p-5">
-              <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                className="flex w-full items-start justify-between gap-3 text-left"
+                onClick={() => setCollapsedModules((prev) => ({ ...prev, training: !prev.training }))}
+              >
                 <SectionHint title="视光训练" desc="视训项目与训练数据" />
-                <ModuleStatusBadge status={moduleStatus.training} />
-              </div>
-              <div className="mt-4 grid gap-4 lg:grid-cols-2">
+                <div className="flex items-center gap-2">
+                  <ModuleStatusBadge status={moduleStatus.training} />
+                  <CaretDown
+                    weight="bold"
+                    className={clsx(
+                      "h-4 w-4 text-gray-400 transition-transform",
+                      collapsedModules.training ? "-rotate-90" : "rotate-0"
+                    )}
+                  />
+                </div>
+              </button>
+              {!collapsedModules.training && <div className="mt-4">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <div>
-                  <div className="text-sm text-gray-500">视训时间</div>
+                  <div className="text-sm text-gray-500">视训日期</div>
                   <input
-                    value={trainingForm.trainingTime}
+                    type="date"
+                    value={trainingForm.trainingDate}
                     onChange={(e) => {
-                      setTrainingForm((prev) => ({ ...prev, trainingTime: e.target.value }));
+                      setTrainingForm((prev) => ({ ...prev, trainingDate: e.target.value }));
                       markModuleDraft("training");
                     }}
                     className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
@@ -588,16 +1360,43 @@ export default function ClientVisitNew() {
                   className="mt-2 w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
                 />
               </div>
+              </div>}
             </section>
           )}
 
           {selectedModules.fitting && (
             <section className="rounded-2xl border border-gray-100 bg-white p-5">
-              <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                className="flex w-full items-start justify-between gap-3 text-left"
+                onClick={() => setCollapsedModules((prev) => ({ ...prev, fitting: !prev.fitting }))}
+              >
                 <SectionHint title="配镜记录" desc="处方与配镜参数" />
-                <ModuleStatusBadge status={moduleStatus.fitting} />
-              </div>
-              <div className="mt-4 grid gap-4 lg:grid-cols-3">
+                <div className="flex items-center gap-2">
+                  <ModuleStatusBadge status={moduleStatus.fitting} />
+                  <CaretDown
+                    weight="bold"
+                    className={clsx(
+                      "h-4 w-4 text-gray-400 transition-transform",
+                      collapsedModules.fitting ? "-rotate-90" : "rotate-0"
+                    )}
+                  />
+                </div>
+              </button>
+              {!collapsedModules.fitting && <div className="mt-4">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                <div>
+                  <div className="text-sm text-gray-500">配镜日期</div>
+                  <input
+                    type="date"
+                    value={fittingForm.fittingDate}
+                    onChange={(e) => {
+                      setFittingForm((prev) => ({ ...prev, fittingDate: e.target.value }));
+                      markModuleDraft("fitting");
+                    }}
+                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
+                </div>
                 <div>
                   <div className="text-sm text-gray-500">处方类型</div>
                   <input
@@ -609,7 +1408,7 @@ export default function ClientVisitNew() {
                     className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
                   />
                 </div>
-                <div className="lg:col-span-2">
+                <div>
                   <div className="text-sm text-gray-500">镜片 / 镜架信息</div>
                   <input
                     value={fittingForm.productInfo}
@@ -632,16 +1431,43 @@ export default function ClientVisitNew() {
                   className="mt-2 w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
                 />
               </div>
+              </div>}
             </section>
           )}
 
           {selectedModules.billing && (
             <section className="rounded-2xl border border-gray-100 bg-white p-5">
-              <div className="flex items-center justify-between gap-3">
+              <button
+                type="button"
+                className="flex w-full items-start justify-between gap-3 text-left"
+                onClick={() => setCollapsedModules((prev) => ({ ...prev, billing: !prev.billing }))}
+              >
                 <SectionHint title="收费详情" desc="收费单与支付状态" />
-                <ModuleStatusBadge status={moduleStatus.billing} />
-              </div>
-              <div className="mt-4 grid gap-4 lg:grid-cols-3">
+                <div className="flex items-center gap-2">
+                  <ModuleStatusBadge status={moduleStatus.billing} />
+                  <CaretDown
+                    weight="bold"
+                    className={clsx(
+                      "h-4 w-4 text-gray-400 transition-transform",
+                      collapsedModules.billing ? "-rotate-90" : "rotate-0"
+                    )}
+                  />
+                </div>
+              </button>
+              {!collapsedModules.billing && <div className="mt-4">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+                <div>
+                  <div className="text-sm text-gray-500">收费日期</div>
+                  <input
+                    type="date"
+                    value={billingForm.billingDate}
+                    onChange={(e) => {
+                      setBillingForm((prev) => ({ ...prev, billingDate: e.target.value }));
+                      markModuleDraft("billing");
+                    }}
+                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
+                </div>
                 <div>
                   <div className="text-sm text-gray-500">收费项目</div>
                   <input
@@ -666,20 +1492,16 @@ export default function ClientVisitNew() {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">支付状态</div>
-                  <select
+                  <Select
+                    className="mt-2"
                     value={billingForm.paymentStatus}
-                    onChange={(e) => {
-                      setBillingForm((prev) => ({ ...prev, paymentStatus: e.target.value }));
+                    onChange={(next) => {
+                      setBillingForm((prev) => ({ ...prev, paymentStatus: next }));
                       markModuleDraft("billing");
                     }}
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                  >
-                    {archivePaymentStatusOptions.map((item) => (
-                      <option key={item} value={item}>
-                        {item}
-                      </option>
-                    ))}
-                  </select>
+                    options={paymentStatusOptions}
+                    triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
                 </div>
               </div>
               <div className="mt-4">
@@ -693,6 +1515,7 @@ export default function ClientVisitNew() {
                   className="mt-2 w-full min-h-[120px] rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
                 />
               </div>
+              </div>}
             </section>
           )}
 
@@ -705,9 +1528,10 @@ export default function ClientVisitNew() {
           <section className="rounded-2xl border border-gray-100 bg-white px-5 py-4">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="text-sm text-gray-500">
-                当前客户：<span className="font-semibold text-gray-700">{patient.name}</span>
+                当前客户：<span className="font-semibold text-gray-700">{patient?.name || basicForm.name || "-"}</span>
                 <span className="mx-2 text-gray-300">|</span>
-                最近就诊：<span className="font-semibold text-gray-700">{formatDateOnly(patient.latestVisit)}</span>
+                最近就诊：
+                <span className="font-semibold text-gray-700">{formatDateOnly(patient?.latestVisit)}</span>
               </div>
               <div className="flex flex-wrap justify-end gap-2">
                 <button

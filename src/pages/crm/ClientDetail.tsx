@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import clsx from "clsx";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { ArrowLeft, Plus, Phone, UserCircle, LockKey, PencilSimple } from "@phosphor-icons/react";
+import { Alarm, ArrowLeft, LockKey, PencilSimple, Phone, Plus, UserCircle } from "@phosphor-icons/react";
 import {
   appointments,
   followups,
@@ -10,12 +11,21 @@ import {
   trainingRecords,
   visitDetailRecords,
   type PatientProfile,
+  type Followup,
+  type Visit,
   type VisitDetailRecord,
 } from "./mockData";
 
 function formatDateOnly(value?: string) {
   if (!value) return "-";
   return String(value).split(" ")[0];
+}
+
+function isDateDue(value?: string) {
+  if (!value) return false;
+  const parsed = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return false;
+  return parsed.getTime() <= Date.now();
 }
 
 function formatEyeLabel(value: string) {
@@ -94,13 +104,49 @@ export default function ClientDetail() {
   const id = String(params.id ?? "");
   const patient = useMemo(() => patients.find((p) => p.id === id) ?? patients[0], [id]);
 
+  const localVisits = useMemo(() => {
+    try {
+      const raw = window.localStorage.getItem(`clientVisits:${patient.id}`);
+      const parsed = JSON.parse(raw ?? "[]") as Visit[];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }, [patient.id]);
+
+  const localVisitDetails = useMemo(() => {
+    try {
+      const raw = window.localStorage.getItem(`clientVisitDetails:${patient.id}`);
+      const parsed = JSON.parse(raw ?? "{}") as Record<string, VisitDetailRecord>;
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch {
+      return {};
+    }
+  }, [patient.id]);
+
+  const combinedVisits = useMemo(() => {
+    const map = new Map<string, Visit>();
+    for (const item of localVisits) map.set(item.id, item);
+    for (const item of historyVisits) {
+      if (!map.has(item.id)) map.set(item.id, item);
+    }
+    return Array.from(map.values()).sort((a, b) => String(b.date).localeCompare(String(a.date)));
+  }, [localVisits]);
+
   const [activeTab, setActiveTab] = useState<TabKey>("visits");
-  const [selectedVisitId, setSelectedVisitId] = useState(historyVisits[0]?.id ?? "v1");
+  const [selectedVisitId, setSelectedVisitId] = useState(() => {
+    try {
+      const raw = window.localStorage.getItem(`clientVisits:${id}`);
+      const parsed = JSON.parse(raw ?? "[]") as Array<{ id?: string }>;
+      if (Array.isArray(parsed) && parsed[0]?.id) return String(parsed[0].id);
+    } catch {}
+    return historyVisits[0]?.id ?? "v1";
+  });
   const [visitEditMode, setVisitEditMode] = useState(false);
   const [visitOverrides, setVisitOverrides] = useState<Record<string, VisitDetailRecord>>({});
   const baseVisitDetail = useMemo(
-    () => visitDetailRecords[selectedVisitId] ?? visitDetailRecords.v1,
-    [selectedVisitId]
+    () => localVisitDetails[selectedVisitId] ?? visitDetailRecords[selectedVisitId] ?? visitDetailRecords.v1,
+    [localVisitDetails, selectedVisitId]
   );
   const effectiveVisitDetail = useMemo(
     () => visitOverrides[selectedVisitId] ?? baseVisitDetail,
@@ -111,13 +157,35 @@ export default function ClientDetail() {
   const [trainingRows, setTrainingRows] = useState(trainingRecords);
   const [selectedTrainingId, setSelectedTrainingId] = useState<string | null>(null);
 
+  useEffect(() => {
+    setSelectedVisitId(combinedVisits[0]?.id ?? historyVisits[0]?.id ?? "v1");
+    setVisitEditMode(false);
+  }, [combinedVisits, patient.id]);
+
+  useEffect(() => {
+    if (visitEditMode) return;
+    setVisitDraft(visitOverrides[selectedVisitId] ?? localVisitDetails[selectedVisitId] ?? visitDetailRecords[selectedVisitId] ?? visitDetailRecords.v1);
+  }, [localVisitDetails, selectedVisitId, visitEditMode, visitOverrides]);
+
   const patientAppointments = useMemo(
     () => appointments.filter((a) => a.patient === patient.name),
     [patient.name]
   );
+  const localFollowups = useMemo(() => {
+    try {
+      const raw = window.localStorage.getItem(`clientFollowups:${patient.id}`);
+      const parsed = JSON.parse(raw ?? "[]") as Followup[];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }, [patient.id]);
   const patientFollowups = useMemo(
-    () => followups.filter((f) => f.patient === patient.name),
-    [patient.name]
+    () =>
+      [...localFollowups, ...followups.filter((f) => f.patient === patient.name)].sort((a, b) =>
+        String(b.reviewDate).localeCompare(String(a.reviewDate))
+      ),
+    [localFollowups, patient.name]
   );
   const patientTrainingRecords = useMemo(
     () => trainingRows.filter((item) => item.patient === patient.name),
@@ -221,12 +289,12 @@ export default function ClientDetail() {
                       <div className="text-base font-bold text-gray-900">就诊时间轴</div>
                     </div>
                     <span className="rounded-xl bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-600">
-                      共 {historyVisits.length} 次
+                      共 {combinedVisits.length} 次
                     </span>
                   </div>
                   <div className="mt-4 space-y-2">
-                    {historyVisits.map((v, idx) => {
-                      const isInitial = idx === historyVisits.length - 1;
+                    {combinedVisits.map((v, idx) => {
+                      const isInitial = idx === combinedVisits.length - 1;
                       const tagClass = isInitial
                         ? "border-sky-200 bg-sky-50 text-sky-700"
                         : "border-emerald-200 bg-emerald-50 text-emerald-700";
@@ -238,7 +306,7 @@ export default function ClientDetail() {
                         key={v.id}
                         onClick={() => {
                           setVisitEditMode(false);
-                          setVisitDraft(visitOverrides[v.id] ?? visitDetailRecords[v.id] ?? visitDetailRecords.v1);
+                          setVisitDraft(visitOverrides[v.id] ?? localVisitDetails[v.id] ?? visitDetailRecords[v.id] ?? visitDetailRecords.v1);
                           setSelectedVisitId(v.id);
                         }}
                         className={
@@ -971,26 +1039,46 @@ export default function ClientDetail() {
                       <th className="px-4 py-3 font-semibold">诊断</th>
                       <th className="px-4 py-3 font-semibold">项目</th>
                       <th className="px-4 py-3 font-semibold">复查日期</th>
+                      <th className="px-4 py-3 font-semibold">提醒时间</th>
                       <th className="px-4 py-3 font-semibold">状态</th>
                       <th className="px-4 py-3 font-semibold">结果</th>
                       <th className="px-4 py-3 font-semibold">负责人</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100 text-sm">
-                    {patientFollowups.map((f) => (
+                    {patientFollowups.map((f) => {
+                      const due = isDateDue(f.reminderDate);
+                      return (
                       <tr key={f.id} className="hover:bg-gray-50">
                         <td className="px-4 py-3 font-semibold text-gray-900">{f.latestVisit}</td>
                         <td className="px-4 py-3 text-gray-700">{f.diagnosis}</td>
                         <td className="px-4 py-3 text-gray-700">{f.treatment}</td>
                         <td className="px-4 py-3 text-gray-700">{f.reviewDate}</td>
+                        <td className="px-4 py-3 text-gray-700">
+                          {f.reminderDate ? (
+                            <span className="inline-flex items-center gap-2">
+                              <Alarm
+                                weight="bold"
+                                className={clsx(
+                                  "h-4 w-4 origin-top",
+                                  due ? "text-red-500 animate-[alarm-shake_0.6s_ease-in-out_infinite]" : "text-gray-300"
+                                )}
+                              />
+                              <span className={due ? "font-semibold text-red-600" : "text-gray-700"}>{f.reminderDate}</span>
+                            </span>
+                          ) : (
+                            "-"
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-gray-700">{f.status}</td>
                         <td className="px-4 py-3 text-gray-500">{f.result}</td>
                         <td className="px-4 py-3 text-gray-700">{f.owner}</td>
                       </tr>
-                    ))}
+                      );
+                    })}
                     {patientFollowups.length === 0 && (
                       <tr>
-                        <td colSpan={7} className="px-4 py-12 text-center text-sm text-gray-500">
+                        <td colSpan={8} className="px-4 py-12 text-center text-sm text-gray-500">
                           暂无数据
                         </td>
                       </tr>

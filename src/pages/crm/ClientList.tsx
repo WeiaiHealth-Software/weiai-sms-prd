@@ -239,7 +239,10 @@ export default function ClientList() {
                 <DownloadSimple weight="bold" className="h-4 w-4" />
                 导出
               </button>
-              <button className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-600 active:bg-primary-700">
+              <button
+                className="inline-flex items-center gap-2 rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-600 active:bg-primary-700"
+                onClick={() => navigate("/crm/client/new/visit/new")}
+              >
                 <Plus weight="bold" className="h-4 w-4" />
                 新增档案
               </button>
