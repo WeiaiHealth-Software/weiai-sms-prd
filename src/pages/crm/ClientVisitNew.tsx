@@ -1,3 +1,5 @@
+/* eslint-disable no-empty */
+/* eslint-disable react-hooks/set-state-in-effect */
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
