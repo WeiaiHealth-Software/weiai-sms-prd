@@ -15,6 +15,7 @@ import Booking from "./pages/crm/Booking";
 import Followup from "./pages/crm/Followup";
 import TagManagement from "./pages/crm/TagManagement";
 import UiSpec from "./pages/system/UiSpec";
+import Login from "./pages/auth/Login";
 
 import ScreenList from "./pages/external/ScreenList";
 import Miniprogram from "./pages/external/Miniprogram";
@@ -42,6 +43,10 @@ const genericRoutes = menuConfig.flatMap((item) =>
 );
 
 export const router = createHashRouter([
+  {
+    path: "/login",
+    element: <Login />,
+  },
   {
     path: "/",
     element: <MainLayout />,

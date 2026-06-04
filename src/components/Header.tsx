@@ -1,10 +1,12 @@
 
-import { Bell, Gear, CaretRight } from "@phosphor-icons/react";
-import { useLocation } from "react-router";
+import { Bell, Gear, CaretRight, SignOut } from "@phosphor-icons/react";
+import { useLocation, useNavigate } from "react-router";
 import { menuConfig } from "../config/menu";
+import { clearAuthed } from "../lib/auth";
 
 export function Header({ toggleSettings }: { toggleSettings: () => void }) {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const pathname = location.pathname;
   const matchedItem =
@@ -64,6 +66,17 @@ export function Header({ toggleSettings }: { toggleSettings: () => void }) {
           title="系统设置"
         >
           <Gear weight="bold" className="text-xl" />
+        </button>
+
+        <button
+          onClick={() => {
+            clearAuthed();
+            navigate("/login", { replace: true });
+          }}
+          className="text-gray-500 hover:text-gray-700 transition"
+          title="退出登录"
+        >
+          <SignOut weight="bold" className="text-xl" />
         </button>
 
         {/* User Profile */}
