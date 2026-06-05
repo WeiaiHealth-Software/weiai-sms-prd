@@ -119,13 +119,13 @@ export default function ClientList() {
   const { RangePicker } = DatePicker;
   const [data, setData] = useState<Patient[]>(patients);
   const [keyword, setKeyword] = useState("");
-  const [followupType, setFollowupType] = useState("回访项目类型");
+  const [followupType, setFollowupType] = useState("就诊类型");
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
   const [page, setPage] = useState(1);
   const [deleteCandidate, setDeleteCandidate] = useState<Patient | null>(null);
   const [applied, setApplied] = useState({
     keyword: "",
-    followupType: "回访项目类型",
+    followupType: "就诊类型",
     startDate: "",
     endDate: "",
   });
@@ -141,7 +141,7 @@ export default function ClientList() {
         if (!haystack.includes(query)) return false;
       }
 
-      if (applied.followupType !== "回访项目类型") {
+      if (applied.followupType !== "就诊类型") {
         if ((p.followupType ?? "") !== applied.followupType) return false;
       }
 
@@ -182,17 +182,20 @@ export default function ClientList() {
               placeholder="搜索姓名 / 手机号 / 患者编号"
             />
             <Select
-              value={followupType === "回访项目类型" ? undefined : followupType}
+              value={followupType === "就诊类型" ? undefined : followupType}
               onChange={(next) => setFollowupType(next)}
-              placeholder="回访项目类型"
+              placeholder="就诊类型"
               className="w-full"
               triggerClassName="border-gray-200 text-gray-700 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
               options={[
+                { value: "初诊", label: "初诊" },
+                { value: "复查", label: "复查" },
+                { value: "视训", label: "视训" },
+                { value: "配镜", label: "配镜" },
                 { value: "角膜塑形镜", label: "角膜塑形镜" },
                 { value: "离焦框架镜", label: "离焦框架镜" },
                 { value: "离焦软镜", label: "离焦软镜" },
                 { value: "哺光仪", label: "哺光仪" },
-                { value: "视训", label: "视训" },
                 { value: "用药", label: "用药" },
                 { value: "定期复查", label: "定期复查" },
               ]}
@@ -212,11 +215,11 @@ export default function ClientList() {
               <button
                 onClick={() => {
                   setKeyword("");
-                  setFollowupType("回访项目类型");
+                  setFollowupType("就诊类型");
                   setDateRange([null, null]);
                   setApplied({
                     keyword: "",
-                    followupType: "回访项目类型",
+                    followupType: "就诊类型",
                     startDate: "",
                     endDate: "",
                   });
@@ -264,6 +267,7 @@ export default function ClientList() {
                 <th className="px-5 py-4 font-semibold">客户信息</th>
                 <th className="px-5 py-4 font-semibold">用户标签</th>
                 <th className="px-5 py-4 font-semibold">就诊日期</th>
+                <th className="px-5 py-4 font-semibold">就诊类型</th>
                 <th className="px-5 py-4 font-semibold">数据记录</th>
                 <th className="px-5 py-4 font-semibold">诊断</th>
                 <th className="px-5 py-4 font-semibold">操作</th>
@@ -293,6 +297,15 @@ export default function ClientList() {
                     <div className="flex items-center gap-2 text-sm">
                       <span className="font-semibold text-gray-900">{formatDateOnly(p.latestVisit)}</span>
                     </div>
+                  </td>
+                  <td className="px-5 py-4">
+                    {p.followupType ? (
+                      <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
+                        {p.followupType}
+                      </span>
+                    ) : (
+                      <div className="text-sm font-semibold text-gray-400">-</div>
+                    )}
                   </td>
                   <td className="px-5 py-4">
                     {p.axial ? (
@@ -339,7 +352,7 @@ export default function ClientList() {
               ))}
               {paged.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-5 py-12 text-center text-sm text-gray-500">
+                  <td colSpan={7} className="px-5 py-12 text-center text-sm text-gray-500">
                     暂无数据
                   </td>
                 </tr>

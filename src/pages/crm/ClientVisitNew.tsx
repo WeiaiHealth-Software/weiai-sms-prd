@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { ArrowLeft, Cake, CaretDown, FloppyDisk, Phone, PencilSimple } from "@phosphor-icons/react";
+import { ArrowLeft, Cake, CaretDown, Check, CreditCard, FloppyDisk, Money, Phone, PencilSimple, Wallet, WechatLogo } from "@phosphor-icons/react";
 import Select, { type SelectOption } from "../../components/form/Select";
 import {
   archiveGenderOptions,
@@ -32,6 +32,57 @@ const archiveDurationUnitOptions: SelectOption[] = [
   { value: "月", label: "月" },
   { value: "年", label: "年" },
 ];
+
+const clinicVisitTypeOptions: SelectOption[] = [
+  { value: "初诊", label: "初诊" },
+  { value: "复查", label: "复查" },
+  { value: "视训", label: "视训" },
+  { value: "配镜", label: "配镜" },
+  { value: "角膜塑形镜", label: "角膜塑形镜" },
+  { value: "离焦框架镜", label: "离焦框架镜" },
+  { value: "离焦软镜", label: "离焦软镜" },
+  { value: "哺光仪", label: "哺光仪" },
+  { value: "视训", label: "视训" },
+  { value: "用药", label: "用药" },
+  { value: "定期复查", label: "定期复查" },
+];
+
+const fittingPrescriptionTypeOptions: SelectOption[] = [
+  { value: "近视镜", label: "近视镜" },
+  { value: "OK镜", label: "OK镜" },
+  { value: "离焦镜", label: "离焦镜" },
+  { value: "离焦框架镜", label: "离焦框架镜" },
+  { value: "离焦软镜", label: "离焦软镜" },
+  { value: "RGP硬镜", label: "RGP硬镜" },
+  { value: "软性隐形眼镜", label: "软性隐形眼镜" },
+  { value: "渐进多焦点镜", label: "渐进多焦点镜" },
+  { value: "防蓝光镜", label: "防蓝光镜" },
+  { value: "太阳镜", label: "太阳镜" },
+  { value: "其他", label: "其他" },
+];
+
+const paymentSourceOptions: SelectOption[] = [
+  { value: "现金", label: "现金" },
+  { value: "支付宝", label: "支付宝" },
+  { value: "微信", label: "微信" },
+  { value: "银行卡", label: "银行卡" },
+];
+
+function PaymentSourceIcon({ value }: { value: string }) {
+  const baseClassName = "h-4 w-4 shrink-0";
+  switch (value) {
+    case "现金":
+      return <Money weight="fill" className={`${baseClassName} text-emerald-500`} />;
+    case "支付宝":
+      return <Wallet weight="fill" className={`${baseClassName} text-sky-500`} />;
+    case "微信":
+      return <WechatLogo weight="fill" className={`${baseClassName} text-emerald-600`} />;
+    case "银行卡":
+      return <CreditCard weight="fill" className={`${baseClassName} text-slate-500`} />;
+    default:
+      return <Wallet weight="fill" className={`${baseClassName} text-slate-400`} />;
+  }
+}
 
 function formatDateOnly(value?: string) {
   if (!value) return "-";
@@ -428,6 +479,7 @@ export default function ClientVisitNew() {
   });
   const [clinicForm, setClinicForm] = useState({
     visitDate: formatTodayISO(),
+    visitType: "",
     doctor: "",
     optometrist: "",
     eye: "双眼",
@@ -457,7 +509,8 @@ export default function ClientVisitNew() {
   const [fittingForm, setFittingForm] = useState({
     fittingDate: formatTodayISO(),
     prescriptionType: "",
-    productInfo: "",
+    lensInfo: "",
+    frameInfo: "",
     fittingNote: "",
   });
   const [billingForm, setBillingForm] = useState({
@@ -465,6 +518,7 @@ export default function ClientVisitNew() {
     item: "",
     amount: "",
     paymentStatus: "未收费",
+    paymentSource: "",
     note: "",
   });
   const [savedMessage, setSavedMessage] = useState("");
@@ -503,11 +557,23 @@ export default function ClientVisitNew() {
           setClinicForm((prev) => ({
             ...prev,
             ...parsed.clinicForm,
+            visitType:
+              (parsed.clinicForm as unknown as { visitType?: string; visitTypes?: string[] } | undefined)?.visitType ??
+              (parsed.clinicForm as unknown as { visitTypes?: string[] } | undefined)?.visitTypes?.[0] ??
+              prev.visitType,
             eyeExam: parsed.clinicForm?.eyeExam ?? prev.eyeExam,
             auxExam: parsed.clinicForm?.auxExam ?? prev.auxExam,
           }));
           setTrainingForm((prev) => ({ ...prev, ...parsed.trainingForm }));
-          setFittingForm((prev) => ({ ...prev, ...parsed.fittingForm }));
+          setFittingForm((prev) => ({
+            ...prev,
+            ...parsed.fittingForm,
+            lensInfo:
+              (parsed.fittingForm as unknown as { lensInfo?: string; productInfo?: string } | undefined)?.lensInfo ??
+              (parsed.fittingForm as unknown as { productInfo?: string } | undefined)?.productInfo ??
+              prev.lensInfo,
+            frameInfo: (parsed.fittingForm as unknown as { frameInfo?: string } | undefined)?.frameInfo ?? prev.frameInfo,
+          }));
           setBillingForm((prev) => ({ ...prev, ...parsed.billingForm }));
           setSavedMessage("已恢复上次草稿");
           return;
@@ -544,6 +610,7 @@ export default function ClientVisitNew() {
     const enableReminder = Boolean(seed.treatment.estimatedDate || seed.treatment.reminderDate);
     setClinicForm({
       visitDate: formatTodayISO(),
+      visitType: patient?.followupType ?? "",
       doctor: seed.basicInfo.doctor,
       optometrist: seed.basicInfo.optometrist,
       eye: seed.chiefHistory.eye,
@@ -570,8 +637,8 @@ export default function ClientVisitNew() {
       completion: "",
       note: "",
     });
-    setFittingForm({ fittingDate: formatTodayISO(), prescriptionType: "", productInfo: "", fittingNote: "" });
-    setBillingForm({ billingDate: formatTodayISO(), item: "", amount: "", paymentStatus: "未收费", note: "" });
+    setFittingForm({ fittingDate: formatTodayISO(), prescriptionType: "", lensInfo: "", frameInfo: "", fittingNote: "" });
+    setBillingForm({ billingDate: formatTodayISO(), item: "", amount: "", paymentStatus: "未收费", paymentSource: "", note: "" });
     setSavedMessage("");
   }, [draftStorageKey, id, isNewClient, patient, seed]);
 
@@ -1017,30 +1084,33 @@ export default function ClientVisitNew() {
 
           {selectedModules.clinic && (
             <section className="rounded-2xl border border-gray-100 bg-white p-5">
-              <button
-                type="button"
-                className="flex w-full items-start justify-between gap-3 text-left"
-                onClick={() => setCollapsedModules((prev) => ({ ...prev, clinic: !prev.clinic }))}
-              >
+              <div className="flex w-full items-start justify-between gap-3 text-left">
                 <SectionHint title="就诊档案" desc="检查 / 诊断 / 处理 / 复查建议" />
                 <div className="flex items-center gap-2">
                   <ModuleStatusBadge status={moduleStatus.clinic} />
-                  <CaretDown
-                    weight="bold"
-                    className={clsx(
-                      "h-4 w-4 text-gray-400 transition-transform",
-                      collapsedModules.clinic ? "-rotate-90" : "rotate-0"
-                    )}
-                  />
+                  <button
+                    type="button"
+                    aria-label={collapsedModules.clinic ? "展开就诊档案" : "折叠就诊档案"}
+                    className="inline-flex cursor-pointer items-center justify-center rounded-lg p-2 text-gray-500 hover:bg-gray-50"
+                    onClick={() => setCollapsedModules((prev) => ({ ...prev, clinic: !prev.clinic }))}
+                  >
+                    <CaretDown
+                      weight="bold"
+                      className={clsx(
+                        "h-4 w-4 text-gray-400 transition-transform",
+                        collapsedModules.clinic ? "-rotate-90" : "rotate-0"
+                      )}
+                    />
+                  </button>
                 </div>
-              </button>
+              </div>
               {!collapsedModules.clinic && <div className="mt-4 space-y-4">
                 <div className="rounded-2xl border border-gray-100 bg-white">
                   <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">
                     就诊信息
                   </div>
                   <div className="p-5">
-                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                       <div>
                         <div className="text-sm text-gray-500">就诊日期</div>
                         <input
@@ -1051,6 +1121,21 @@ export default function ClientVisitNew() {
                             markModuleDraft("clinic");
                           }}
                           className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-sm text-gray-500">就诊类型</div>
+                        <Select
+                          className="mt-2"
+                          value={clinicForm.visitType}
+                          onChange={(next) => {
+                            setClinicForm((prev) => ({ ...prev, visitType: next }));
+                            markModuleDraft("clinic");
+                          }}
+                          options={clinicVisitTypeOptions}
+                          placeholder="请选择"
+                          triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                          dropdownClassName="border-gray-200"
                         />
                       </div>
                       <div>
@@ -1264,23 +1349,26 @@ export default function ClientVisitNew() {
 
           {selectedModules.training && (
             <section className="rounded-2xl border border-gray-100 bg-white p-5">
-              <button
-                type="button"
-                className="flex w-full items-start justify-between gap-3 text-left"
-                onClick={() => setCollapsedModules((prev) => ({ ...prev, training: !prev.training }))}
-              >
+              <div className="flex w-full items-start justify-between gap-3 text-left">
                 <SectionHint title="视光训练" desc="视训项目与训练数据" />
                 <div className="flex items-center gap-2">
                   <ModuleStatusBadge status={moduleStatus.training} />
-                  <CaretDown
-                    weight="bold"
-                    className={clsx(
-                      "h-4 w-4 text-gray-400 transition-transform",
-                      collapsedModules.training ? "-rotate-90" : "rotate-0"
-                    )}
-                  />
+                  <button
+                    type="button"
+                    aria-label={collapsedModules.training ? "展开视光训练" : "折叠视光训练"}
+                    className="inline-flex items-center justify-center rounded-lg p-2 text-gray-500 hover:bg-gray-50"
+                    onClick={() => setCollapsedModules((prev) => ({ ...prev, training: !prev.training }))}
+                  >
+                    <CaretDown
+                      weight="bold"
+                      className={clsx(
+                        "h-4 w-4 text-gray-400 transition-transform",
+                        collapsedModules.training ? "-rotate-90" : "rotate-0"
+                      )}
+                    />
+                  </button>
                 </div>
-              </button>
+              </div>
               {!collapsedModules.training && <div className="mt-4">
               <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <div>
@@ -1368,25 +1456,28 @@ export default function ClientVisitNew() {
 
           {selectedModules.fitting && (
             <section className="rounded-2xl border border-gray-100 bg-white p-5">
-              <button
-                type="button"
-                className="flex w-full items-start justify-between gap-3 text-left"
-                onClick={() => setCollapsedModules((prev) => ({ ...prev, fitting: !prev.fitting }))}
-              >
+              <div className="flex w-full items-start justify-between gap-3 text-left">
                 <SectionHint title="配镜记录" desc="处方与配镜参数" />
                 <div className="flex items-center gap-2">
                   <ModuleStatusBadge status={moduleStatus.fitting} />
-                  <CaretDown
-                    weight="bold"
-                    className={clsx(
-                      "h-4 w-4 text-gray-400 transition-transform",
-                      collapsedModules.fitting ? "-rotate-90" : "rotate-0"
-                    )}
-                  />
+                  <button
+                    type="button"
+                    aria-label={collapsedModules.fitting ? "展开配镜记录" : "折叠配镜记录"}
+                    className="inline-flex items-center justify-center rounded-lg p-2 text-gray-500 hover:bg-gray-50"
+                    onClick={() => setCollapsedModules((prev) => ({ ...prev, fitting: !prev.fitting }))}
+                  >
+                    <CaretDown
+                      weight="bold"
+                      className={clsx(
+                        "h-4 w-4 text-gray-400 transition-transform",
+                        collapsedModules.fitting ? "-rotate-90" : "rotate-0"
+                      )}
+                    />
+                  </button>
                 </div>
-              </button>
+              </div>
               {!collapsedModules.fitting && <div className="mt-4">
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                 <div>
                   <div className="text-sm text-gray-500">配镜日期</div>
                   <input
@@ -1400,22 +1491,36 @@ export default function ClientVisitNew() {
                   />
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">处方类型</div>
-                  <input
+                  <div className="text-sm text-gray-500">配镜类型</div>
+                  <Select
+                    className="mt-2"
                     value={fittingForm.prescriptionType}
+                    onChange={(next) => {
+                      setFittingForm((prev) => ({ ...prev, prescriptionType: next }));
+                      markModuleDraft("fitting");
+                    }}
+                    options={fittingPrescriptionTypeOptions}
+                    placeholder="请选择"
+                    triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500">镜片信息</div>
+                  <input
+                    value={fittingForm.lensInfo}
                     onChange={(e) => {
-                      setFittingForm((prev) => ({ ...prev, prescriptionType: e.target.value }));
+                      setFittingForm((prev) => ({ ...prev, lensInfo: e.target.value }));
                       markModuleDraft("fitting");
                     }}
                     className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
                   />
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">镜片 / 镜架信息</div>
+                  <div className="text-sm text-gray-500">镜架信息</div>
                   <input
-                    value={fittingForm.productInfo}
+                    value={fittingForm.frameInfo}
                     onChange={(e) => {
-                      setFittingForm((prev) => ({ ...prev, productInfo: e.target.value }));
+                      setFittingForm((prev) => ({ ...prev, frameInfo: e.target.value }));
                       markModuleDraft("fitting");
                     }}
                     className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
@@ -1439,25 +1544,28 @@ export default function ClientVisitNew() {
 
           {selectedModules.billing && (
             <section className="rounded-2xl border border-gray-100 bg-white p-5">
-              <button
-                type="button"
-                className="flex w-full items-start justify-between gap-3 text-left"
-                onClick={() => setCollapsedModules((prev) => ({ ...prev, billing: !prev.billing }))}
-              >
+              <div className="flex w-full items-start justify-between gap-3 text-left">
                 <SectionHint title="收费详情" desc="收费单与支付状态" />
                 <div className="flex items-center gap-2">
                   <ModuleStatusBadge status={moduleStatus.billing} />
-                  <CaretDown
-                    weight="bold"
-                    className={clsx(
-                      "h-4 w-4 text-gray-400 transition-transform",
-                      collapsedModules.billing ? "-rotate-90" : "rotate-0"
-                    )}
-                  />
+                  <button
+                    type="button"
+                    aria-label={collapsedModules.billing ? "展开收费详情" : "折叠收费详情"}
+                    className="inline-flex items-center justify-center rounded-lg p-2 text-gray-500 hover:bg-gray-50"
+                    onClick={() => setCollapsedModules((prev) => ({ ...prev, billing: !prev.billing }))}
+                  >
+                    <CaretDown
+                      weight="bold"
+                      className={clsx(
+                        "h-4 w-4 text-gray-400 transition-transform",
+                        collapsedModules.billing ? "-rotate-90" : "rotate-0"
+                      )}
+                    />
+                  </button>
                 </div>
-              </button>
+              </div>
               {!collapsedModules.billing && <div className="mt-4">
-              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
                 <div>
                   <div className="text-sm text-gray-500">收费日期</div>
                   <input
@@ -1503,6 +1611,39 @@ export default function ClientVisitNew() {
                     }}
                     options={paymentStatusOptions}
                     triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                  />
+                </div>
+                <div>
+                  <div className="text-sm text-gray-500">支付来源</div>
+                  <Select
+                    className="mt-2"
+                    value={billingForm.paymentSource || undefined}
+                    onChange={(next) => {
+                      setBillingForm((prev) => ({ ...prev, paymentSource: next }));
+                      markModuleDraft("billing");
+                    }}
+                    options={paymentSourceOptions}
+                    placeholder="请选择"
+                    triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                    renderValue={(option, placeholder) =>
+                      option ? (
+                        <span className="flex min-w-0 items-center gap-2">
+                          <PaymentSourceIcon value={option.value} />
+                          <span className="truncate">{option.label}</span>
+                        </span>
+                      ) : (
+                        placeholder
+                      )
+                    }
+                    renderOption={(option, state) => (
+                      <div className="flex w-full items-center justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <PaymentSourceIcon value={option.value} />
+                          <span className="truncate">{option.label}</span>
+                        </div>
+                        {state.selected ? <Check className="h-4 w-4 text-primary-600" /> : <span className="h-4 w-4" />}
+                      </div>
+                    )}
                   />
                 </div>
               </div>

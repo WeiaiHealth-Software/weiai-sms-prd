@@ -10,6 +10,8 @@ export type MultiSelectProps = {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
+  triggerClassName?: string;
+  dropdownClassName?: string;
 };
 
 export default function MultiSelect({
@@ -19,6 +21,8 @@ export default function MultiSelect({
   placeholder = "请选择",
   disabled,
   className,
+  triggerClassName,
+  dropdownClassName,
 }: MultiSelectProps) {
   const triggerId = useId();
   const listboxId = useMemo(() => `${triggerId}-listbox`, [triggerId]);
@@ -134,7 +138,8 @@ export default function MultiSelect({
         className={clsx(
           "w-full min-h-11 rounded-xl border border-slate-200 px-3 py-2 text-sm bg-white text-left flex items-center justify-between gap-3",
           "outline-none focus:ring-1 focus:ring-primary-500 focus:border-primary-500",
-          disabled ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "hover:bg-slate-50 text-slate-700"
+          disabled ? "bg-slate-100 text-slate-400 cursor-not-allowed" : "hover:bg-slate-50 text-slate-700",
+          triggerClassName
         )}
       >
         <div className="flex flex-wrap items-center gap-2 min-w-0 flex-1">
@@ -175,7 +180,10 @@ export default function MultiSelect({
           id={listboxId}
           tabIndex={-1}
           onKeyDown={onListKeyDown}
-          className="absolute z-50 mt-2 w-full rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden"
+          className={clsx(
+            "absolute z-50 mt-2 w-full rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden",
+            dropdownClassName
+          )}
         >
           <div className="max-h-64 overflow-auto p-1">
             {enabledOptions.map((option, index) => {
@@ -209,4 +217,3 @@ export default function MultiSelect({
     </div>
   );
 }
-
