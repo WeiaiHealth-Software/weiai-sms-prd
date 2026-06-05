@@ -11,6 +11,7 @@ import {
   archivePaymentStatusOptions,
   archiveSourceOptions,
   historyVisits,
+  miniProgramUsers,
   patients,
   visitDetailRecords,
   type ArchiveModuleKey,
@@ -444,6 +445,11 @@ export default function ClientVisitNew() {
   ];
 
   const [isBasicEditing, setIsBasicEditing] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | undefined>(undefined);
+  const miniProgramUserOptions = useMemo(
+    () => miniProgramUsers.map((user) => ({ value: user.id, label: `${user.name}（${user.mobile}）` })),
+    []
+  );
   const [basicForm, setBasicForm] = useState<{
     name: string;
     mobile: string;
@@ -530,6 +536,7 @@ export default function ClientVisitNew() {
         const parsed = JSON.parse(rawDraft) as {
           version: number;
           isBasicEditing?: boolean;
+          selectedUserId?: string;
           basicForm?: typeof basicForm;
           selectedModules?: typeof selectedModules;
           collapsedModules?: typeof collapsedModules;
@@ -541,6 +548,7 @@ export default function ClientVisitNew() {
         };
         if (parsed.version === 1) {
           setIsBasicEditing(parsed.isBasicEditing ?? (isNewClient || !patient));
+          setSelectedUserId(parsed.selectedUserId);
           setBasicForm(
             parsed.basicForm ?? {
               name: "",
@@ -583,6 +591,7 @@ export default function ClientVisitNew() {
 
     if (isNewClient || !patient) {
       setIsBasicEditing(true);
+      setSelectedUserId(undefined);
       setBasicForm({
         name: "",
         mobile: "",
@@ -709,6 +718,7 @@ export default function ClientVisitNew() {
       JSON.stringify({
         version: 1,
         isBasicEditing,
+        selectedUserId,
         basicForm,
         selectedModules,
         collapsedModules,
@@ -966,14 +976,40 @@ export default function ClientVisitNew() {
                 </div>
               </div>
             ) : (
-              <div className="mt-4 grid gap-4 lg:grid-cols-3">
+              <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <div>
                   <div className="text-sm text-gray-500">姓名</div>
-                  <input
-                    value={basicForm.name}
-                    onChange={(e) => setBasicForm((prev) => ({ ...prev, name: e.target.value }))}
-                    className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
-                  />
+                  {isNewClient ? (
+                    <Select
+                      className="mt-2"
+                      value={selectedUserId}
+                      onChange={(next) => {
+                        setSelectedUserId(next);
+                        const user = miniProgramUsers.find((row) => row.id === next);
+                        if (!user) return;
+                        setBasicForm({
+                          name: user.name,
+                          mobile: user.mobile.replace(/\s+/g, ""),
+                          gender: user.gender,
+                          birthday: user.birthday,
+                          source: user.source,
+                          memberLevel: user.memberLevel,
+                        });
+                      }}
+                      options={miniProgramUserOptions}
+                      placeholder="输入姓名/手机号搜索"
+                      searchable
+                      searchPlaceholder="搜索姓名/手机号"
+                      triggerClassName="border-gray-200 bg-white px-4 text-gray-800 hover:bg-white focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                      dropdownClassName="border-gray-200"
+                    />
+                  ) : (
+                    <input
+                      value={basicForm.name}
+                      onChange={(e) => setBasicForm((prev) => ({ ...prev, name: e.target.value }))}
+                      className="mt-2 w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
+                    />
+                  )}
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">手机号</div>

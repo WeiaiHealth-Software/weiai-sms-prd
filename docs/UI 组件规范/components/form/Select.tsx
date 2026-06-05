@@ -16,6 +16,9 @@ export type SelectProps = {
   disabled?: boolean;
   className?: string;
   triggerClassName?: string;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  onSearch?: (keyword: string) => void;
 };
 
 export default function Select({
@@ -25,22 +28,35 @@ export default function Select({
   placeholder = '请选择',
   disabled,
   className,
-  triggerClassName
+  triggerClassName,
+  searchable,
+  searchPlaceholder,
+  onSearch
 }: SelectProps) {
   const triggerId = useId();
   const listboxId = useMemo(() => `${triggerId}-listbox`, [triggerId]);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [searchValue, setSearchValue] = useState('');
 
   const selected = useMemo(
     () => (value ? options.find(o => o.value === value) : undefined),
     [options, value]
   );
 
-  const enabledOptions = useMemo(() => options.filter(o => !o.disabled), [options]);
+  const filteredOptions = useMemo(() => {
+    if (!searchable) return options;
+    if (onSearch) return options;
+    const keyword = searchValue.trim().toLowerCase();
+    if (!keyword) return options;
+    return options.filter(o => o.label.toLowerCase().includes(keyword));
+  }, [onSearch, options, searchValue, searchable]);
+
+  const enabledOptions = useMemo(() => filteredOptions.filter(o => !o.disabled), [filteredOptions]);
 
   useEffect(() => {
     if (!open) return;
@@ -65,6 +81,10 @@ export default function Select({
     const nextIndex = selectedIndex >= 0 ? selectedIndex : 0;
     setActiveIndex(nextIndex);
     requestAnimationFrame(() => {
+      if (searchable) {
+        searchInputRef.current?.focus();
+        return;
+      }
       optionRefs.current[nextIndex]?.focus();
     });
   }, [enabledOptions, open, value]);
@@ -117,8 +137,23 @@ export default function Select({
 
   useEffect(() => {
     if (!open) return;
+    if (searchable) return;
     optionRefs.current[activeIndex]?.focus();
   }, [activeIndex, open]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (!searchable) return;
+    setActiveIndex(0);
+  }, [open, searchable, searchValue]);
+
+  useEffect(() => {
+    if (!searchable) return;
+    if (open) return;
+    if (!searchValue) return;
+    setSearchValue('');
+    onSearch?.('');
+  }, [onSearch, open, searchValue, searchable]);
 
   return (
     <div ref={wrapperRef} className={classNames('relative', className)}>
@@ -152,7 +187,28 @@ export default function Select({
           onKeyDown={onListKeyDown}
           className="absolute z-50 mt-2 w-full rounded-xl border border-slate-200 bg-white shadow-lg overflow-hidden"
         >
-          <div className="max-h-64 overflow-auto p-1">
+          {searchable && (
+            <div className="border-b border-slate-100 p-2">
+              <input
+                ref={searchInputRef}
+                value={searchValue}
+                placeholder={searchPlaceholder ?? '搜索'}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setSearchValue(next);
+                  onSearch?.(next);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    optionRefs.current[0]?.focus();
+                  }
+                }}
+                className="w-full h-10 rounded-lg border border-slate-200 px-3 text-sm bg-white text-slate-700 outline-none focus:ring-1 focus:ring-brand-500 focus:border-brand-500"
+              />
+            </div>
+          )}
+          <div className={classNames('max-h-64 overflow-auto p-1', searchable && 'pt-2')}>
             {enabledOptions.map((o, i) => {
               const selectedNow = o.value === value;
               const activeNow = i === activeIndex;

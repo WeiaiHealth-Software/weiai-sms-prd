@@ -29,6 +29,64 @@ export type Patient = {
   summary?: string;
 };
 
+export type MiniProgramUser = {
+  id: string;
+  name: string;
+  mobile: string;
+  gender: "男" | "女";
+  birthday: string;
+  source?: string;
+  memberLevel?: string;
+};
+
+export const miniProgramUsers: MiniProgramUser[] = [
+  {
+    id: "mpu-001",
+    name: "张店长",
+    mobile: "13800138000",
+    gender: "男",
+    birthday: "1990-01-01",
+    source: "自然",
+    memberLevel: "VIP",
+  },
+  {
+    id: "mpu-002",
+    name: "李女士",
+    mobile: "13900139000",
+    gender: "女",
+    birthday: "1994-08-12",
+    source: "小红书",
+    memberLevel: "普通用户",
+  },
+  {
+    id: "mpu-003",
+    name: "王同学",
+    mobile: "13700001111",
+    gender: "男",
+    birthday: "2012-05-20",
+    source: "美团",
+    memberLevel: "普通用户",
+  },
+  {
+    id: "mpu-004",
+    name: "陈女士",
+    mobile: "13600002222",
+    gender: "女",
+    birthday: "1988-11-03",
+    source: "海华",
+    memberLevel: "SVIP",
+  },
+  {
+    id: "mpu-005",
+    name: "赵先生",
+    mobile: "13500003333",
+    gender: "男",
+    birthday: "1997-03-16",
+    source: "自然",
+    memberLevel: "VIP",
+  },
+];
+
 export type Appointment = {
   id: string;
   patient: string;

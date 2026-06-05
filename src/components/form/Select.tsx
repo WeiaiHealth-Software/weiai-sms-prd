@@ -24,6 +24,9 @@ export type SelectProps = {
   dropdownClassName?: string;
   renderValue?: (option: SelectOption | undefined, placeholder: string) => React.ReactNode;
   renderOption?: (option: SelectOption, state: RenderState) => React.ReactNode;
+  searchable?: boolean;
+  searchPlaceholder?: string;
+  onSearch?: (keyword: string) => void;
 };
 
 export default function Select({
@@ -37,17 +40,31 @@ export default function Select({
   dropdownClassName,
   renderValue,
   renderOption,
+  searchable,
+  searchPlaceholder,
+  onSearch,
 }: SelectProps) {
   const triggerId = useId();
   const listboxId = useMemo(() => `${triggerId}-listbox`, [triggerId]);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
 
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [searchValue, setSearchValue] = useState("");
 
   const selected = useMemo(() => (value ? options.find((option) => option.value === value) : undefined), [options, value]);
-  const enabledOptions = useMemo(() => options.filter((option) => !option.disabled), [options]);
+
+  const filteredOptions = useMemo(() => {
+    if (!searchable) return options;
+    if (onSearch) return options;
+    const keyword = searchValue.trim().toLowerCase();
+    if (!keyword) return options;
+    return options.filter((option) => option.label.toLowerCase().includes(keyword));
+  }, [onSearch, options, searchValue, searchable]);
+
+  const enabledOptions = useMemo(() => filteredOptions.filter((option) => !option.disabled), [filteredOptions]);
 
   useEffect(() => {
     if (!open) return;
@@ -81,14 +98,33 @@ export default function Select({
     setActiveIndex(nextIndex);
 
     requestAnimationFrame(() => {
+      if (searchable) {
+        searchInputRef.current?.focus();
+        return;
+      }
       optionRefs.current[nextIndex]?.focus();
     });
-  }, [enabledOptions, open, value]);
+  }, [enabledOptions, open, searchable, value]);
 
   useEffect(() => {
     if (!open) return;
+    if (searchable) return;
     optionRefs.current[activeIndex]?.focus();
-  }, [activeIndex, open]);
+  }, [activeIndex, open, searchable]);
+
+  useEffect(() => {
+    if (!open) return;
+    if (!searchable) return;
+    setActiveIndex(0);
+  }, [open, searchable, searchValue]);
+
+  useEffect(() => {
+    if (!searchable) return;
+    if (open) return;
+    if (!searchValue) return;
+    setSearchValue("");
+    onSearch?.("");
+  }, [onSearch, open, searchValue, searchable]);
 
   const onTriggerKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (disabled) return;
@@ -174,7 +210,28 @@ export default function Select({
           onKeyDown={onListKeyDown}
           className={clsx("absolute z-50 mt-2 w-full overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg", dropdownClassName)}
         >
-          <div className="max-h-64 overflow-auto p-1">
+          {searchable ? (
+            <div className="border-b border-slate-100 p-2">
+              <input
+                ref={searchInputRef}
+                value={searchValue}
+                placeholder={searchPlaceholder ?? "搜索"}
+                onChange={(event) => {
+                  const next = event.target.value;
+                  setSearchValue(next);
+                  onSearch?.(next);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowDown") {
+                    event.preventDefault();
+                    optionRefs.current[0]?.focus();
+                  }
+                }}
+                className="h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500"
+              />
+            </div>
+          ) : null}
+          <div className={clsx("max-h-64 overflow-auto p-1", searchable && "pt-2")}>
             {enabledOptions.map((option, index) => {
               const selectedNow = option.value === value;
               const activeNow = index === activeIndex;

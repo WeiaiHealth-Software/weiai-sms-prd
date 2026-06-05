@@ -269,7 +269,7 @@ export default function ClientList() {
                 <th className="px-5 py-4 font-semibold">就诊日期</th>
                 <th className="px-5 py-4 font-semibold">就诊类型</th>
                 <th className="px-5 py-4 font-semibold">数据记录</th>
-                <th className="px-5 py-4 font-semibold">诊断</th>
+                <th className="px-5 py-4 font-semibold w-[200px]">诊断</th>
                 <th className="px-5 py-4 font-semibold">操作</th>
               </tr>
             </thead>
@@ -323,9 +323,9 @@ export default function ClientList() {
                       <div className="text-sm font-semibold text-gray-400">-</div>
                     )}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-5 py-4 w-[200px]">
                     {p.diagnosisNote ? (
-                      <div className="max-w-[420px] truncate whitespace-nowrap text-sm font-semibold text-gray-800">
+                      <div className="w-[200px] truncate whitespace-nowrap text-sm font-semibold text-gray-800">
                         {p.diagnosisNote}
                       </div>
                     ) : (
