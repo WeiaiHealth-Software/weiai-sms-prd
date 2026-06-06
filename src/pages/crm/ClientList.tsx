@@ -2,12 +2,13 @@ import { useMemo, useState } from "react";
 import { DownloadSimple, Plus } from "@phosphor-icons/react";
 import { useNavigate } from "react-router";
 import { patients, profileTagStandard, type Patient, type PatientProfile } from "./mockData";
+import { getMergedPatients, isLocalPatientId, removeLocalPatient } from "./patientArchiveStore";
 import { DatePicker } from "antd";
 import dayjs, { type Dayjs } from "dayjs";
 import Select from "../../components/form/Select";
 
 function formatDateOnly(value?: string) {
-  if (!value) return "-";
+  if (!value) return "--";
   return String(value).split(" ")[0];
 }
 
@@ -117,7 +118,7 @@ function ProfileTags({ profile }: { profile?: PatientProfile }) {
 export default function ClientList() {
   const navigate = useNavigate();
   const { RangePicker } = DatePicker;
-  const [data, setData] = useState<Patient[]>(patients);
+  const [data, setData] = useState<Patient[]>(() => getMergedPatients(patients));
   const [keyword, setKeyword] = useState("");
   const [followupType, setFollowupType] = useState("就诊类型");
   const [dateRange, setDateRange] = useState<[Dayjs | null, Dayjs | null]>([null, null]);
@@ -147,7 +148,7 @@ export default function ClientList() {
 
       if (start || end) {
         const date = formatDateOnly(p.latestVisit);
-        if (date === "-") return false;
+        if (date === "--") return false;
         const d = new Date(date);
         if (start && d < start) return false;
         if (end) {
@@ -304,7 +305,7 @@ export default function ClientList() {
                         {p.followupType}
                       </span>
                     ) : (
-                      <div className="text-sm font-semibold text-gray-400">-</div>
+                      <div className="text-sm font-semibold text-gray-400">--</div>
                     )}
                   </td>
                   <td className="px-5 py-4">
@@ -320,7 +321,7 @@ export default function ClientList() {
                         </span>
                       </div>
                     ) : (
-                      <div className="text-sm font-semibold text-gray-400">-</div>
+                      <div className="text-sm font-semibold text-gray-400">--</div>
                     )}
                   </td>
                   <td className="px-5 py-4 w-[200px]">
@@ -329,7 +330,7 @@ export default function ClientList() {
                         {p.diagnosisNote}
                       </div>
                     ) : (
-                      <div className="text-sm font-semibold text-gray-400">-</div>
+                      <div className="text-sm font-semibold text-gray-400">--</div>
                     )}
                   </td>
                   <td className="px-5 py-4">
@@ -424,6 +425,7 @@ export default function ClientList() {
                 className="rounded-xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700 active:bg-rose-800"
                 onClick={() => {
                   const id = deleteCandidate.id;
+                  if (isLocalPatientId(id)) removeLocalPatient(id);
                   setData((prev) => prev.filter((x) => x.id !== id));
                   setDeleteCandidate(null);
                   const nextTotal = Math.max(0, total - 1);

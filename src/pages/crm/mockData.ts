@@ -12,6 +12,7 @@ export type Patient = {
   gender: "男" | "女";
   age: number;
   mobile: string;
+  idCard?: string;
   store?: string;
   owner?: string;
   latestVisit?: string;
@@ -27,6 +28,11 @@ export type Patient = {
   followStatus?: string;
   memberStatus?: string;
   summary?: string;
+  medicalHistory?: {
+    eyeDiseaseHistory?: string;
+    eyeSurgerySide?: "无" | "左眼" | "右眼" | "双眼";
+    eyeSurgeryDesc?: string;
+  };
 };
 
 export type MiniProgramUser = {
@@ -209,6 +215,7 @@ export const profileTagStandard = [
       { value: "小红书", className: "border-rose-100 bg-rose-50 text-rose-700" },
       { value: "海华", className: "border-teal-100 bg-teal-50 text-teal-700" },
       { value: "自然", className: "border-emerald-100 bg-emerald-50 text-emerald-700" },
+      { value: "小程序扫码", className: "border-emerald-100 bg-emerald-50 text-emerald-700" },
       { value: "其他", className: "border-slate-200 bg-slate-100 text-slate-600" },
     ],
     desc: "标识客户进入系统的主要来源渠道。",
@@ -225,6 +232,36 @@ export const profileTagStandard = [
 ] as const;
 
 export const patients: Patient[] = [
+  {
+    id: "p_new_1",
+    no: "P20269901",
+    name: "许星澜",
+    gender: "女",
+    age: 9,
+    mobile: "138 0000 0901",
+    store: "静安门店",
+    profile: { memberLevel: "普通用户", other: "新客户" },
+  },
+  {
+    id: "p_new_2",
+    no: "P20269902",
+    name: "秦沐阳",
+    gender: "男",
+    age: 12,
+    mobile: "138 0000 0902",
+    store: "静安门店",
+    profile: { memberLevel: "普通用户", other: "新客户" },
+  },
+  {
+    id: "p_new_3",
+    no: "P20269903",
+    name: "沈予安",
+    gender: "男",
+    age: 7,
+    mobile: "138 0000 0903",
+    store: "静安门店",
+    profile: { memberLevel: "普通用户", other: "新客户" },
+  },
   {
     id: "p1",
     no: "P20260001",

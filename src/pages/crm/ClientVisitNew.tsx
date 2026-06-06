@@ -20,6 +20,7 @@ import {
   type VisitDetailRecord,
   type VisitExamRow,
 } from "./mockData";
+import { findMergedPatientById } from "./patientArchiveStore";
 
 const archiveEyeOptions: SelectOption[] = [
   { value: "双眼", label: "双眼" },
@@ -404,7 +405,7 @@ export default function ClientVisitNew() {
   const isNewClient = id === "new";
   const patient = useMemo(() => {
     if (isNewClient) return null;
-    return patients.find((p) => p.id === id) ?? patients[0] ?? null;
+    return findMergedPatientById(patients, id) ?? patients[0] ?? null;
   }, [id, isNewClient]);
   const seed = useMemo(() => {
     if (isNewClient) {

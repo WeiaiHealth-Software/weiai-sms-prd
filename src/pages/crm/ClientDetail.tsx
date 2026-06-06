@@ -15,11 +15,29 @@ import {
   type Visit,
   type VisitDetailRecord,
 } from "./mockData";
+import { findMergedPatientById, isLocalPatientId } from "./patientArchiveStore";
 
 function formatDateOnly(value?: string) {
   if (!value) return "-";
   return String(value).split(" ")[0];
 }
+
+const emptyVisitDetail: VisitDetailRecord = {
+  basicInfo: { doctor: "", optometrist: "" },
+  chiefHistory: { eye: "右眼", symptom: "", duration: "", durationUnit: "", description: "" },
+  eyeExam: [],
+  auxExam: [],
+  diagnosis: "",
+  treatment: {
+    inspection: { item: "", quantity: "", unit: "", price: "", total: "" },
+    prescription: { drug: "", quantity: "", spec: "", unit: "", price: "", eye: "", usage: "", total: "" },
+    therapy: { item: "", quantity: "", unit: "", price: "", total: "" },
+    advice: "",
+    followupCycle: "",
+    estimatedDate: "",
+    reminderDate: "",
+  },
+};
 
 function isDateDue(value?: string) {
   if (!value) return false;
@@ -102,7 +120,7 @@ export default function ClientDetail() {
   const navigate = useNavigate();
   const params = useParams();
   const id = String(params.id ?? "");
-  const patient = useMemo(() => patients.find((p) => p.id === id) ?? patients[0], [id]);
+  const patient = useMemo(() => findMergedPatientById(patients, id) ?? patients[0], [id]);
 
   const localVisits = useMemo(() => {
     try {
@@ -113,6 +131,8 @@ export default function ClientDetail() {
       return [];
     }
   }, [patient.id]);
+
+  const hasVisitRecords = localVisits.length > 0 || Boolean(patient.latestVisit);
 
   const localVisitDetails = useMemo(() => {
     try {
@@ -125,27 +145,26 @@ export default function ClientDetail() {
   }, [patient.id]);
 
   const combinedVisits = useMemo(() => {
+    if (isLocalPatientId(patient.id)) {
+      return [...localVisits].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    }
+    if (!hasVisitRecords) {
+      return [...localVisits].sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    }
     const map = new Map<string, Visit>();
     for (const item of localVisits) map.set(item.id, item);
     for (const item of historyVisits) {
       if (!map.has(item.id)) map.set(item.id, item);
     }
     return Array.from(map.values()).sort((a, b) => String(b.date).localeCompare(String(a.date)));
-  }, [localVisits]);
+  }, [hasVisitRecords, localVisits, patient.id]);
 
   const [activeTab, setActiveTab] = useState<TabKey>("visits");
-  const [selectedVisitId, setSelectedVisitId] = useState(() => {
-    try {
-      const raw = window.localStorage.getItem(`clientVisits:${id}`);
-      const parsed = JSON.parse(raw ?? "[]") as Array<{ id?: string }>;
-      if (Array.isArray(parsed) && parsed[0]?.id) return String(parsed[0].id);
-    } catch {}
-    return historyVisits[0]?.id ?? "v1";
-  });
+  const [selectedVisitId, setSelectedVisitId] = useState<string>("");
   const [visitEditMode, setVisitEditMode] = useState(false);
   const [visitOverrides, setVisitOverrides] = useState<Record<string, VisitDetailRecord>>({});
   const baseVisitDetail = useMemo(
-    () => localVisitDetails[selectedVisitId] ?? visitDetailRecords[selectedVisitId] ?? visitDetailRecords.v1,
+    () => (selectedVisitId ? localVisitDetails[selectedVisitId] ?? visitDetailRecords[selectedVisitId] ?? emptyVisitDetail : emptyVisitDetail),
     [localVisitDetails, selectedVisitId]
   );
   const effectiveVisitDetail = useMemo(
@@ -158,13 +177,29 @@ export default function ClientDetail() {
   const [selectedTrainingId, setSelectedTrainingId] = useState<string | null>(null);
 
   useEffect(() => {
-    setSelectedVisitId(combinedVisits[0]?.id ?? historyVisits[0]?.id ?? "v1");
-    setVisitEditMode(false);
+    const nextVisitId = combinedVisits[0]?.id ?? "";
+    setTimeout(() => {
+      setSelectedVisitId(nextVisitId);
+      setVisitEditMode(false);
+    }, 0);
   }, [combinedVisits, patient.id]);
 
   useEffect(() => {
     if (visitEditMode) return;
-    setVisitDraft(visitOverrides[selectedVisitId] ?? localVisitDetails[selectedVisitId] ?? visitDetailRecords[selectedVisitId] ?? visitDetailRecords.v1);
+    if (!selectedVisitId) {
+      setTimeout(() => {
+        setVisitDraft(emptyVisitDetail);
+      }, 0);
+      return;
+    }
+    const nextDraft =
+      visitOverrides[selectedVisitId] ??
+      localVisitDetails[selectedVisitId] ??
+      visitDetailRecords[selectedVisitId] ??
+      emptyVisitDetail;
+    setTimeout(() => {
+      setVisitDraft(nextDraft);
+    }, 0);
   }, [localVisitDetails, selectedVisitId, visitEditMode, visitOverrides]);
 
   const patientAppointments = useMemo(
@@ -281,7 +316,12 @@ export default function ClientDetail() {
 
         <div className="p-5">
           {activeTab === "visits" && (
-            <div className="grid gap-5 xl:grid-cols-[320px_1fr_240px]">
+            !hasVisitRecords ? (
+              <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center text-sm font-semibold text-gray-500">
+                暂无档案信息
+              </div>
+            ) : (
+              <div className="grid gap-5 xl:grid-cols-[320px_1fr_240px]">
               <aside>
                 <div className="rounded-2xl border border-gray-100 bg-white p-4 xl:sticky xl:top-4 xl:z-10 xl:max-h-[calc(100vh-2rem)] xl:overflow-auto">
                   <div className="flex items-center justify-between">
@@ -867,6 +907,7 @@ export default function ClientDetail() {
                 </div>
               </aside>
             </div>
+            )
           )}
 
           {activeTab === "glasses" && (
