@@ -1,5 +1,6 @@
 
-import { Bell, Gear, CaretRight, SignOut } from "@phosphor-icons/react";
+import { Bell, Gear, CaretRight, SignOut, UserCircle } from "@phosphor-icons/react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { menuConfig } from "../config/menu";
 import { clearAuthed } from "../lib/auth";
@@ -7,6 +8,8 @@ import { clearAuthed } from "../lib/auth";
 export function Header({ toggleSettings }: { toggleSettings: () => void }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef<HTMLDivElement | null>(null);
 
   const pathname = location.pathname;
   const matchedItem =
@@ -32,6 +35,17 @@ export function Header({ toggleSettings }: { toggleSettings: () => void }) {
   const title = matchedItem.label;
   const subTitle = crmPageMeta?.label ?? matchedSub?.label ?? null;
   const desc = crmPageMeta?.desc ?? null;
+
+  useEffect(() => {
+    const onDown = (e: MouseEvent) => {
+      const el = userMenuRef.current;
+      if (!el) return;
+      if (el.contains(e.target as Node)) return;
+      setIsUserMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
 
   return (
     <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-6 lg:px-8 flex-none z-40">
@@ -68,28 +82,59 @@ export function Header({ toggleSettings }: { toggleSettings: () => void }) {
           <Gear weight="bold" className="text-xl" />
         </button>
 
-        <button
-          onClick={() => {
-            clearAuthed();
-            navigate("/login", { replace: true });
-          }}
-          className="text-gray-500 hover:text-gray-700 transition"
-          title="退出登录"
-        >
-          <SignOut weight="bold" className="text-xl" />
-        </button>
-
         {/* User Profile */}
-        <div className="flex items-center gap-3 pl-2 cursor-pointer hover:opacity-80 transition">
-          <img
-            className="h-8 w-8 rounded-full object-cover border border-gray-200 shadow-sm"
-            src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-            alt="User"
-          />
-          <div className="hidden lg:block leading-tight">
-            <p className="font-bold text-sm text-gray-900">张店长</p>
-            <p className="text-gray-500 text-[10px]">惟爱 · 上海海华医院</p>
-          </div>
+        <div ref={userMenuRef} className="relative">
+          <button
+            type="button"
+            onClick={() => setIsUserMenuOpen((v) => !v)}
+            className="flex items-center gap-3 pl-2 cursor-pointer hover:opacity-80 transition"
+            aria-haspopup="menu"
+            aria-expanded={isUserMenuOpen}
+          >
+            <img
+              className="h-8 w-8 rounded-full object-cover border border-gray-200 shadow-sm"
+              src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+              alt="User"
+            />
+            <div className="hidden lg:block leading-tight text-left">
+              <p className="font-bold text-sm text-gray-900">张店长</p>
+              <p className="text-gray-500 text-[10px]">惟爱 · 上海海华医院</p>
+            </div>
+          </button>
+
+          {isUserMenuOpen && (
+            <div
+              role="menu"
+              className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg p-1 z-[60]"
+            >
+              <button
+                role="menuitem"
+                type="button"
+                onClick={() => {
+                  setIsUserMenuOpen(false);
+                  toggleSettings();
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition"
+              >
+                <UserCircle weight="bold" className="text-base text-gray-500" />
+                <span>个人信息</span>
+              </button>
+              <div className="my-1 h-px bg-gray-100" />
+              <button
+                role="menuitem"
+                type="button"
+                onClick={() => {
+                  setIsUserMenuOpen(false);
+                  clearAuthed();
+                  navigate("/login", { replace: true });
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition"
+              >
+                <SignOut weight="bold" className="text-base text-red-500" />
+                <span>退出登录</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>
