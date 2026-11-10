@@ -243,7 +243,7 @@ export default function Schedule() {
   return (
     <div className="h-full flex flex-col relative">
       {/* Top Bar */}
-      <div className="bg-white border border-gray-200 rounded-2xl px-5 py-4 flex justify-between items-center shrink-0 mb-4">
+      <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3 flex justify-between items-center shrink-0 mb-3">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-primary-50 rounded-lg flex items-center justify-center text-primary-600">
@@ -309,10 +309,10 @@ export default function Schedule() {
 
       {/* Main View */}
       <div className="flex-1 overflow-hidden flex flex-col">
-        <div className="flex-1 flex gap-6 overflow-hidden">
+        <div className="flex-1 flex gap-4 overflow-hidden">
           {/* Left Column */}
-          <div className="w-1/3 flex flex-col gap-4">
-            <div className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex flex-col overflow-hidden">
+          <div className="w-1/3 flex flex-col gap-3">
+            <div className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-col overflow-hidden">
               <div className="flex justify-between items-center mb-4 shrink-0 border-b border-gray-100 pb-3">
                 <span className="font-bold text-gray-700 flex items-center">
                   <Sun weight="bold" className="text-amber-500 mr-2" />
@@ -360,7 +360,7 @@ export default function Schedule() {
               </div>
             </div>
 
-            <div className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex flex-col overflow-hidden">
+            <div className="flex-1 bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-col overflow-hidden">
               <div className="flex justify-between items-center mb-4 shrink-0 border-b border-gray-100 pb-3">
                 <span className="font-bold text-gray-700 flex items-center">
                   <CloudSun weight="bold" className="text-orange-400 mr-2" />
@@ -410,15 +410,15 @@ export default function Schedule() {
           </div>
 
           {/* Right Column: Timeline */}
-          <div className="w-2/3 bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col overflow-hidden">
-            <div className="flex justify-between items-center mb-6 shrink-0">
+          <div className="w-2/3 bg-white rounded-2xl border border-gray-200 shadow-sm p-4 flex flex-col overflow-hidden">
+            <div className="flex justify-between items-center mb-4 shrink-0">
               <h4 className="font-bold text-gray-700 flex items-center">
                 <Path weight="bold" className="text-primary-500 mr-2" />
                 医生/视光师 号源时间轴
               </h4>
               <span className="text-xs text-gray-400">只读模式</span>
             </div>
-            <div className="flex-1 overflow-y-auto pr-2 space-y-6 no-scrollbar">
+            <div className="flex-1 overflow-y-auto pr-2 space-y-4 no-scrollbar">
               {Array.from(new Set([...currentDayData.am, ...currentDayData.pm]))
                 .filter((id) => {
                   const s = MOCK_STAFF.find((st) => st.id === id);
@@ -622,7 +622,7 @@ export default function Schedule() {
                     <Info weight="bold" className="text-primary-500 mr-1" /> 点击时间块临时修改接诊人数
                   </p>
                 </div>
-                <div className="flex-1 overflow-y-auto pr-2 space-y-6 no-scrollbar">
+                <div className="flex-1 overflow-y-auto pr-2 space-y-4 no-scrollbar">
                   {Array.from(new Set([...currentDayData.am, ...currentDayData.pm]))
                     .filter((id) => {
                       const s = MOCK_STAFF.find((st) => st.id === id);
@@ -794,10 +794,10 @@ export default function Schedule() {
                 <X weight="bold" className="text-xl" />
               </button>
             </div>
-            <div className="p-6 overflow-y-auto flex-1 space-y-8">
+            <div className="p-5 overflow-y-auto flex-1 space-y-4">
               <div>
                 <h4 className="font-bold text-slate-700 mb-4 border-l-4 border-primary-500 pl-2">全局营业时段</h4>
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-sm text-slate-500">上午时段</label>
                     <div className="flex items-center space-x-2">

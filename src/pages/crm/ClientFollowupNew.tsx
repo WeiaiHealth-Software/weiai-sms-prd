@@ -22,9 +22,9 @@ export default function ClientFollowupNew() {
   const [submitted, setSubmitted] = useState(false);
 
   return (
-    <div className="h-full flex flex-col gap-6">
+    <div className="h-full flex flex-col gap-4">
       <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
-        <div className="border-b border-gray-100 p-5">
+        <div className="border-b border-gray-100 p-4">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-start gap-3">
               <button
@@ -50,8 +50,8 @@ export default function ClientFollowupNew() {
           )}
         </div>
 
-        <div className="p-5 space-y-5">
-          <section className="rounded-2xl border border-gray-100 bg-white p-5">
+        <div className="p-4 space-y-4">
+          <section className="rounded-2xl border border-gray-100 bg-white p-4">
             <div className="text-base font-bold text-gray-900">客户信息</div>
             <div className="mt-4 grid gap-4 lg:grid-cols-4">
               <div className="rounded-2xl bg-gray-50 p-4">
@@ -72,7 +72,7 @@ export default function ClientFollowupNew() {
               </div>
             </div>
           </section>
-          <section className="rounded-2xl border border-gray-100 bg-white p-5">
+          <section className="rounded-2xl border border-gray-100 bg-white p-4">
             <div className="text-base font-bold text-gray-900">回访信息</div>
             <div className="mt-4 grid gap-4 lg:grid-cols-3">
               <div>
@@ -119,7 +119,7 @@ export default function ClientFollowupNew() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-gray-100 bg-white p-5">
+          <section className="rounded-2xl border border-gray-100 bg-white p-4">
             <div className="text-base font-bold text-gray-900">任务预览（原型结构）</div>
             <div className="mt-4 grid gap-4 lg:grid-cols-3">
               <div className="rounded-2xl bg-gray-50 p-4">

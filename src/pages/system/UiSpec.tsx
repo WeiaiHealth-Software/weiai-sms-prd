@@ -134,7 +134,7 @@ const selectOptions: SelectOption[] = [
 
 function SectionIntro({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="rounded-2xl border border-primary-200/80 bg-primary-50/45 px-5 py-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
+    <div className="rounded-2xl border border-primary-200/80 bg-primary-50/45 px-4 py-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
       <div className="inline-flex items-center rounded-full border border-primary-200 bg-white/80 px-2.5 py-1 text-[11px] font-semibold tracking-wide text-primary-700">
         规范说明
       </div>
@@ -345,7 +345,7 @@ export default function UiSpec() {
       </div>
 
       {tab === "system" && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <SectionIntro
             title="系统 UI 规范"
             items={[
@@ -355,7 +355,7 @@ export default function UiSpec() {
             ]}
           />
 
-          <div className="space-y-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+          <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-sm font-bold text-slate-800">主题色（primary）</h3>
@@ -478,10 +478,10 @@ export default function UiSpec() {
       )}
 
       {tab === "basics" && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <SectionIntro title="系统基础组件" items={["本页聚焦最小基础组件集合，用于统一全系统的样式与交互。", "示例以静态展示为主，复用时优先保持类名规范与视觉层级。"]} />
 
-          <div className="space-y-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+          <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
             <div className="space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <h3 className="text-sm font-bold text-slate-800">图标（Phosphor）</h3>
@@ -584,7 +584,7 @@ export default function UiSpec() {
                   <li>删除类动作保留危险语义，使用红色纯文字链接即可。</li>
                 </ul>
               </div>
-              <div className="flex flex-wrap items-center gap-6">
+              <div className="flex flex-wrap items-center gap-4">
                 <a
                   href="/#"
                   onClick={(event) => event.preventDefault()}
@@ -623,7 +623,7 @@ export default function UiSpec() {
       )}
 
       {tab === "table" && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <SectionIntro
             title="表格页开发规范"
             items={[
@@ -771,7 +771,7 @@ export default function UiSpec() {
       )}
 
       {tab === "form" && (
-        <div className="space-y-6">
+        <div className="space-y-4">
           <SectionIntro
             title="表单组件"
             items={[
@@ -781,7 +781,7 @@ export default function UiSpec() {
             ]}
           />
 
-          <div className="space-y-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+          <div className="space-y-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
             <div className="space-y-3">
               <h3 className="text-sm font-bold text-slate-800">1. Input / InputSearch</h3>
               <div className="grid gap-4 lg:grid-cols-2">

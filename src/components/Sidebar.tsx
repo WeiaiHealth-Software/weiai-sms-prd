@@ -40,7 +40,7 @@ export function Sidebar() {
       )}
     >
       {/* Logo Area */}
-      <div className="h-20 flex items-center px-4 border-b border-gray-100 flex-none">
+      <div className="h-[70px] flex items-center px-4 border-b border-gray-100 flex-none">
         <div className="flex items-center justify-center gap-3 overflow-hidden whitespace-nowrap">
           <div className="w-8 h-8 flex-none text-primary-500">
             <svg
@@ -60,7 +60,7 @@ export function Sidebar() {
       </div>
 
       {/* Menu Area */}
-      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+      <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
         {menuConfig.map((item) => {
           const hasSubs = item.subs.length > 0;
           const isActive = isL1Active(item);
@@ -75,7 +75,7 @@ export function Sidebar() {
                   else navigate(item.path);
                 }}
                 className={clsx(
-                  "flex items-center gap-3 px-3 py-3 transition-colors duration-200 group cursor-pointer w-full text-left border-l-4",
+                  "flex items-center gap-3 px-3 py-2.5 transition-colors duration-200 group cursor-pointer w-full text-left border-l-4",
                   isExactL1
                     ? "bg-primary-50 text-primary-600 border-primary-500"
                     : isActive
@@ -130,7 +130,7 @@ export function Sidebar() {
                         key={sub.id}
                         to={sub.path}
                         className={clsx(
-                          "block w-full text-left px-3 py-2.5 text-[14px] leading-6 transition-colors border-l-2",
+                          "block w-full text-left px-3 py-2 text-[14px] leading-6 transition-colors border-l-2",
                           isSubActive
                             ? "border-primary-500 text-primary-700 font-semibold bg-primary-50"
                             : "border-transparent text-gray-500 hover:text-gray-900 hover:bg-gray-50 hover:border-primary-300"
@@ -150,7 +150,7 @@ export function Sidebar() {
       {/* Footer Area */}
       <div
         className={clsx(
-          "p-4 border-t border-gray-100 flex-none flex items-center",
+          "p-3 border-t border-gray-100 flex-none flex items-center",
           isCollapsed ? "justify-center" : "justify-between"
         )}
       >

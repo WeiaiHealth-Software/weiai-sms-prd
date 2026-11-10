@@ -280,13 +280,13 @@ export default function TagManagement() {
 
               <div className="mt-8 flex justify-end gap-4">
                 <button
-                  className="rounded-2xl border border-slate-200 bg-white px-6 py-3 text-base font-semibold text-slate-600 hover:bg-slate-50"
+                  className="rounded-2xl border border-slate-200 bg-white px-5 py-2.5 text-base font-semibold text-slate-600 hover:bg-slate-50"
                   onClick={closeTagModal}
                 >
                   取消
                 </button>
                 <button
-                  className="rounded-2xl bg-primary-500 px-6 py-3 text-base font-semibold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-primary-300"
+                  className="rounded-2xl bg-primary-500 px-5 py-2.5 text-base font-semibold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-primary-300"
                   disabled={!tagDraft.value.trim()}
                   onClick={handleSaveTag}
                 >
@@ -337,10 +337,10 @@ export default function TagManagement() {
       : null;
 
   return (
-    <div className="min-h-full flex flex-col gap-6">
+    <div className="min-h-full flex flex-col gap-4">
       <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
         <div className="border-b border-gray-100">
-          <div className="flex flex-col gap-3 p-5 xl:flex-row xl:items-center xl:justify-between">
+          <div className="flex flex-col gap-3 p-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex min-w-0 flex-1 items-center gap-3">
               <Select
                 value={tagFilter}
@@ -420,7 +420,7 @@ export default function TagManagement() {
           </table>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-gray-100 px-4 py-4 text-sm text-gray-500 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-3 border-t border-gray-100 px-4 py-3 text-sm text-gray-500 lg:flex-row lg:items-center lg:justify-between">
           <div>共 {filteredTagRows.length} 条标签数据，当前第 {currentTagPage} / {totalTagPages} 页</div>
           <div className="flex flex-wrap items-center gap-2">
             <button

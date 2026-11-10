@@ -45,7 +45,7 @@ export default function Login() {
                     </div>
                   </div>
 
-                  <div className="mt-5 grid grid-cols-[1fr_auto] items-start gap-6">
+                  <div className="mt-5 grid grid-cols-[1fr_auto] items-start gap-4">
                     <div className="space-y-3">
                       {[
                         { label: "客户档案", value: "3,482" },

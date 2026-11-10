@@ -48,7 +48,7 @@ export function Header({ toggleSettings }: { toggleSettings: () => void }) {
   }, []);
 
   return (
-    <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-6 lg:px-8 flex-none z-40">
+    <header className="h-[70px] bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6 flex-none z-40">
       {/* Left: Breadcrumb / Title */}
       <div className="min-w-0">
         <div className="flex items-center gap-2 min-w-0">

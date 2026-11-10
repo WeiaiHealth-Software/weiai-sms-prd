@@ -172,10 +172,10 @@ export default function ClientList() {
   const pageItems = getPageItems(totalPages, currentPage);
 
   return (
-    <div className="min-h-full flex flex-col gap-6">
+    <div className="min-h-full flex flex-col gap-4">
       <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
         <div className="border-b border-gray-100">
-          <div className="p-5 grid gap-3 xl:grid-cols-[1.42fr_0.82fr_1.42fr_auto] xl:items-center">
+          <div className="p-4 grid gap-3 xl:grid-cols-[1.42fr_0.82fr_1.42fr_auto] xl:items-center">
             <input
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
@@ -265,19 +265,19 @@ export default function ClientList() {
           <table className="min-w-full text-left">
             <thead className="bg-gray-50 text-xs uppercase tracking-[0.18em] text-gray-400">
               <tr>
-                <th className="px-5 py-4 font-semibold">客户信息</th>
-                <th className="px-5 py-4 font-semibold">用户标签</th>
-                <th className="px-5 py-4 font-semibold">就诊日期</th>
-                <th className="px-5 py-4 font-semibold">就诊类型</th>
-                <th className="px-5 py-4 font-semibold">数据记录</th>
-                <th className="px-5 py-4 font-semibold w-[200px]">诊断</th>
-                <th className="px-5 py-4 font-semibold">操作</th>
+                <th className="px-4 py-3 font-semibold">客户信息</th>
+                <th className="px-4 py-3 font-semibold">用户标签</th>
+                <th className="px-4 py-3 font-semibold">就诊日期</th>
+                <th className="px-4 py-3 font-semibold">就诊类型</th>
+                <th className="px-4 py-3 font-semibold">数据记录</th>
+                <th className="px-4 py-3 font-semibold w-[200px]">诊断</th>
+                <th className="px-4 py-3 font-semibold">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
               {paged.map((p) => (
                 <tr key={p.id} className="transition hover:bg-gray-50">
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     <button type="button" className="text-left" onClick={() => navigate(`/crm/client/${p.id}`)}>
                       <div className="flex items-center gap-3">
                         <GenderIcon gender={p.gender} />
@@ -291,15 +291,15 @@ export default function ClientList() {
                       </div>
                     </button>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     <ProfileTags profile={p.profile} />
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     <div className="flex items-center gap-2 text-sm">
                       <span className="font-semibold text-gray-900">{formatDateOnly(p.latestVisit)}</span>
                     </div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     {p.followupType ? (
                       <span className="inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700">
                         {p.followupType}
@@ -308,7 +308,7 @@ export default function ClientList() {
                       <div className="text-sm font-semibold text-gray-400">--</div>
                     )}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     {p.axial ? (
                       <div className="max-w-[520px] truncate whitespace-nowrap text-sm font-semibold text-gray-800">
                         <span className="text-gray-500">眼轴：</span>
@@ -324,7 +324,7 @@ export default function ClientList() {
                       <div className="text-sm font-semibold text-gray-400">--</div>
                     )}
                   </td>
-                  <td className="px-5 py-4 w-[200px]">
+                  <td className="px-4 py-3 w-[200px]">
                     {p.diagnosisNote ? (
                       <div className="w-[200px] truncate whitespace-nowrap text-sm font-semibold text-gray-800">
                         {p.diagnosisNote}
@@ -333,7 +333,7 @@ export default function ClientList() {
                       <div className="text-sm font-semibold text-gray-400">--</div>
                     )}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <button
                         className="rounded-lg bg-primary-50 px-3 py-2 text-xs font-semibold text-primary-600 hover:bg-primary-100 active:bg-primary-200"
@@ -353,7 +353,7 @@ export default function ClientList() {
               ))}
               {paged.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-sm text-gray-500">
+                  <td colSpan={7} className="px-4 py-10 text-center text-sm text-gray-500">
                     暂无数据
                   </td>
                 </tr>
@@ -362,7 +362,7 @@ export default function ClientList() {
           </table>
         </div>
 
-        <div className="flex flex-col gap-4 border-t border-gray-100 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 border-t border-gray-100 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="text-sm text-gray-500">
             共 <span className="font-bold text-gray-900">{total}</span> 条患者记录，当前显示{" "}
             <span className="font-bold text-gray-900">{total ? pageStartIdx + 1 : 0}</span> -{" "}

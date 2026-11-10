@@ -144,7 +144,7 @@ export default function Room() {
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex justify-between items-center mb-6 shrink-0">
+      <div className="flex justify-between items-center mb-4 shrink-0">
         <div className="flex bg-white p-1 rounded-lg border border-gray-200 shadow-sm">
           {[
             { id: "all", label: "全部" },
@@ -174,15 +174,15 @@ export default function Room() {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="flex-1 overflow-y-auto pb-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredRooms.map((r) => {
             const statusMeta = getStatusMeta(r.status);
             const Icon = r.icon;
             return (
               <div
                 key={r.roomNo}
-                className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow group relative flex flex-col gap-4"
+                className="bg-white rounded-2xl border border-gray-200 shadow-sm p-3.5 hover:shadow-md transition-shadow group relative flex flex-col gap-3"
               >
                 <div className="absolute top-3 right-3 flex items-center rounded-lg bg-white/95 border border-gray-100 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
@@ -285,7 +285,7 @@ export default function Room() {
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto flex-1 bg-white space-y-6">
+        <div className="p-5 overflow-y-auto flex-1 bg-white space-y-4">
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
               门牌号 <span className="text-red-500">*</span>
@@ -312,7 +312,7 @@ export default function Room() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">类型</label>
               <div className="relative">
@@ -397,13 +397,13 @@ export default function Room() {
       {isDeleteModalOpen && (
         <div className="fixed inset-0 z-[80] bg-black/30 backdrop-blur-sm flex items-center justify-center">
           <div className="w-[360px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-100">
+            <div className="px-4 py-3 border-b border-gray-100">
               <h3 className="text-base font-bold text-gray-900">确认删除诊室</h3>
             </div>
-            <div className="px-5 py-4 text-sm text-gray-600">
+            <div className="px-4 py-3 text-sm text-gray-600">
               <p>删除后无法恢复，是否继续？</p>
             </div>
-            <div className="px-5 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
+            <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 flex justify-end gap-2">
               <button
                 onClick={() => setIsDeleteModalOpen(false)}
                 className="px-4 py-2 text-sm border border-gray-200 rounded-lg text-gray-600 hover:bg-white transition"

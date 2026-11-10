@@ -132,9 +132,9 @@ export default function Followup() {
   }, []);
 
   return (
-    <div className="min-h-full flex flex-col gap-6">
+    <div className="min-h-full flex flex-col gap-4">
       <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
-        <div className="border-b border-gray-100 p-5">
+        <div className="border-b border-gray-100 p-4">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <div className="text-lg font-bold text-gray-900">复查回访任务视图</div>
@@ -260,14 +260,14 @@ export default function Followup() {
           <table className="min-w-full text-left">
             <thead className="bg-gray-50 text-xs uppercase tracking-[0.18em] text-gray-400">
               <tr>
-                <th className="px-5 py-4 font-semibold">患者</th>
-                <th className="px-5 py-4 font-semibold">最近就诊</th>
-                <th className="px-5 py-4 font-semibold">诊断 / 治疗</th>
-                <th className="px-5 py-4 font-semibold">应复查日期</th>
-                <th className="px-5 py-4 font-semibold">提醒时间</th>
-                <th className="px-5 py-4 font-semibold">联系结果</th>
-                <th className="px-5 py-4 font-semibold">责任人</th>
-                <th className="px-5 py-4 font-semibold">操作</th>
+                <th className="px-4 py-3 font-semibold">患者</th>
+                <th className="px-4 py-3 font-semibold">最近就诊</th>
+                <th className="px-4 py-3 font-semibold">诊断 / 治疗</th>
+                <th className="px-4 py-3 font-semibold">应复查日期</th>
+                <th className="px-4 py-3 font-semibold">提醒时间</th>
+                <th className="px-4 py-3 font-semibold">联系结果</th>
+                <th className="px-4 py-3 font-semibold">责任人</th>
+                <th className="px-4 py-3 font-semibold">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
@@ -278,25 +278,25 @@ export default function Followup() {
                 const due = isDateDue(item.reminderDate);
                 return (
                   <tr key={item.id} className="hover:bg-gray-50">
-                    <td className="px-5 py-4">
+                    <td className="px-4 py-3">
                       <div className="font-semibold text-gray-900">{item.patient}</div>
                       <div className="mt-1 text-xs text-gray-500">联系方式已绑定小程序</div>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-4 py-3">
                       <div className="font-semibold text-gray-700">{item.latestVisit}</div>
                       <div className="mt-1 text-xs text-gray-500">最近就诊时间</div>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-4 py-3">
                       <div className="font-semibold text-gray-700">{item.diagnosis}</div>
                       <div className="mt-1 text-xs text-gray-500">{item.treatment}</div>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-4 py-3">
                       <div className="font-semibold text-gray-900">{item.reviewDate}</div>
                       <span className={`mt-2 inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${statusClass(item.status)}`}>
                         {item.status}
                       </span>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-4 py-3">
                       {item.reminderDate ? (
                         <span className="inline-flex items-center gap-2 font-semibold">
                           <Alarm
@@ -312,12 +312,12 @@ export default function Followup() {
                         <span className="text-gray-400">-</span>
                       )}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-4 py-3">
                       <div className="font-semibold text-gray-700">{item.result}</div>
                       <div className="mt-1 text-xs text-gray-500">{item.status === "已逾期" ? "需升级联系策略" : "保留本次沟通摘要"}</div>
                     </td>
-                    <td className="px-5 py-4 text-gray-700">{item.owner}</td>
-                    <td className="px-5 py-4">
+                    <td className="px-4 py-3 text-gray-700">{item.owner}</td>
+                    <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-2">
                         <button
                           className="rounded-xl bg-rose-50 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-100 active:bg-rose-200 disabled:opacity-50"
@@ -349,7 +349,7 @@ export default function Followup() {
               })}
               {paged.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-5 py-12 text-center text-sm text-gray-500">
+                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-gray-500">
                     暂无数据
                   </td>
                 </tr>
@@ -358,7 +358,7 @@ export default function Followup() {
           </table>
         </div>
 
-        <div className="flex flex-col gap-4 border-t border-gray-100 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 border-t border-gray-100 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="text-sm text-gray-500">
             共 <span className="font-bold text-gray-900">{total}</span> 条回访任务，当前显示{" "}
             <span className="font-bold text-gray-900">{total ? pageStartIdx + 1 : 0}</span> -{" "}

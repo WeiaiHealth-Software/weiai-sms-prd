@@ -280,14 +280,14 @@ function ExamTable({
 }) {
   return (
     <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden">
-      <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">{title}</div>
+      <div className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-sm font-bold text-gray-900">{title}</div>
       <div className="overflow-x-auto">
         <table className="min-w-full text-left text-sm">
           <thead className="text-xs uppercase tracking-[0.18em] text-gray-400">
             <tr>
-              <th className="px-5 py-4 font-semibold">检查项目</th>
-              <th className="px-5 py-4 font-semibold">右眼（OD）</th>
-              <th className="px-5 py-4 font-semibold">左眼（OS）</th>
+              <th className="px-4 py-3 font-semibold">检查项目</th>
+              <th className="px-4 py-3 font-semibold">右眼（OD）</th>
+              <th className="px-4 py-3 font-semibold">左眼（OS）</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -299,8 +299,8 @@ function ExamTable({
               const leftChecked = leftNow === "阳性";
               return (
                 <tr key={`${row.label}-${idx}`} className="hover:bg-gray-50">
-                  <td className="px-5 py-4 font-semibold text-gray-700 whitespace-nowrap">{row.label}</td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3 font-semibold text-gray-700 whitespace-nowrap">{row.label}</td>
+                  <td className="px-4 py-3">
                     {isBoolean ? (
                       <div className="flex items-center gap-2">
                         <span className={clsx("text-sm font-semibold", !rightChecked ? "text-primary-600" : "text-gray-400")}>
@@ -326,7 +326,7 @@ function ExamTable({
                       />
                     )}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     {isBoolean ? (
                       <div className="flex items-center gap-2">
                         <span className={clsx("text-sm font-semibold", !leftChecked ? "text-primary-600" : "text-gray-400")}>
@@ -847,9 +847,9 @@ export default function ClientVisitNew() {
   }, [basicForm.birthday, patient]);
 
   return (
-    <div className="min-h-full flex flex-col gap-6">
+    <div className="min-h-full flex flex-col gap-4">
       <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
-        <div className="border-b border-gray-100 p-5">
+        <div className="border-b border-gray-100 p-4">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div className="flex items-start gap-3">
               <button
@@ -887,8 +887,8 @@ export default function ClientVisitNew() {
           )}
         </div>
 
-        <div className="p-5 space-y-5">
-          <section className="rounded-2xl border border-gray-100 bg-white p-5">
+        <div className="p-4 space-y-4">
+          <section className="rounded-2xl border border-gray-100 bg-white p-4">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <SectionHint title="档案基础信息" desc="先建档，再选择是否录入本次服务单，可选就诊 / 视训 / 配镜 / 收费。" />
               {isNewClient ? (
@@ -1071,7 +1071,7 @@ export default function ClientVisitNew() {
             )}
           </section>
 
-          <section className="rounded-2xl border border-gray-100 bg-white p-5">
+          <section className="rounded-2xl border border-gray-100 bg-white p-4">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <SectionHint title="本次服务单（可选）" desc="支持单独录入一个模块，也支持一次录入多个模块。默认已勾选“就诊档案”。" />
               <div className="flex flex-wrap items-center gap-2">
@@ -1120,7 +1120,7 @@ export default function ClientVisitNew() {
           </section>
 
           {selectedModules.clinic && (
-            <section className="rounded-2xl border border-gray-100 bg-white p-5">
+            <section className="rounded-2xl border border-gray-100 bg-white p-4">
               <div className="flex w-full items-start justify-between gap-3 text-left">
                 <SectionHint title="就诊档案" desc="检查 / 诊断 / 处理 / 复查建议" />
                 <div className="flex items-center gap-2">
@@ -1143,10 +1143,10 @@ export default function ClientVisitNew() {
               </div>
               {!collapsedModules.clinic && <div className="mt-4 space-y-4">
                 <div className="rounded-2xl border border-gray-100 bg-white">
-                  <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">
+                  <div className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-sm font-bold text-gray-900">
                     就诊信息
                   </div>
-                  <div className="p-5">
+                  <div className="p-4">
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                       <div>
                         <div className="text-sm text-gray-500">就诊日期</div>
@@ -1202,10 +1202,10 @@ export default function ClientVisitNew() {
                 </div>
 
                 <div className="rounded-2xl border border-gray-100 bg-white">
-                  <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">
+                  <div className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-sm font-bold text-gray-900">
                     主诉与病史
                   </div>
-                  <div className="p-5">
+                  <div className="p-4">
                     <div className="grid gap-4 md:grid-cols-12">
                       <div className="md:col-span-3">
                         <div className="text-sm text-gray-500">眼别</div>
@@ -1287,10 +1287,10 @@ export default function ClientVisitNew() {
                 />
 
                 <div className="rounded-2xl border border-gray-100 bg-white">
-                  <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">
+                  <div className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-sm font-bold text-gray-900">
                     诊断与建议
                   </div>
-                  <div className="p-5">
+                  <div className="p-4">
                     <div className="grid gap-4 xl:grid-cols-2">
                       <div>
                         <div className="text-sm text-gray-500">诊断</div>
@@ -1319,7 +1319,7 @@ export default function ClientVisitNew() {
                 </div>
 
                 <div className="rounded-2xl border border-gray-100 bg-white">
-                  <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 flex items-center justify-between gap-4">
+                  <div className="border-b border-gray-100 bg-gray-50 px-4 py-3 flex items-center justify-between gap-4">
                     <div className="text-sm font-bold text-gray-900">随访与复查</div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm font-semibold text-gray-700">{clinicForm.enableReminder ? "已开启" : "未开启"}</span>
@@ -1338,7 +1338,7 @@ export default function ClientVisitNew() {
                     </div>
                   </div>
                   {clinicForm.enableReminder && (
-                    <div className="p-5 space-y-4">
+                    <div className="p-4 space-y-4">
                       <div className="grid gap-4 md:grid-cols-3">
                         <div>
                           <div className="text-sm text-gray-500">随访周期</div>
@@ -1385,7 +1385,7 @@ export default function ClientVisitNew() {
           )}
 
           {selectedModules.training && (
-            <section className="rounded-2xl border border-gray-100 bg-white p-5">
+            <section className="rounded-2xl border border-gray-100 bg-white p-4">
               <div className="flex w-full items-start justify-between gap-3 text-left">
                 <SectionHint title="视光训练" desc="视训项目与训练数据" />
                 <div className="flex items-center gap-2">
@@ -1492,7 +1492,7 @@ export default function ClientVisitNew() {
           )}
 
           {selectedModules.fitting && (
-            <section className="rounded-2xl border border-gray-100 bg-white p-5">
+            <section className="rounded-2xl border border-gray-100 bg-white p-4">
               <div className="flex w-full items-start justify-between gap-3 text-left">
                 <SectionHint title="配镜记录" desc="处方与配镜参数" />
                 <div className="flex items-center gap-2">
@@ -1580,7 +1580,7 @@ export default function ClientVisitNew() {
           )}
 
           {selectedModules.billing && (
-            <section className="rounded-2xl border border-gray-100 bg-white p-5">
+            <section className="rounded-2xl border border-gray-100 bg-white p-4">
               <div className="flex w-full items-start justify-between gap-3 text-left">
                 <SectionHint title="收费详情" desc="收费单与支付状态" />
                 <div className="flex items-center gap-2">
@@ -1705,7 +1705,7 @@ export default function ClientVisitNew() {
             </section>
           )}
 
-          <section className="rounded-2xl border border-gray-100 bg-white px-5 py-4">
+          <section className="rounded-2xl border border-gray-100 bg-white px-4 py-3">
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
               <div className="text-sm text-gray-500">
                 当前客户：<span className="font-semibold text-gray-700">{patient?.name || basicForm.name || "-"}</span>

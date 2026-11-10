@@ -232,8 +232,8 @@ export default function ClientDetail() {
   );
 
   return (
-    <div className="h-full flex flex-col gap-6">
-      <div className="bg-white rounded-2xl card-shadow border border-gray-100 p-5">
+    <div className="h-full flex flex-col gap-4">
+      <div className="bg-white rounded-2xl card-shadow border border-gray-100 p-4">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div className="flex items-start gap-3">
             <button
@@ -296,7 +296,7 @@ export default function ClientDetail() {
       </div>
 
       <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-visible">
-        <div className="border-b border-gray-100 bg-gray-50 px-5 pt-4">
+        <div className="border-b border-gray-100 bg-gray-50 px-4 pt-3">
           <div className="flex flex-wrap items-end gap-2">
             {tabs.map((t) => (
               <button
@@ -314,14 +314,14 @@ export default function ClientDetail() {
           </div>
         </div>
 
-        <div className="p-5">
+        <div className="p-4">
           {activeTab === "visits" && (
             !hasVisitRecords ? (
-              <div className="rounded-2xl border border-gray-100 bg-white p-8 text-center text-sm font-semibold text-gray-500">
+              <div className="rounded-2xl border border-gray-100 bg-white p-6 text-center text-sm font-semibold text-gray-500">
                 暂无档案信息
               </div>
             ) : (
-              <div className="grid gap-5 xl:grid-cols-[320px_1fr_240px]">
+              <div className="grid gap-4 xl:grid-cols-[320px_1fr_240px]">
               <aside>
                 <div className="rounded-2xl border border-gray-100 bg-white p-4 xl:sticky xl:top-4 xl:z-10 xl:max-h-[calc(100vh-2rem)] xl:overflow-auto">
                   <div className="flex items-center justify-between">
@@ -374,7 +374,7 @@ export default function ClientDetail() {
                 </div>
               </aside>
 
-              <section className="rounded-2xl border border-gray-100 bg-white p-5">
+              <section className="rounded-2xl border border-gray-100 bg-white p-4">
                 <div id="visit-overview" className="scroll-mt-6">
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                   <div>
@@ -443,8 +443,8 @@ export default function ClientDetail() {
                 )}
                 </div>
 
-                <div id="visit-basic" className="scroll-mt-6 mt-5 grid gap-4 lg:grid-cols-2">
-                  <div className="rounded-2xl border border-gray-100 bg-white p-5">
+                <div id="visit-basic" className="scroll-mt-6 mt-4 grid gap-4 lg:grid-cols-2">
+                  <div className="rounded-2xl border border-gray-100 bg-white p-4">
                     <div className="text-sm font-bold text-gray-900">基本信息</div>
                     <div className="mt-4 grid gap-3 sm:grid-cols-2">
                       <div className="rounded-2xl bg-gray-50 p-4">
@@ -483,7 +483,7 @@ export default function ClientDetail() {
                       </div>
                     </div>
                   </div>
-                  <div className="rounded-2xl border border-gray-100 bg-white p-5">
+                  <div className="rounded-2xl border border-gray-100 bg-white p-4">
                     <div className="text-sm font-bold text-gray-900">诊断</div>
                     {visitEditMode ? (
                       <textarea
@@ -499,7 +499,7 @@ export default function ClientDetail() {
                   </div>
                 </div>
 
-                <div id="visit-chief" className="scroll-mt-6 mt-5 rounded-2xl border border-gray-100 bg-white p-5">
+                <div id="visit-chief" className="scroll-mt-6 mt-4 rounded-2xl border border-gray-100 bg-white p-4">
                   <div className="text-sm font-bold text-gray-900">主诉与病史</div>
                   <div className="mt-4 grid gap-3 lg:grid-cols-4">
                     <div className="rounded-2xl bg-gray-50 p-4">
@@ -600,23 +600,23 @@ export default function ClientDetail() {
                   )}
                 </div>
 
-                <div id="visit-exams" className="scroll-mt-6 mt-5 space-y-4">
+                <div id="visit-exams" className="scroll-mt-6 mt-4 space-y-4">
                   <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden">
-                    <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">眼部检查</div>
+                    <div className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-sm font-bold text-gray-900">眼部检查</div>
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-left text-sm">
                         <thead className="text-xs uppercase tracking-[0.18em] text-gray-400">
                           <tr>
-                            <th className="px-5 py-4 font-semibold">检查项目</th>
-                            <th className="px-5 py-4 font-semibold">右眼（OD）</th>
-                            <th className="px-5 py-4 font-semibold">左眼（OS）</th>
+                            <th className="px-4 py-3 font-semibold">检查项目</th>
+                            <th className="px-4 py-3 font-semibold">右眼（OD）</th>
+                            <th className="px-4 py-3 font-semibold">左眼（OS）</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                           {(visitEditMode ? visitDraft.eyeExam : effectiveVisitDetail.eyeExam).map((row, idx) => (
                             <tr key={`${row.label}-${idx}`} className="hover:bg-gray-50">
-                              <td className="px-5 py-4 font-semibold text-gray-700 whitespace-nowrap">{row.label}</td>
-                              <td className="px-5 py-4">
+                              <td className="px-4 py-3 font-semibold text-gray-700 whitespace-nowrap">{row.label}</td>
+                              <td className="px-4 py-3">
                                 {visitEditMode ? (
                                   <input
                                     value={visitDraft.eyeExam[idx]?.right ?? ""}
@@ -634,7 +634,7 @@ export default function ClientDetail() {
                                   </div>
                                 )}
                               </td>
-                              <td className="px-5 py-4">
+                              <td className="px-4 py-3">
                                 {visitEditMode ? (
                                   <input
                                     value={visitDraft.eyeExam[idx]?.left ?? ""}
@@ -660,21 +660,21 @@ export default function ClientDetail() {
                   </div>
 
                   <div className="rounded-2xl border border-gray-100 bg-white overflow-hidden">
-                    <div className="border-b border-gray-100 bg-gray-50 px-5 py-4 text-sm font-bold text-gray-900">辅助检查</div>
+                    <div className="border-b border-gray-100 bg-gray-50 px-4 py-3 text-sm font-bold text-gray-900">辅助检查</div>
                     <div className="overflow-x-auto">
                       <table className="min-w-full text-left text-sm">
                         <thead className="text-xs uppercase tracking-[0.18em] text-gray-400">
                           <tr>
-                            <th className="px-5 py-4 font-semibold">检查项目</th>
-                            <th className="px-5 py-4 font-semibold">右眼（OD）</th>
-                            <th className="px-5 py-4 font-semibold">左眼（OS）</th>
+                            <th className="px-4 py-3 font-semibold">检查项目</th>
+                            <th className="px-4 py-3 font-semibold">右眼（OD）</th>
+                            <th className="px-4 py-3 font-semibold">左眼（OS）</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                           {(visitEditMode ? visitDraft.auxExam : effectiveVisitDetail.auxExam).map((row, idx) => (
                             <tr key={`${row.label}-${idx}`} className="hover:bg-gray-50">
-                              <td className="px-5 py-4 font-semibold text-gray-700 whitespace-nowrap">{row.label}</td>
-                              <td className="px-5 py-4">
+                              <td className="px-4 py-3 font-semibold text-gray-700 whitespace-nowrap">{row.label}</td>
+                              <td className="px-4 py-3">
                                 {visitEditMode ? (
                                   <input
                                     value={visitDraft.auxExam[idx]?.right ?? ""}
@@ -692,7 +692,7 @@ export default function ClientDetail() {
                                   </div>
                                 )}
                               </td>
-                              <td className="px-5 py-4">
+                              <td className="px-4 py-3">
                                 {visitEditMode ? (
                                   <input
                                     value={visitDraft.auxExam[idx]?.left ?? ""}
@@ -718,11 +718,11 @@ export default function ClientDetail() {
                   </div>
                 </div>
 
-                <div id="visit-treatment" className="scroll-mt-6 mt-5 space-y-4">
-                  <div className="rounded-2xl border border-gray-100 bg-white p-5">
+                <div id="visit-treatment" className="scroll-mt-6 mt-4 space-y-4">
+                  <div className="rounded-2xl border border-gray-100 bg-white p-4">
                     <div className="text-sm font-bold text-gray-900">处理</div>
                     <div className="mt-4 space-y-4">
-                      <div className="rounded-2xl bg-gray-50 p-5">
+                      <div className="rounded-2xl bg-gray-50 p-4">
                         <div className="text-sm font-bold text-gray-900">检查</div>
                         <div className="mt-4 grid grid-cols-4 gap-3 text-xs font-semibold text-gray-400">
                           <div>项目</div>
@@ -741,7 +741,7 @@ export default function ClientDetail() {
                         </div>
                       </div>
 
-                      <div className="rounded-2xl bg-gray-50 p-5">
+                      <div className="rounded-2xl bg-gray-50 p-4">
                         <div className="text-sm font-bold text-gray-900">处方</div>
                         <div className="mt-4 grid gap-4 sm:grid-cols-4">
                           {(
@@ -781,7 +781,7 @@ export default function ClientDetail() {
                         </div>
                       </div>
 
-                      <div className="rounded-2xl bg-gray-50 p-5">
+                      <div className="rounded-2xl bg-gray-50 p-4">
                         <div className="text-sm font-bold text-gray-900">治疗</div>
                         <div className="mt-4 grid grid-cols-4 gap-3 text-xs font-semibold text-gray-400">
                           <div>项目名</div>
@@ -803,7 +803,7 @@ export default function ClientDetail() {
                   </div>
 
                   <div className="grid gap-4 lg:grid-cols-2">
-                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
+                    <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
                       <div className="text-sm font-bold text-emerald-900">医生建议</div>
                       {visitEditMode ? (
                         <textarea
@@ -822,7 +822,7 @@ export default function ClientDetail() {
                         </div>
                       )}
                     </div>
-                    <div className="rounded-2xl border border-gray-100 bg-white p-5">
+                    <div className="rounded-2xl border border-gray-100 bg-white p-4">
                       <div className="text-sm font-bold text-gray-900">门诊随访</div>
                       <div className="mt-4 space-y-5">
                         <div>
@@ -977,7 +977,7 @@ export default function ClientDetail() {
               </div>
 
               {selectedTrainingRecord && (
-                <section className="rounded-2xl border border-gray-100 bg-white p-5">
+                <section className="rounded-2xl border border-gray-100 bg-white p-4">
                   <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
                     <div>
                       <div className="text-base font-bold text-gray-900">视训详情</div>

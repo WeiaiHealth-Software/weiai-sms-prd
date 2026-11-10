@@ -78,17 +78,17 @@ export default function Personnel() {
           <table className="w-full text-left border-collapse">
             <thead className="bg-gray-50 sticky top-0 z-10 border-b border-gray-200">
               <tr>
-                <th className="py-3 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">人员信息</th>
-                <th className="py-3 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">角色 / 职称</th>
-                <th className="py-3 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">擅长描述</th>
-                <th className="py-3 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider">状态 / 时间</th>
-                <th className="py-3 px-6 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">操作</th>
+                <th className="py-2.5 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">人员信息</th>
+                <th className="py-2.5 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">角色 / 职称</th>
+                <th className="py-2.5 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">擅长描述</th>
+                <th className="py-2.5 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">状态 / 时间</th>
+                <th className="py-2.5 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-right">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {STAFF.map((s) => (
                 <tr key={s.id} className="hover:bg-slate-50 transition-colors group">
-                  <td className="py-3 px-6">
+                  <td className="py-2.5 px-4">
                     <div className="flex items-center space-x-3">
                       <div className="relative">
                         <div
@@ -117,16 +117,16 @@ export default function Personnel() {
                       </div>
                     </div>
                   </td>
-                  <td className="py-3 px-6">
+                  <td className="py-2.5 px-4">
                     <div className="text-sm font-bold text-slate-700">{s.role}</div>
                     <div className="text-xs text-slate-500">{s.title}</div>
                   </td>
-                  <td className="py-3 px-6">
+                  <td className="py-2.5 px-4">
                     <div className="text-sm text-slate-600 max-w-xs truncate" title={s.desc}>
                       {s.desc}
                     </div>
                   </td>
-                  <td className="py-3 px-6">
+                  <td className="py-2.5 px-4">
                     {s.status === "active" ? (
                       <>
                         <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-bold">在职</span>
@@ -139,7 +139,7 @@ export default function Personnel() {
                       </>
                     )}
                   </td>
-                  <td className="py-3 px-6 text-right">
+                  <td className="py-2.5 px-4 text-right">
                     <button className="text-primary-600 hover:text-primary-700 text-sm font-medium mr-3">编辑</button>
                   </td>
                 </tr>
@@ -174,9 +174,9 @@ export default function Personnel() {
           </button>
         </div>
 
-        <div className="p-6 overflow-y-auto flex-1 bg-white space-y-6">
+        <div className="p-5 overflow-y-auto flex-1 bg-white space-y-4">
           {/* 顶部头像与基础信息区 */}
-          <div className="flex gap-6">
+          <div className="flex gap-4">
             {/* 左侧：头像上传 */}
             <div className="w-1/3 flex flex-col items-center">
               <label className="relative group cursor-pointer w-24 h-24 block">
@@ -219,7 +219,7 @@ export default function Personnel() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">角色</label>
               <div className="relative">
@@ -253,7 +253,7 @@ export default function Personnel() {
             ></textarea>
           </div>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">入职时间</label>
               <input

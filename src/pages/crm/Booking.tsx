@@ -93,9 +93,9 @@ export default function Booking() {
   const waitingCount = useMemo(() => filtered.filter((a) => a.status === "待到诊").length, [filtered]);
 
   return (
-    <div className="min-h-full flex flex-col gap-6">
+    <div className="min-h-full flex flex-col gap-4">
       <div className="bg-white rounded-2xl card-shadow border border-gray-100 overflow-hidden">
-        <div className="border-b border-gray-100 p-5">
+        <div className="border-b border-gray-100 p-4">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
             <div>
               <div className="text-lg font-bold text-gray-900">预约全量视图</div>
@@ -186,46 +186,46 @@ export default function Booking() {
           <table className="min-w-full text-left">
             <thead className="bg-gray-50 text-xs uppercase tracking-[0.18em] text-gray-400">
               <tr>
-                <th className="px-5 py-4 font-semibold">预约日期 / 时段</th>
-                <th className="px-5 py-4 font-semibold">患者</th>
-                <th className="px-5 py-4 font-semibold">门店 / 诊室</th>
-                <th className="px-5 py-4 font-semibold">问题 / 解决方案</th>
-                <th className="px-5 py-4 font-semibold">标签 / 来源</th>
-                <th className="px-5 py-4 font-semibold">状态</th>
-                <th className="px-5 py-4 font-semibold">备注</th>
-                <th className="px-5 py-4 font-semibold">操作</th>
+                <th className="px-4 py-3 font-semibold">预约日期 / 时段</th>
+                <th className="px-4 py-3 font-semibold">患者</th>
+                <th className="px-4 py-3 font-semibold">门店 / 诊室</th>
+                <th className="px-4 py-3 font-semibold">问题 / 解决方案</th>
+                <th className="px-4 py-3 font-semibold">标签 / 来源</th>
+                <th className="px-4 py-3 font-semibold">状态</th>
+                <th className="px-4 py-3 font-semibold">备注</th>
+                <th className="px-4 py-3 font-semibold">操作</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100 text-sm">
               {paged.map((item) => (
                 <tr key={item.id} className="hover:bg-gray-50">
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     <div className="font-semibold text-gray-900">{item.date}</div>
                     <div className="mt-1 text-xs text-gray-500">{item.time}</div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     <div className="font-semibold text-gray-900">{item.patient}</div>
                     <div className="mt-1 text-xs text-gray-500">联系方式待展示</div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     <div className="font-semibold text-gray-700">{item.store}</div>
                     <div className="mt-1 text-xs text-gray-500">{item.room}</div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     <div className="font-semibold text-gray-700">{item.issue}</div>
                     <div className="mt-1 text-xs text-gray-500">{item.solution}</div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     <div className="font-semibold text-gray-700">{item.tags}</div>
                     <div className="mt-1 text-xs text-gray-500">{item.source}</div>
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3">
                     <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${statusClass(item.status)}`}>
                       {item.status}
                     </span>
                   </td>
-                  <td className="px-5 py-4 text-gray-600">{item.note}</td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3 text-gray-600">{item.note}</td>
+                  <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-2">
                       <button className="rounded-xl bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-200 active:bg-gray-300">
                         改期
@@ -242,7 +242,7 @@ export default function Booking() {
               ))}
               {paged.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-5 py-12 text-center text-sm text-gray-500">
+                  <td colSpan={8} className="px-4 py-10 text-center text-sm text-gray-500">
                     暂无数据
                   </td>
                 </tr>
@@ -251,7 +251,7 @@ export default function Booking() {
           </table>
         </div>
 
-        <div className="flex flex-col gap-4 border-t border-gray-100 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 border-t border-gray-100 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="text-sm text-gray-500">
             共 <span className="font-bold text-gray-900">{total}</span> 条预约记录，当前显示{" "}
             <span className="font-bold text-gray-900">{total ? pageStartIdx + 1 : 0}</span> -{" "}
