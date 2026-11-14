@@ -37,6 +37,30 @@ export type OrderLogistics = {
   shippedAt: string;
 };
 
+/** 售后类型 */
+export type AfterSaleType = "仅退款" | "退货退款";
+
+/** 售后状态 */
+export type AfterSaleStatus = "待审核" | "已同意" | "已拒绝" | "退款中" | "已完成";
+
+/** 售后记录（一个订单至多一条进行中的售后） */
+export type AfterSaleRecord = {
+  type: AfterSaleType;
+  reason: string;
+  status: AfterSaleStatus;
+  appliedAt: string;
+  reviewedAt?: string;
+  /** 审核备注（同意/拒绝时填写 */
+  reviewNote?: string;
+  /** 退款金额 */
+  refundAmount?: number;
+  refundedAt?: string;
+  /** 退货物流（退货退款时客户寄回） */
+  returnLogistics?: { company: string; trackingNo: string };
+  /** 商家确认收货时间 */
+  receivedAt?: string;
+};
+
 /** 商城订单 */
 export type MallOrder = {
   id: string;
@@ -58,6 +82,8 @@ export type MallOrder = {
   completedAt?: string;
   cancelledAt?: string;
   cancelReason?: string;
+  /** 售后记录 */
+  afterSale?: AfterSaleRecord;
   /** 商家备注 */
   remark: string;
   createdAt: string;
@@ -256,6 +282,12 @@ export const initialOrders: MallOrder[] = [
     paidAt: "2026-11-07 11:00",
     logistics: { company: "顺丰速运", trackingNo: "SF5555666677", shippedAt: "2026-11-07 15:00" },
     completedAt: "2026-11-09 10:00",
+    afterSale: {
+      type: "退货退款",
+      reason: "设备使用时有异响，影响正常使用，申请退货退款",
+      status: "待审核",
+      appliedAt: "2026-11-10 14:20",
+    },
     remark: "客户反馈设备有异响，申请换货处理中",
     createdAt: "2026-11-07 10:55",
   },

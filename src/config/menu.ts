@@ -77,8 +77,7 @@ export const menuConfig = [
     subs: [
       { id: "mall_shop", label: "店铺管理", path: "/mall/shop", features: ["商城店铺列表", "新增/编辑店铺", "默认店铺设置（惟爱线上商城）", "店铺启用/停用"] },
       { id: "mall_product", label: "商品管理", path: "/mall/product", features: ["商城商品列表（引用 ERP 商品主数据）", "上架/下架控制", "设置上架数量（按需分配，余量留给线下门店）", "商城售价设置", "展示图与详情页配置", "资质对外可见性配置", "商品排序"] },
-      { id: "mall_order", label: "订单管理", path: "/mall/order", features: ["全状态订单列表（待付款/待发货/已发货/已完成/已取消/售后）", "发货并录入快递单号", "物流查询跳转", "订单详情查看", "订单清单导出 Excel"] },
-      { id: "mall_aftersale", label: "售后管理", path: "/mall/aftersale", features: ["退款/退货申请列表", "商家审核退款", "退款处理与打款", "售后记录留痕"] },
+      { id: "mall_order", label: "订单管理", path: "/mall/order", features: ["全状态订单列表（待付款/待发货/已发货/已完成/已取消/售后）", "发货并录入快递单号", "物流查询跳转", "订单详情查看", "售后处理（退款/退货审核、退款打款）", "订单清单导出 Excel"] },
       { id: "mall_review", label: "评价管理", path: "/mall/review", features: ["商品评价列表", "评价审核与回复", "差评处理与隐藏", "商品详情页展示控制"] },
       { id: "mall_agent", label: "代理人管理", path: "/mall/agent", features: ["注册申请审核（通过/驳回并填写原因）", "代理人列表", "分销关系绑定（上下级）", "子账号权限管理"] },
       { id: "mall_withdraw", label: "提现管理", path: "/mall/withdraw", features: ["自动提现规则配置（阈值/结算周期）", "商户提现区分", "提现记录与状态（待处理/成功/失败）", "失败原因记录", "手动提现作为备用", "提现流水导出", "提现数据权限管控"] },
