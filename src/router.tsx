@@ -14,6 +14,13 @@ import ClientFollowupNew from "./pages/crm/ClientFollowupNew";
 import Booking from "./pages/crm/Booking";
 import Followup from "./pages/crm/Followup";
 import TagManagement from "./pages/crm/TagManagement";
+import MallProductList from "./pages/mall/ProductList";
+import MallShopList from "./pages/mall/ShopList";
+import MallOrderList from "./pages/mall/OrderList";
+import InventoryProductList from "./pages/inventory/ProductList";
+import InventoryProductForm from "./pages/inventory/ProductForm";
+import InventoryWarehouseList from "./pages/inventory/WarehouseList";
+import StockMovementList from "./pages/inventory/StockMovementList";
 import UiSpec from "./pages/system/UiSpec";
 import Login from "./pages/auth/Login";
 
@@ -46,6 +53,13 @@ const genericRoutes = menuConfig.flatMap((item) =>
           "/crm/tag-management",
           "/crm/booking",
           "/crm/followup",
+          "/mall/product",
+          "/mall/shop",
+          "/mall/order",
+          "/inventory/product",
+          "/inventory/warehouse",
+          "/inventory/inbound",
+          "/inventory/outbound",
         ].includes(sub.path)
     )
     .map((sub) => ({
@@ -119,6 +133,42 @@ export const router = createHashRouter([
       {
         path: "crm/client/:id/followup/new",
         element: <ClientFollowupNew />,
+      },
+      {
+        path: "mall/product",
+        element: <MallProductList />,
+      },
+      {
+        path: "mall/shop",
+        element: <MallShopList />,
+      },
+      {
+        path: "mall/order",
+        element: <MallOrderList />,
+      },
+      {
+        path: "inventory/product",
+        element: <InventoryProductList />,
+      },
+      {
+        path: "inventory/product/new",
+        element: <InventoryProductForm />,
+      },
+      {
+        path: "inventory/product/:spuId/edit",
+        element: <InventoryProductForm />,
+      },
+      {
+        path: "inventory/warehouse",
+        element: <InventoryWarehouseList />,
+      },
+      {
+        path: "inventory/inbound",
+        element: <StockMovementList direction="入库" />,
+      },
+      {
+        path: "inventory/outbound",
+        element: <StockMovementList direction="出库" />,
       },
       ...genericRoutes,
       {

@@ -5,6 +5,7 @@ import {
   Users,
   Package,
   Receipt,
+  ShoppingBag,
   Palette,
 } from "@phosphor-icons/react";
 
@@ -60,11 +61,27 @@ export const menuConfig = [
     label: "库存管理(ERP)",
     path: "/inventory",
     subs: [
-      { id: "product", label: "商品管理", path: "/inventory/product", features: ["全量商品库查询", "商品档案列表", "实时库存详情", "价格体系维护"] },
-      { id: "inbound", label: "入库管理", path: "/inventory/inbound", features: ["采购订单创建", "采购入库单", "销售退回入库", "供应商管理"] },
-      { id: "outbound", label: "出库管理", path: "/inventory/outbound", features: ["销售出库记录", "采购退货出库", "报损/领用出库", "出库单据管理"] },
+      { id: "product", label: "商品管理", path: "/inventory/product", features: ["全量商品库查询（SPU + SKU 两层）", "商品档案列表（注册证/生产许可证/有效期/资质）", "规格属性与 SKU 明细维护", "新增商品可登记初始入库库存", "价格体系维护"] },
+      { id: "warehouse", label: "仓库管理", path: "/inventory/warehouse", features: ["仓库列表维护", "新增/编辑仓库（名称、地址）", "默认仓库设置", "仓库库存分布（按 SKU 统计）"] },
+      { id: "inbound", label: "入库管理", path: "/inventory/inbound", features: ["采购入库单", "退货入库单", "盘盈入库单", "入库单据导出", "入库确认后增加仓库库存"] },
+      { id: "outbound", label: "出库管理", path: "/inventory/outbound", features: ["销售出库单（商城订单发货自动生成）", "采购退货出库", "报损出库", "出库单据导出", "出库数量校验仓库可用库存"] },
       { id: "category", label: "类目管理", path: "/inventory/category", features: ["商品类目树维护", "新增/编辑类目", "类目属性模板配置", "类目关联品牌设置"] },
       { id: "transfer", label: "盘点调拨", path: "/inventory/transfer", features: ["门店间调货申请", "月度/季度盘点录入", "盘盈盘亏调整", "库存流水日志"] },
+    ],
+  },
+  {
+    id: "mall",
+    icon: ShoppingBag,
+    label: "商城管理",
+    path: "/mall",
+    subs: [
+      { id: "mall_shop", label: "店铺管理", path: "/mall/shop", features: ["商城店铺列表", "新增/编辑店铺", "默认店铺设置（惟爱线上商城）", "店铺启用/停用"] },
+      { id: "mall_product", label: "商品管理", path: "/mall/product", features: ["商城商品列表（引用 ERP 商品主数据）", "上架/下架控制", "设置上架数量（按需分配，余量留给线下门店）", "商城售价设置", "展示图与详情页配置", "资质对外可见性配置", "商品排序"] },
+      { id: "mall_order", label: "订单管理", path: "/mall/order", features: ["全状态订单列表（待付款/待发货/已发货/已完成/已取消/售后）", "发货并录入快递单号", "物流查询跳转", "订单详情查看", "订单清单导出 Excel"] },
+      { id: "mall_aftersale", label: "售后管理", path: "/mall/aftersale", features: ["退款/退货申请列表", "商家审核退款", "退款处理与打款", "售后记录留痕"] },
+      { id: "mall_review", label: "评价管理", path: "/mall/review", features: ["商品评价列表", "评价审核与回复", "差评处理与隐藏", "商品详情页展示控制"] },
+      { id: "mall_agent", label: "代理人管理", path: "/mall/agent", features: ["注册申请审核（通过/驳回并填写原因）", "代理人列表", "分销关系绑定（上下级）", "子账号权限管理"] },
+      { id: "mall_withdraw", label: "提现管理", path: "/mall/withdraw", features: ["自动提现规则配置（阈值/结算周期）", "商户提现区分", "提现记录与状态（待处理/成功/失败）", "失败原因记录", "手动提现作为备用", "提现流水导出", "提现数据权限管控"] },
     ],
   },
   {
