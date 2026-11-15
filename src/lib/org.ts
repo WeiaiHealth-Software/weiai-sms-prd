@@ -236,7 +236,6 @@ export const QUICK_LOGIN_USER_IDS: string[] = [
   "U-002",
   "U-003",
   "U-004",
-  "U-005",
   "U-006",
   "U-007",
 ];
