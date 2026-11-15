@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Check, LockKey, Minus, ShieldCheck } from "@phosphor-icons/react";
+import { Check, Info, LockKey, Minus, ShieldCheck } from "@phosphor-icons/react";
 import clsx from "clsx";
 import { menuConfig } from "../../config/menu";
 import { PROTECTED_ROLES, ROLE_DEFINITIONS, getRole, type RoleId } from "../../lib/rbac";
@@ -74,6 +74,29 @@ export default function PermissionManagement() {
             </button>
           );
         })}
+
+        {/* 单一归属原则提示 */}
+        <div className="mt-1 rounded-xl border border-amber-200 bg-amber-50 p-3">
+          <div className="flex items-start gap-2">
+            <Info weight="fill" className="mt-0.5 flex-none text-sm text-amber-500" />
+            <div className="space-y-2 text-[11px] leading-4 text-amber-800">
+              <p className="font-bold">单一归属原则</p>
+              <p>
+                每个账号仅归属<strong>一家门店</strong>或<strong>线上商城</strong>，登录后只能查看该范围内的数据。
+              </p>
+              <p>
+                如需跨范围权限，二选一：
+              </p>
+              <ul className="space-y-1 pl-3 list-disc">
+                <li>升级为<strong>超级管理员</strong>，可查看全部门店与商城；</li>
+                <li>为每个门店/商城<strong>分别创建账号</strong>。</li>
+              </ul>
+              <p className="rounded-lg bg-white/60 px-2 py-1.5">
+                <span className="font-semibold">举例：</span>张三既是「上海海华门店」的店员，又负责「线上商城」的商品录入，则为其创建两个账号（一个门店店员、一个商城录入人员），分别登录使用。
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 右侧：选中角色的权限内容 */}

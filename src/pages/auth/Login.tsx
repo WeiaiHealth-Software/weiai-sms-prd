@@ -1,4 +1,4 @@
-import { Eye, EyeSlash, Lightning, Lock, User } from "@phosphor-icons/react";
+import { Eye, EyeSlash, Info, Lightning, Lock, User } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { getHomePath, getQuickLoginUsers, signIn, signInAs } from "../../lib/auth";
@@ -130,6 +130,22 @@ export default function Login() {
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* 单一归属原则提示 */}
+            <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-3">
+              <div className="flex items-start gap-2">
+                <Info weight="fill" className="mt-0.5 flex-none text-sm text-amber-500" />
+                <div className="space-y-1.5 text-[11px] leading-4 text-amber-800">
+                  <p className="font-bold">单一归属原则</p>
+                  <p>
+                    每个账号仅归属<strong>一家门店</strong>或<strong>线上商城</strong>，登录后只能查看该范围内的数据。
+                  </p>
+                  <p>
+                    如需跨范围权限，可升级为<strong>超级管理员</strong>，或为每个门店/商城<strong>分别创建账号</strong>。
+                  </p>
+                </div>
               </div>
             </div>
           </div>
