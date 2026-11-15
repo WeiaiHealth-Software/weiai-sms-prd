@@ -10,24 +10,22 @@ import ValidityCell from "../../components/product/ValidityCell";
 import ProductRefCard from "../../components/product/ProductRefCard";
 import { clamp, getPageItems } from "../../lib/pagination";
 import { getMergedProductMap, getMergedSkus, getMergedSkuMap } from "../inventory/productStore";
+import { getCategoryNames } from "../inventory/categoryStore";
 import {
   erpProducts,
   erpSkus,
   initialMallListings,
   initialShops,
   initialWarehouses,
-  productCategoryOptions,
   getSkuTotalStock,
   getSkuSpecText,
   getShopStockCapacity,
   getShopAvailableStock,
   type ErpSku,
   type MallListing,
-  type ProductCategory,
 } from "./mockData";
 
 type StatusFilter = "全部状态" | MallListing["status"];
-type CategoryFilter = "全部分类" | ProductCategory;
 type ShopFilter = "全部店铺" | string;
 
 type ListingDraft = {
@@ -41,7 +39,6 @@ type ListingDraft = {
 };
 
 const statusFilterOptions: SelectOption[] = ["全部状态", "已上架", "已下架"].map((item) => ({ value: item, label: item }));
-const categoryFilterOptions: SelectOption[] = ["全部分类", ...productCategoryOptions].map((item) => ({ value: item, label: item }));
 const statusEditOptions: SelectOption[] = ["已上架", "已下架"].map((item) => ({ value: item, label: item }));
 const shopFilterOptions: SelectOption[] = [
   { value: "全部店铺", label: "全部店铺" },
@@ -53,7 +50,7 @@ const pageSize = 10;
 export default function MallProductList() {
   const [listings, setListings] = useState<MallListing[]>(initialMallListings);
   const [shopFilter, setShopFilter] = useState<ShopFilter>("全部店铺");
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("全部分类");
+  const [categoryFilter, setCategoryFilter] = useState<string>("全部分类");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("全部状态");
   const [keyword, setKeyword] = useState("");
   const [page, setPage] = useState(1);
@@ -78,6 +75,11 @@ export default function MallProductList() {
   // ERP 商品主数据含本次会话在「库存管理 · 商品管理」中新增 / 编辑的档案
   const productMap = useMemo(() => getMergedProductMap(erpProducts), []);
   const skuMap = useMemo(() => getMergedSkuMap(erpSkus), []);
+  // 分类筛选项来自「库存管理 · 类目管理」
+  const categoryFilterOptions = useMemo<SelectOption[]>(
+    () => ["全部分类", ...getCategoryNames()].map((item) => ({ value: item, label: item })),
+    []
+  );
   const productOf = (sku: ErpSku) => productMap[sku.spuId];
   const skuSpecText = (sku: ErpSku) => getSkuSpecText(sku);
 
@@ -615,7 +617,7 @@ export default function MallProductList() {
               <Select
                 value={categoryFilter}
                 onChange={(value) => {
-                  setCategoryFilter(value as CategoryFilter);
+                  setCategoryFilter(value);
                   setPage(1);
                 }}
                 options={categoryFilterOptions}

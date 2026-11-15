@@ -8,28 +8,41 @@ import {
   erpProducts,
   erpSkus,
   initialWarehouses,
-  productCategoryOptions,
   getSkuTotalStock,
   getSkuWarehouseStock,
   type ErpProduct,
-  type ProductCategory,
 } from "./mockData";
+import { getCategoryNames } from "./categoryStore";
 import { getMergedProducts, getMergedSkus } from "./productStore";
+import { getValidityWarn, type ValidityWarnLevel } from "../../lib/validity";
 
-type CategoryFilter = "全部分类" | ProductCategory;
 type WarehouseFilter = "全部仓库" | string;
+type ValidityFilter = "全部效期" | ValidityWarnLevel;
 
-const categoryFilterOptions: SelectOption[] = ["全部分类", ...productCategoryOptions].map((item) => ({ value: item, label: item }));
 const warehouseFilterOptions: SelectOption[] = [
   { value: "全部仓库", label: "全部仓库" },
   ...initialWarehouses.map((warehouse) => ({ value: warehouse.id, label: warehouse.name })),
 ];
 
+const validityFilterOptions: SelectOption[] = [
+  { value: "全部效期", label: "全部效期" },
+  { value: "expired", label: "已过期" },
+  { value: "soon", label: "临期" },
+  { value: "normal", label: "正常" },
+];
+
 export default function InventoryProductList() {
   const navigate = useNavigate();
-  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("全部分类");
+  const [categoryFilter, setCategoryFilter] = useState<string>("全部分类");
   const [warehouseFilter, setWarehouseFilter] = useState<WarehouseFilter>("全部仓库");
+  const [validityFilter, setValidityFilter] = useState<ValidityFilter>("全部效期");
   const [keyword, setKeyword] = useState("");
+
+  // 分类筛选项来自「类目管理」，与商品档案共用同一份类目数据
+  const categoryFilterOptions = useMemo<SelectOption[]>(
+    () => ["全部分类", ...getCategoryNames()].map((item) => ({ value: item, label: item })),
+    []
+  );
 
   // 商品档案由「新增 / 编辑商品」页面写入本地存储，这里读取合并结果
   const products = useMemo<ErpProduct[]>(() => getMergedProducts(erpProducts), []);
@@ -39,10 +52,14 @@ export default function InventoryProductList() {
     const kw = keyword.trim().toLowerCase();
     return products.filter((product) => {
       if (categoryFilter !== "全部分类" && product.category !== categoryFilter) return false;
+      if (validityFilter !== "全部效期") {
+        // 未录入有效期的商品不参与效期筛选
+        if (!product.validityTo || getValidityWarn(product.validityTo).level !== validityFilter) return false;
+      }
       if (kw && !`${product.name} ${product.spuId} ${product.manufacturer} ${product.registrationNo}`.toLowerCase().includes(kw)) return false;
       return true;
     });
-  }, [categoryFilter, keyword, products]);
+  }, [categoryFilter, keyword, products, validityFilter]);
 
   const skusOf = (spuId: string) => skus.filter((sku) => sku.spuId === spuId);
 
@@ -103,7 +120,7 @@ export default function InventoryProductList() {
             <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
               <Select
                 value={categoryFilter}
-                onChange={(value) => setCategoryFilter(value as CategoryFilter)}
+                onChange={(value) => setCategoryFilter(value)}
                 options={categoryFilterOptions}
                 className="min-w-[140px]"
                 triggerClassName="h-[46px] rounded-2xl border-gray-200 px-4"
@@ -113,6 +130,13 @@ export default function InventoryProductList() {
                 onChange={(value) => setWarehouseFilter(value)}
                 options={warehouseFilterOptions}
                 className="min-w-[150px]"
+                triggerClassName="h-[46px] rounded-2xl border-gray-200 px-4"
+              />
+              <Select
+                value={validityFilter}
+                onChange={(value) => setValidityFilter(value as ValidityFilter)}
+                options={validityFilterOptions}
+                className="min-w-[130px]"
                 triggerClassName="h-[46px] rounded-2xl border-gray-200 px-4"
               />
               <input

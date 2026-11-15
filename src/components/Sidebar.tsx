@@ -1,32 +1,38 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Link, useLocation, useNavigate } from "react-router";
-import { menuConfig } from "../config/menu";
+import { menuConfig, type MenuItem } from "../config/menu";
 import { ArrowsClockwise, ArrowLineLeft, ArrowLineRight, CaretDown } from "@phosphor-icons/react";
 import clsx from "clsx";
+import { useSession } from "../lib/auth";
 
 export function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const session = useSession();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [expandedMenus, setExpandedMenus] = useState<Set<string>>(new Set(["store_mgmt"]));
+  /** 手动展开/收起覆盖；未覆盖的一级菜单跟随当前路由自动展开 */
+  const [expandedOverrides, setExpandedOverrides] = useState<Record<string, boolean>>({});
+
+  /** 只展示当前角色有权访问的菜单与子菜单 */
+  const visibleMenus = useMemo(() => {
+    if (!session) return [];
+    const { roleId } = session;
+    return menuConfig
+      .filter((item) => item.roles.includes(roleId))
+      .map((item) => ({
+        ...item,
+        subs: item.subs.filter((sub) => sub.roles.includes(roleId)),
+      }));
+  }, [session]);
 
   const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
-  const toggleMenu = (id: string) => {
-    setExpandedMenus((prev: Set<string>) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+  const toggleMenu = (id: string, isExpanded: boolean) => {
+    setExpandedOverrides((prev) => ({ ...prev, [id]: !isExpanded }));
   };
 
-  const isL1Active = (item: any) => {
+  const isL1Active = (item: MenuItem) => {
     if (item.path === "/") return location.pathname === "/";
     if (item.subs.length === 0) return location.pathname === item.path;
     return location.pathname === item.path || location.pathname.startsWith(`${item.path}/`);
@@ -36,11 +42,11 @@ export function Sidebar() {
     <aside
       className={clsx(
         "bg-white border-r border-gray-200 flex-none flex flex-col transition-all duration-300 z-50",
-        isCollapsed ? "w-20" : "w-76"
+        isCollapsed ? "w-20" : "w-68"
       )}
     >
       {/* Logo Area */}
-      <div className="h-[70px] flex items-center px-4 border-b border-gray-100 flex-none">
+      <div className="h-[68px] flex items-center px-4 border-b border-gray-100 flex-none">
         <div className="flex items-center justify-center gap-3 overflow-hidden whitespace-nowrap">
           <div className="w-8 h-8 flex-none text-primary-500">
             <svg
@@ -52,7 +58,7 @@ export function Sidebar() {
             </svg>
           </div>
           {!isCollapsed && (
-            <span className="font-bold text-2xl text-gray-900 tracking-tight">
+            <span className="font-bold text-xl text-gray-900 tracking-tight">
               惟爱 · 门店管理系统
             </span>
           )}
@@ -61,17 +67,23 @@ export function Sidebar() {
 
       {/* Menu Area */}
       <div className="flex-1 overflow-y-auto py-3 px-3 space-y-1">
-        {menuConfig.map((item) => {
+        {visibleMenus.map((item) => {
           const hasSubs = item.subs.length > 0;
           const isActive = isL1Active(item);
-          const isExpanded = expandedMenus.has(item.id);
+          const isExpanded = expandedOverrides[item.id] ?? isActive;
           const isExactL1 = location.pathname === item.path && !hasSubs;
 
           return (
-            <div key={item.id} className="mb-1">
+            <div
+              key={item.id}
+              className={clsx(
+                "mb-1",
+                item.id === "ui_spec" && "mt-2 border-t border-gray-100 pt-2"
+              )}
+            >
               <button
                 onClick={() => {
-                  if (hasSubs) toggleMenu(item.id);
+                  if (hasSubs) toggleMenu(item.id, isExpanded);
                   else navigate(item.path);
                 }}
                 className={clsx(

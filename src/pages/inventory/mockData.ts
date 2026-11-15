@@ -6,12 +6,20 @@
 // - 库存按仓库拆分（stockByWarehouse），SKU 总库存为各仓之和。
 // 商城管理通过 skuId 只读引用本模块，不复制、不覆盖。
 
-export type ProductCategory = "医疗器械类" | "视功能训练类" | "周边产品类";
+import type { MovementDirection, MovementSource, MovementType } from "./movementConfig";
+export type { MovementDirection, MovementSource, MovementType } from "./movementConfig";
 
+/**
+ * 商品分类名。类目已改为可维护数据（见 categoryStore），因此这里是自由字符串，
+ * 不再限定为固定几个品类；下列常量仅作为「类目管理」的初始种子数据。
+ */
+export type ProductCategory = string;
+
+/** 类目管理初始种子：内置分类 */
 export const productCategoryOptions: ProductCategory[] = ["医疗器械类", "视功能训练类", "周边产品类"];
 
-/** 类目规格属性模板：定义该类目下可用的规格属性名，商品从中勾选启用的属性 */
-export const categorySpecTemplates: Record<ProductCategory, string[]> = {
+/** 类目管理初始种子：各类目的规格属性模板（定义该类目下可用的规格属性名） */
+export const categorySpecTemplates: Record<string, string[]> = {
   医疗器械类: ["度数", "片型", "直径", "型号"],
   视功能训练类: ["型号", "版本", "规格"],
   周边产品类: ["型号", "容量", "包装规格"],
@@ -157,27 +165,10 @@ export { getValidityWarn } from "../../lib/validity";
 // 出入库（库存流水）
 //
 // 库存数量只能通过出入库单据变动，商品档案本身不承载库存增减：
-// - 入库单：采购到货 / 客户退货 / 盘盈  → stockByWarehouse 增加
-// - 出库单：订单发货 / 采购退货 / 报损  → stockByWarehouse 减少
+// - 入库单：采购到货 / 商城或门店退货 / 盘盈  → stockByWarehouse 增加
+// - 出库单：商城或门店销售 / 采购退货 / 报损  → stockByWarehouse 减少
 // 商城可上架上限 = 店铺绑定仓库的 SKU 库存合计，因此出入库会间接影响商城。
 // ─────────────────────────────────────────────────────────────
-
-/** 出入库方向 */
-export type MovementDirection = "入库" | "出库";
-
-/** 出入库类型（按方向归类） */
-export type MovementType =
-  | "采购入库"
-  | "退货入库"
-  | "盘盈入库"
-  | "销售出库"
-  | "采购退货出库"
-  | "报损出库";
-
-export const movementTypesByDirection: Record<MovementDirection, MovementType[]> = {
-  入库: ["采购入库", "退货入库", "盘盈入库"],
-  出库: ["销售出库", "采购退货出库", "报损出库"],
-};
 
 export type MovementStatus = "草稿" | "已确认" | "已作废";
 
@@ -193,8 +184,9 @@ export type StockMovement = {
   id: string;
   direction: MovementDirection;
   type: MovementType;
+  source: MovementSource;
   warehouseId: string;
-  /** 往来单位：入库为供应商，出库为领用部门 / 客户 */
+  /** 往来单位或关联订单/门店 */
   partner: string;
   operator: string;
   remark: string;
@@ -219,6 +211,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "RK-20261102-001",
     direction: "入库",
     type: "采购入库",
+    source: "供应商",
     warehouseId: "WH-001",
     partner: "上海美尼康光学有限公司",
     operator: "仓管员 · 李伟",
@@ -234,6 +227,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "RK-20261105-001",
     direction: "入库",
     type: "采购入库",
+    source: "供应商",
     warehouseId: "WH-001",
     partner: "杭州视康医疗设备有限公司",
     operator: "仓管员 · 李伟",
@@ -249,6 +243,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "RK-20261108-001",
     direction: "入库",
     type: "退货入库",
+    source: "线上商城",
     warehouseId: "WH-001",
     partner: "线上商城退货 · 订单 SO-20261028-019",
     operator: "售后专员 · 王芳",
@@ -261,6 +256,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "RK-20261112-001",
     direction: "入库",
     type: "盘盈入库",
+    source: "库存调整",
     warehouseId: "WH-001",
     partner: "内部调整",
     operator: "仓管员 · 李伟",
@@ -273,6 +269,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "CK-20261103-001",
     direction: "出库",
     type: "销售出库",
+    source: "线上商城",
     warehouseId: "WH-001",
     partner: "线上商城订单 SO-20261103-007",
     operator: "仓管员 · 张敏",
@@ -288,6 +285,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "CK-20261109-001",
     direction: "出库",
     type: "销售出库",
+    source: "线上商城",
     warehouseId: "WH-001",
     partner: "线上商城订单 SO-20261109-012",
     operator: "仓管员 · 张敏",
@@ -300,6 +298,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "CK-20261110-001",
     direction: "出库",
     type: "报损出库",
+    source: "库存调整",
     warehouseId: "WH-001",
     partner: "内部调整",
     operator: "仓管员 · 李伟",
@@ -312,6 +311,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "RK-20261106-002",
     direction: "入库",
     type: "采购入库",
+    source: "供应商",
     warehouseId: "WH-002",
     partner: "上海美尼康光学有限公司",
     operator: "仓管员 · 赵磊",
@@ -327,6 +327,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "CK-20261108-002",
     direction: "出库",
     type: "销售出库",
+    source: "来源待确认",
     warehouseId: "WH-002",
     partner: "华北旗舰店订单 SO-20261108-003",
     operator: "仓管员 · 赵磊",
@@ -339,6 +340,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "RK-20261109-003",
     direction: "入库",
     type: "采购入库",
+    source: "供应商",
     warehouseId: "WH-003",
     partner: "杭州视康医疗设备有限公司",
     operator: "仓管员 · 陈静",
@@ -354,6 +356,7 @@ export const initialStockMovements: StockMovement[] = [
     id: "CK-20261111-003",
     direction: "出库",
     type: "销售出库",
+    source: "来源待确认",
     warehouseId: "WH-003",
     partner: "华南旗舰店订单 SO-20261111-009",
     operator: "仓管员 · 陈静",
@@ -362,10 +365,35 @@ export const initialStockMovements: StockMovement[] = [
     createdAt: "2026-11-11",
     items: [{ skuId: "SKU-1007-01", quantity: 16, unitPrice: 28 }],
   },
+  {
+    id: "RK-20261113-001",
+    direction: "入库",
+    type: "退货入库",
+    source: "线下门店",
+    warehouseId: "WH-001",
+    partner: "惟爱上海门店 · 销售单 LS-20261112-001",
+    operator: "售后专员 · 王芳",
+    remark: "门店顾客退货，商品检查完好",
+    status: "已确认",
+    createdAt: "2026-11-13",
+    items: [{ skuId: "SKU-1006-01", quantity: 1, unitPrice: 12 }],
+  },
+  {
+    id: "CK-20261112-004",
+    direction: "出库",
+    type: "销售出库",
+    source: "线下门店",
+    warehouseId: "WH-002",
+    partner: "惟爱北京门店 · 销售单 LS-20261112-001",
+    operator: "门店店员 · 刘洋",
+    remark: "线下门店销售",
+    status: "已确认",
+    createdAt: "2026-11-12",
+    items: [{ skuId: "SKU-1001-01", quantity: 1, unitPrice: 1800 }],
+  },
 ];
 
 /** 按方向取单据 */
 export function getMovementsByDirection(direction: MovementDirection) {
   return initialStockMovements.filter((movement) => movement.direction === direction);
 }
-

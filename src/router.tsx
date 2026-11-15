@@ -6,7 +6,6 @@ import Personnel from "./pages/store/Personnel";
 import Room from "./pages/store/Room";
 import Schedule from "./pages/store/Schedule";
 import { GenericPlaceholder } from "./pages/generic/GenericPlaceholder";
-import { menuConfig } from "./config/menu";
 import ClientList from "./pages/crm/ClientList";
 import ClientDetail from "./pages/crm/ClientDetail";
 import ClientVisitNew from "./pages/crm/ClientVisitNew";
@@ -17,12 +16,25 @@ import TagManagement from "./pages/crm/TagManagement";
 import MallProductList from "./pages/mall/ProductList";
 import MallShopList from "./pages/mall/ShopList";
 import MallOrderList from "./pages/mall/OrderList";
+import MallReviewList from "./pages/mall/ReviewList";
+import MallAgentList from "./pages/mall/AgentList";
+import MallAgentDetail from "./pages/mall/AgentDetail";
 import InventoryProductList from "./pages/inventory/ProductList";
 import InventoryProductForm from "./pages/inventory/ProductForm";
 import InventoryWarehouseList from "./pages/inventory/WarehouseList";
+import InventoryCategoryList from "./pages/inventory/CategoryList";
 import StockMovementList from "./pages/inventory/StockMovementList";
 import UiSpec from "./pages/system/UiSpec";
+import StoreList from "./pages/store/StoreList";
+import PermissionManagement from "./pages/system/PermissionManagement";
+import UserManagement from "./pages/system/UserManagement";
+import SystemSettings from "./pages/system/SystemSettings";
+import LogManagement from "./pages/system/LogManagement";
 import Login from "./pages/auth/Login";
+import { requireAuthLoader } from "./lib/auth";
+import type { RoleId } from "./lib/rbac";
+import { RequireRole, StoreIndexRedirect, SystemIndexRedirect } from "./components/RoleGuard";
+import { GLOBAL_ADMIN_ROLES, SYSTEM_ROLES, menuConfig } from "./config/menu";
 
 import ScreenList from "./pages/external/ScreenList";
 import Pad from "./pages/external/Pad";
@@ -40,6 +52,12 @@ import FamilyGroupDetailPage from "./pages/external/miniprogram/pages/FamilyGrou
 import PatientListPage from "./pages/external/miniprogram/pages/PatientListPage";
 import MyAppointmentsPage from "./pages/external/miniprogram/pages/MyAppointmentsPage";
 
+/** 门店工作区可见角色：管理员与门店店长 */
+const STORE_WORKSPACE_ROLES: RoleId[] = ["developer", "super_admin", "store_manager"];
+
+/** 排班额外开放给视光师 */
+const SCHEDULE_ROLES: RoleId[] = ["developer", "super_admin", "store_manager", "optometrist"];
+
 // Create dynamic routes based on menuConfig for generic pages
 const genericRoutes = menuConfig.flatMap((item) =>
   item.subs
@@ -56,10 +74,19 @@ const genericRoutes = menuConfig.flatMap((item) =>
           "/mall/product",
           "/mall/shop",
           "/mall/order",
+          "/mall/review",
+          "/mall/agent",
+          "/mall/withdraw",
           "/inventory/product",
           "/inventory/warehouse",
           "/inventory/inbound",
           "/inventory/outbound",
+          "/inventory/category",
+          "/store/list",
+          "/system/permission",
+          "/system/user",
+          "/system/settings",
+          "/system/log",
         ].includes(sub.path)
     )
     .map((sub) => ({
@@ -76,6 +103,7 @@ export const router = createHashRouter([
   {
     path: "/",
     element: <MainLayout />,
+    loader: requireAuthLoader,
     children: [
       {
         index: true,
@@ -83,26 +111,91 @@ export const router = createHashRouter([
       },
       {
         path: "ui-spec",
-        element: <UiSpec />,
+        element: (
+          <RequireRole roles={GLOBAL_ADMIN_ROLES}>
+            <UiSpec />
+          </RequireRole>
+        ),
+      },
+      {
+        path: "system",
+        children: [
+          {
+            index: true,
+            element: <SystemIndexRedirect />,
+          },
+          {
+            path: "permission",
+            element: (
+              <RequireRole roles={GLOBAL_ADMIN_ROLES}>
+                <PermissionManagement />
+              </RequireRole>
+            ),
+          },
+          {
+            path: "user",
+            element: (
+              <RequireRole roles={SYSTEM_ROLES}>
+                <UserManagement />
+              </RequireRole>
+            ),
+          },
+          {
+            path: "settings",
+            element: (
+              <RequireRole roles={GLOBAL_ADMIN_ROLES}>
+                <SystemSettings />
+              </RequireRole>
+            ),
+          },
+          {
+            path: "log",
+            element: (
+              <RequireRole roles={SYSTEM_ROLES}>
+                <LogManagement />
+              </RequireRole>
+            ),
+          },
+        ],
       },
       {
         path: "store",
         children: [
           {
             index: true,
-            element: <Navigate to="/store/personnel" replace />,
+            element: <StoreIndexRedirect />,
+          },
+          {
+            path: "list",
+            element: (
+              <RequireRole roles={GLOBAL_ADMIN_ROLES}>
+                <StoreList />
+              </RequireRole>
+            ),
           },
           {
             path: "personnel",
-            element: <Personnel />,
+            element: (
+              <RequireRole roles={STORE_WORKSPACE_ROLES}>
+                <Personnel />
+              </RequireRole>
+            ),
           },
           {
             path: "room",
-            element: <Room />,
+            element: (
+              <RequireRole roles={STORE_WORKSPACE_ROLES}>
+                <Room />
+              </RequireRole>
+            ),
           },
           {
             path: "schedule",
-            element: <Schedule />,
+            element: (
+              <RequireRole roles={SCHEDULE_ROLES}>
+                <Schedule />
+              </RequireRole>
+            ),
           },
         ],
       },
@@ -147,6 +240,18 @@ export const router = createHashRouter([
         element: <MallOrderList />,
       },
       {
+        path: "mall/review",
+        element: <MallReviewList />,
+      },
+      {
+        path: "mall/agent",
+        element: <MallAgentList />,
+      },
+      {
+        path: "mall/agent/:id",
+        element: <MallAgentDetail />,
+      },
+      {
         path: "inventory/product",
         element: <InventoryProductList />,
       },
@@ -161,6 +266,10 @@ export const router = createHashRouter([
       {
         path: "inventory/warehouse",
         element: <InventoryWarehouseList />,
+      },
+      {
+        path: "inventory/category",
+        element: <InventoryCategoryList />,
       },
       {
         path: "inventory/inbound",

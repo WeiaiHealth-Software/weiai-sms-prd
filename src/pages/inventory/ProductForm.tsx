@@ -7,14 +7,13 @@ import { readImages } from "../../lib/image";
 import {
   erpProducts,
   erpSkus,
-  categorySpecTemplates,
   initialWarehouses,
-  productCategoryOptions,
   getSkuWarehouseStock,
   type ErpProduct,
   type ErpSku,
   type ProductCategory,
 } from "./mockData";
+import { getCategoryNames, getSpecTemplate } from "./categoryStore";
 import { getMergedProducts, getMergedSkus, nextSpuId, saveProductOverride } from "./productStore";
 
 type SkuDraft = {
@@ -49,7 +48,6 @@ type ProductDraft = {
   skus: SkuDraft[];
 };
 
-const categoryEditOptions: SelectOption[] = productCategoryOptions.map((item) => ({ value: item, label: item }));
 const statusOptions: SelectOption[] = [
   { value: "启用", label: "启用" },
   { value: "停用", label: "停用" },
@@ -81,18 +79,18 @@ function toDraft(product: ErpProduct, skus: ErpSku[]): ProductDraft {
   };
 }
 
-function createEmptyDraft(): ProductDraft {
+function createEmptyDraft(defaultCategory: string): ProductDraft {
   return {
     name: "",
     manufacturer: "",
-    category: "医疗器械类",
+    category: defaultCategory,
     validityTo: "",
     registrationNo: "",
     productionLicenseNo: "",
     manualName: "",
     images: [],
     certificateImages: [],
-    specAttributes: ["型号"],
+    specAttributes: getSpecTemplate(defaultCategory).slice(0, 1),
     initWarehouseId: initialWarehouses[0].id,
     skus: [{ skuId: "", specValues: {}, barcode: "", image: "", costPrice: "", retailPrice: "", status: "启用", initStock: "" }],
   };
@@ -252,13 +250,21 @@ export default function InventoryProductForm() {
     return { product, skus: getMergedSkus(erpSkus).filter((sku) => sku.spuId === spuId) };
   });
 
-  const [draft, setDraft] = useState<ProductDraft>(() => (initial ? toDraft(initial.product, initial.skus) : createEmptyDraft()));
+  const [draft, setDraft] = useState<ProductDraft>(() => (initial ? toDraft(initial.product, initial.skus) : createEmptyDraft(getCategoryNames()[0] ?? "")));
   const [uploadError, setUploadError] = useState("");
   /** 是否在建档时同步登记初始库存（仅新增商品时生效） */
   const [useInitStock, setUseInitStock] = useState(true);
 
   const allProducts = useMemo(() => getMergedProducts(erpProducts), []);
   const allSkus = useMemo(() => getMergedSkus(erpSkus), []);
+
+  // 类目与规格属性模板来自「类目管理」，可动态增补
+  const [categoryNames] = useState<string[]>(() => getCategoryNames());
+  const categoryOptions = useMemo<SelectOption[]>(() => {
+    const names = !draft.category || categoryNames.includes(draft.category) ? categoryNames : [...categoryNames, draft.category];
+    return names.filter(Boolean).map((item) => ({ value: item, label: item }));
+  }, [categoryNames, draft.category]);
+  const specTemplate = useMemo(() => getSpecTemplate(draft.category), [draft.category]);
 
   const patchDraft = (patch: Partial<ProductDraft>) => setDraft((prev) => ({ ...prev, ...patch }));
   const patchSku = (index: number, patch: Partial<SkuDraft>) =>
@@ -411,10 +417,10 @@ export default function InventoryProductForm() {
                 setDraft((prev) => ({
                   ...prev,
                   category: nextCategory,
-                  specAttributes: prev.specAttributes.filter((attr) => categorySpecTemplates[nextCategory].includes(attr)),
+                  specAttributes: prev.specAttributes.filter((attr) => getSpecTemplate(nextCategory).includes(attr)),
                 }));
               }}
-              options={categoryEditOptions}
+              options={categoryOptions}
               triggerClassName="h-12 rounded-2xl px-4 text-sm font-semibold"
               dropdownClassName="rounded-2xl"
             />
@@ -465,7 +471,7 @@ export default function InventoryProductForm() {
 
       <FormSection title={`规格属性（取自「${draft.category}」模板）`} desc="勾选后，下方 SKU 将按所选属性组合定义规格。">
         <div className="flex flex-wrap gap-3">
-          {categorySpecTemplates[draft.category].map((attr) => {
+          {specTemplate.map((attr) => {
             const selected = draft.specAttributes.includes(attr);
             return (
               <button

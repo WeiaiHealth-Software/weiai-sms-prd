@@ -1,15 +1,27 @@
-
-import { Bell, Gear, CaretRight, SignOut, UserCircle } from "@phosphor-icons/react";
+import { Bell, Gear, CaretRight, SignOut, UserCircle, Storefront } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { menuConfig } from "../config/menu";
-import { clearAuthed } from "../lib/auth";
+import { clearAuthed, useSession } from "../lib/auth";
+import { getRole } from "../lib/rbac";
+import { getStoreById } from "../lib/org";
+import { getCurrentStoreId, subscribeStoreContext } from "../lib/storeContext";
 
 export function Header({ toggleSettings }: { toggleSettings: () => void }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const session = useSession();
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [currentStoreId, setCurrentStoreId] = useState<string | null>(() => getCurrentStoreId());
   const userMenuRef = useRef<HTMLDivElement | null>(null);
+
+  const role = session ? getRole(session.roleId) : null;
+
+  /** 门店角色显示所属门店；全局角色显示当前进入的门店工作区，否则为全部门店 */
+  const scopeLabel =
+    session?.storeName ?? getStoreById(currentStoreId ?? undefined)?.name ?? "全部门店";
+
+  useEffect(() => subscribeStoreContext(() => setCurrentStoreId(getCurrentStoreId())), []);
 
   const pathname = location.pathname;
   const matchedItem =
@@ -48,7 +60,7 @@ export function Header({ toggleSettings }: { toggleSettings: () => void }) {
   }, []);
 
   return (
-    <header className="h-[70px] bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6 flex-none z-40">
+    <header className="h-[68px] bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6 flex-none z-40">
       {/* Left: Breadcrumb / Title */}
       <div className="min-w-0">
         <div className="flex items-center gap-2 min-w-0">
@@ -64,8 +76,19 @@ export function Header({ toggleSettings }: { toggleSettings: () => void }) {
       </div>
 
       {/* Right: Actions & User */}
-      <div className="flex items-center gap-4">
-        <div className="h-6 w-px bg-gray-200 mx-2"></div>
+      <div className="flex items-center gap-3">
+        {/* 数据范围：展示当前可见门店/范围（角色与姓名由头像区承载，避免重复） */}
+        {role && (
+          <div
+            className="hidden items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1.5 text-xs font-semibold text-gray-600 md:flex"
+            title={role.description}
+          >
+            <Storefront weight="duotone" className="text-base text-primary-500" />
+            <span className="max-w-[180px] truncate">{scopeLabel}</span>
+          </div>
+        )}
+
+        <div className="h-6 w-px bg-gray-200 mx-1"></div>
 
         {/* Notification */}
         <button className="relative text-gray-500 hover:text-gray-700 transition">
@@ -82,12 +105,12 @@ export function Header({ toggleSettings }: { toggleSettings: () => void }) {
           <Gear weight="bold" className="text-xl" />
         </button>
 
-        {/* User Profile */}
+        {/* User Profile：头像 + 姓名 + 角色权限 */}
         <div ref={userMenuRef} className="relative">
           <button
             type="button"
             onClick={() => setIsUserMenuOpen((v) => !v)}
-            className="flex items-center gap-3 pl-2 cursor-pointer hover:opacity-80 transition"
+            className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition"
             aria-haspopup="menu"
             aria-expanded={isUserMenuOpen}
           >
@@ -97,16 +120,31 @@ export function Header({ toggleSettings }: { toggleSettings: () => void }) {
               alt="User"
             />
             <div className="hidden lg:block leading-tight text-left">
-              <p className="font-bold text-sm text-gray-900">张店长</p>
-              <p className="text-gray-500 text-[10px]">惟爱 · 上海海华医院</p>
+              <p className="font-bold text-sm text-gray-900">{session?.name ?? "未登录"}</p>
+              <p className="text-gray-500 text-[10px]">{role?.label ?? "—"}</p>
             </div>
           </button>
 
-          {isUserMenuOpen && (
+          {isUserMenuOpen && session && role && (
             <div
               role="menu"
-              className="absolute right-0 mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-lg p-1 z-[60]"
+              className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-lg p-1 z-[60]"
             >
+              <div className="px-3 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-bold text-gray-900">{session.name}</span>
+                  <span className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold ${role.tone}`}>
+                    {role.label}
+                  </span>
+                </div>
+                <div className="mt-1 text-xs text-gray-500">
+                  账号：{session.account}
+                </div>
+                <div className="mt-0.5 text-xs text-gray-500">
+                  数据范围：{role.scopeLabel} · {scopeLabel}
+                </div>
+              </div>
+              <div className="my-1 h-px bg-gray-100" />
               <button
                 role="menuitem"
                 type="button"

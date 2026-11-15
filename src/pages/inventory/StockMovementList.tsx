@@ -17,15 +17,25 @@ import {
   getMovementTotalAmount,
   initialStockMovements,
   initialWarehouses,
-  movementTypesByDirection,
   type MovementDirection,
+  type MovementSource,
   type MovementStatus,
   type MovementType,
   type StockMovement,
 } from "./mockData";
+import {
+  getDefaultMovementSource,
+  getMovementLabel,
+  getMovementScenarioKey,
+  getMovementScenarioOptions,
+  getMovementSourceOptions,
+  getMovementTone,
+  getMovementTypeOptions,
+  inferMovementSource,
+} from "./movementConfig";
 import { getMergedProductMap, getMergedSkus, getMergedSkuMap } from "./productStore";
 
-type TypeFilter = "全部类型" | MovementType;
+type TypeFilter = string;
 type WarehouseFilter = "全部仓库" | string;
 type StatusFilter = "全部状态" | MovementStatus;
 
@@ -33,6 +43,7 @@ type ItemDraft = { skuId: string; quantity: string; unitPrice: string };
 
 type MovementDraft = {
   type: MovementType;
+  source: MovementSource;
   warehouseId: string;
   partner: string;
   operator: string;
@@ -67,6 +78,17 @@ function money(value: number) {
   return `¥${value.toFixed(2)}`;
 }
 
+function getPartnerField(type: MovementType, source: MovementSource) {
+  if (source === "来源待确认") return { label: "往来单位 / 关联单据", placeholder: "来源待确认，请核实门店或线上订单信息" };
+  if (type === "采购入库") return { label: "供应商", placeholder: "例如：上海美尼康光学有限公司" };
+  if (type === "采购退货出库") return { label: "供应商 / 退货单号", placeholder: "例如：上海美尼康光学有限公司 / 采购退货单号" };
+  if (type === "退货入库" && source === "线上商城") return { label: "商城退货订单", placeholder: "例如：线上商城订单 SO-20261028-019" };
+  if (type === "退货入库") return { label: "退货门店 / 单据", placeholder: "例如：惟爱上海门店 / 退货单号" };
+  if (type === "销售出库" && source === "线上商城") return { label: "商城订单", placeholder: "例如：线上商城订单 SO-20261103-007" };
+  if (type === "销售出库") return { label: "销售门店 / 单据", placeholder: "例如：惟爱北京门店 / 销售单号" };
+  return { label: "调整说明", placeholder: "例如：月度盘点差异 / 报损原因" };
+}
+
 export default function StockMovementList({ direction }: { direction: MovementDirection }) {
   const isInbound = direction === "入库";
   const docLabel = isInbound ? "入库单" : "出库单";
@@ -77,7 +99,12 @@ export default function StockMovementList({ direction }: { direction: MovementDi
   const skuMap = useMemo(() => getMergedSkuMap(erpSkus), []);
 
   const [movements, setMovements] = useState<StockMovement[]>(() =>
-    initialStockMovements.filter((movement) => movement.direction === direction)
+    initialStockMovements
+      .filter((movement) => movement.direction === direction)
+      .map((movement) => ({
+        ...movement,
+        source: movement.source ?? inferMovementSource(movement.type, movement.partner, movement.remark),
+      }))
   );
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("全部类型");
   const [warehouseFilter, setWarehouseFilter] = useState<WarehouseFilter>("全部仓库");
@@ -88,11 +115,21 @@ export default function StockMovementList({ direction }: { direction: MovementDi
   const [detail, setDetail] = useState<StockMovement | null>(null);
   const [voidCandidate, setVoidCandidate] = useState<StockMovement | null>(null);
 
-  const typeFilterOptions: SelectOption[] = useMemo(
-    () => [{ value: "全部类型", label: "全部类型" }, ...movementTypesByDirection[direction].map((item) => ({ value: item, label: item }))],
-    [direction]
-  );
-  const typeEditOptions: SelectOption[] = movementTypesByDirection[direction].map((item) => ({ value: item, label: item }));
+  const typeFilterOptions: SelectOption[] = useMemo(() => {
+    const known = getMovementScenarioOptions(direction).map((scenario) => ({
+      value: getMovementScenarioKey(scenario.type, scenario.source),
+      label: scenario.label,
+    }));
+    const unresolved = movements
+      .filter((movement) => movement.source === "来源待确认")
+      .map((movement) => ({
+        value: getMovementScenarioKey(movement.type, movement.source),
+        label: getMovementLabel(movement.type, movement.source),
+      }));
+    const unique = new Map([...known, ...unresolved].map((option) => [option.value, option]));
+    return [{ value: "全部类型", label: "全部类型" }, ...unique.values()];
+  }, [direction, movements]);
+  const typeEditOptions: SelectOption[] = getMovementTypeOptions(direction).map((item) => ({ value: item, label: item }));
   const warehouseFilterOptions: SelectOption[] = useMemo(
     () => [{ value: "全部仓库", label: "全部仓库" }, ...initialWarehouses.map((item) => ({ value: item.id, label: item.name }))],
     []
@@ -104,10 +141,10 @@ export default function StockMovementList({ direction }: { direction: MovementDi
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
     return movements.filter((movement) => {
-      if (typeFilter !== "全部类型" && movement.type !== typeFilter) return false;
+      if (typeFilter !== "全部类型" && getMovementScenarioKey(movement.type, movement.source) !== typeFilter) return false;
       if (warehouseFilter !== "全部仓库" && movement.warehouseId !== warehouseFilter) return false;
       if (statusFilter !== "全部状态" && movement.status !== statusFilter) return false;
-      if (kw && !`${movement.id} ${movement.partner} ${movement.operator}`.toLowerCase().includes(kw)) return false;
+      if (kw && !`${movement.id} ${movement.type} ${movement.source} ${movement.partner} ${movement.operator} ${movement.remark}`.toLowerCase().includes(kw)) return false;
       return true;
     });
   }, [keyword, movements, statusFilter, typeFilter, warehouseFilter]);
@@ -125,7 +162,8 @@ export default function StockMovementList({ direction }: { direction: MovementDi
 
   function openCreate() {
     setDraft({
-      type: movementTypesByDirection[direction][0],
+      type: getMovementTypeOptions(direction)[0],
+      source: getDefaultMovementSource(getMovementTypeOptions(direction)[0]),
       warehouseId: initialWarehouses[0].id,
       partner: "",
       operator: "",
@@ -181,6 +219,7 @@ export default function StockMovementList({ direction }: { direction: MovementDi
       id,
       direction,
       type: draft.type,
+      source: draft.source,
       warehouseId: draft.warehouseId,
       partner: draft.partner.trim(),
       operator: draft.operator.trim(),
@@ -204,14 +243,16 @@ export default function StockMovementList({ direction }: { direction: MovementDi
   }
 
   function exportCsv() {
-    const header = ["单据号", "方向", "类型", "仓库", "往来单位", "SKU 编码", "商品名称", "规格", "数量", "单价", "金额", "经办人", "状态", "单据日期"];
+    const header = ["单据号", "方向", "业务场景", "业务类型", "业务来源", "仓库", "往来单位", "SKU 编码", "商品名称", "规格", "数量", "单价", "金额", "经办人", "状态", "单据日期"];
     const lines = filtered.flatMap((movement) =>
       movement.items.map((item) => {
         const sku = skuMap[item.skuId];
         return [
           movement.id,
           movement.direction,
+          getMovementLabel(movement.type, movement.source),
           movement.type,
+          movement.source,
           warehouseName(movement.warehouseId),
           movement.partner,
           item.skuId,
@@ -238,6 +279,8 @@ export default function StockMovementList({ direction }: { direction: MovementDi
     URL.revokeObjectURL(url);
   }
 
+  const partnerField = draft ? getPartnerField(draft.type, draft.source) : null;
+
   const createModal =
     draft && typeof document !== "undefined"
       ? createPortal(
@@ -250,7 +293,9 @@ export default function StockMovementList({ direction }: { direction: MovementDi
                 <div>
                   <div className="text-[20px] font-bold leading-8 text-gray-900">新建{docLabel}</div>
                   <div className="mt-1 text-sm font-medium leading-6 text-slate-500">
-                    {isInbound ? "入库确认后增加仓库库存，商城可上架上限随之提高。" : "出库确认后扣减仓库库存，商城可上架上限随之降低。"}
+                    {isInbound
+                      ? "采购、线上/门店退货及盘盈分别记录来源；确认后增加仓库库存。"
+                      : "销售出库区分线上商城与线下门店；确认后扣减仓库库存。"}
                   </div>
                 </div>
                 <button className="rounded-2xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200" onClick={closeCreate}>
@@ -274,30 +319,48 @@ export default function StockMovementList({ direction }: { direction: MovementDi
                     <FieldRow label="单据类型">
                       <Select
                         value={draft.type}
-                        onChange={(value) => patchDraft({ type: value as MovementType })}
+                        onChange={(value) => {
+                          const type = value as MovementType;
+                          patchDraft({ type, source: getDefaultMovementSource(type) });
+                        }}
                         options={typeEditOptions}
                         triggerClassName="h-12 rounded-2xl px-4 text-sm font-semibold"
                         dropdownClassName="rounded-2xl"
                       />
                     </FieldRow>
-                    <FieldRow label={isInbound ? "供应商 / 往来单位" : "领用部门 / 客户"}>
+                    <FieldRow label="业务来源">
+                      {getMovementSourceOptions(draft.type).length > 1 ? (
+                        <Select
+                          value={draft.source}
+                          onChange={(value) => patchDraft({ source: value as MovementSource })}
+                          options={getMovementSourceOptions(draft.type).map((item) => ({ value: item, label: item }))}
+                          triggerClassName="h-12 rounded-2xl px-4 text-sm font-semibold"
+                          dropdownClassName="rounded-2xl"
+                        />
+                      ) : (
+                        <div className="flex h-12 items-center rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-600">
+                          {draft.source}
+                        </div>
+                      )}
+                    </FieldRow>
+                    <FieldRow label={partnerField?.label ?? "往来单位"}>
                       <input
                         className={inputCls}
                         value={draft.partner}
                         onChange={(e) => patchDraft({ partner: e.target.value })}
-                        placeholder={isInbound ? "例如：上海美尼康光学有限公司" : "例如：线上商城订单 SO-20261103-007"}
+                        placeholder={partnerField?.placeholder ?? "填写往来单位 / 关联单据"}
                       />
                     </FieldRow>
                     <FieldRow label="经办人">
                       <input className={inputCls} value={draft.operator} onChange={(e) => patchDraft({ operator: e.target.value })} placeholder="例如：仓管员 · 李伟" />
                     </FieldRow>
                   </div>
-                  <FieldRow label="备注">
+                  <FieldRow label="业务备注">
                     <textarea
                       rows={2}
                       value={draft.remark}
                       onChange={(e) => patchDraft({ remark: e.target.value })}
-                      placeholder="选填，例如物流单号、到货批次说明"
+                      placeholder="选填，例如：上海海华医院销售、商城订单发货、门店顾客退货等业务说明"
                       className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-700 outline-none placeholder:text-slate-400 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
                     />
                   </FieldRow>
@@ -442,10 +505,14 @@ export default function StockMovementList({ direction }: { direction: MovementDi
               <div className="flex items-start justify-between gap-4 border-b border-gray-100 px-8 py-6">
                 <div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[20px] font-bold leading-8 text-gray-900">{detail.id}</span>
+                    <StatusTag
+                      status={getMovementLabel(detail.type, detail.source)}
+                      tone={getMovementTone(detail.type, detail.source)}
+                      className="px-3 py-1.5 text-sm"
+                    />
                     <StatusTag status={detail.status} tone={statusToneMap[detail.status]} />
                   </div>
-                  <div className="mt-1 text-sm font-medium leading-6 text-slate-500">{detail.type} · {detail.createdAt}</div>
+                  <div className="mt-1 text-sm font-medium leading-6 text-slate-500">{detail.id} · {detail.createdAt}</div>
                 </div>
                 <button className="rounded-2xl bg-slate-100 px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-200" onClick={() => setDetail(null)}>
                   关闭
@@ -456,12 +523,13 @@ export default function StockMovementList({ direction }: { direction: MovementDi
                 <div className="rounded-2xl border border-slate-200 bg-slate-50/60 p-5">
                   <div className="grid gap-3 md:grid-cols-2">
                     <InfoRow label="方向" value={detail.direction} labelClassName="w-24" />
-                    <InfoRow label="类型" value={detail.type} labelClassName="w-24" />
+                    <InfoRow label="业务类型" value={detail.type} labelClassName="w-24" />
+                    <InfoRow label="业务来源" value={detail.source} labelClassName="w-24" />
                     <InfoRow label="仓库" value={warehouseName(detail.warehouseId)} labelClassName="w-24" />
-                    <InfoRow label={detail.direction === "入库" ? "供应商" : "领用部门 / 客户"} value={detail.partner} labelClassName="w-24" />
+                    <InfoRow label={getPartnerField(detail.type, detail.source).label} value={detail.partner} labelClassName="w-24" />
                     <InfoRow label="经办人" value={detail.operator} labelClassName="w-24" />
                     <InfoRow label="单据日期" value={detail.createdAt} labelClassName="w-24" />
-                    <InfoRow label="备注" value={detail.remark || "—"} labelClassName="w-24" />
+                    <InfoRow label="业务备注" value={detail.remark || "—"} labelClassName="w-24" />
                   </div>
                 </div>
 
@@ -575,7 +643,7 @@ export default function StockMovementList({ direction }: { direction: MovementDi
               <input
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                placeholder={`搜索单据号 / ${isInbound ? "供应商" : "往来单位"} / 经办人`}
+                placeholder="搜索单据号 / 供应商 / 订单或门店 / 经办人"
                 className="h-[46px] w-full max-w-[300px] rounded-2xl border border-gray-200 bg-white px-4 text-sm text-slate-700 outline-none placeholder:text-slate-400 focus:border-primary-300 focus:ring-2 focus:ring-primary-100"
               />
             </div>
@@ -603,8 +671,8 @@ export default function StockMovementList({ direction }: { direction: MovementDi
               <ArrowUp weight="bold" className="h-4 w-4 flex-none text-rose-500" />
             )}
             {isInbound
-              ? "入库增加仓库库存，商城可上架上限随之提高；库存以「仓库 + SKU」为最小单元。"
-              : "出库扣减仓库库存，商城可上架上限随之降低；商城订单发货将自动生成销售出库单。"}
+              ? "入库增加仓库库存；采购、商城/门店退货及盘盈分别记录业务来源。"
+              : "出库扣减仓库库存；销售出库区分商城订单与门店销售。"}
           </div>
         </div>
 
@@ -642,9 +710,11 @@ export default function StockMovementList({ direction }: { direction: MovementDi
                       <div className="mt-0.5 truncate text-xs text-gray-500">{movement.createdAt}</div>
                     </td>
                     <td className="px-4 py-3 text-left">
-                      <span className="inline-flex rounded-full border border-primary-100 bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-600">
-                        {movement.type}
-                      </span>
+                      <StatusTag
+                        status={getMovementLabel(movement.type, movement.source)}
+                        tone={getMovementTone(movement.type, movement.source)}
+                        className="px-2.5 py-1"
+                      />
                     </td>
                     <td className="px-4 py-3 text-left">
                       <div className="truncate text-gray-700">{summary.name}</div>
@@ -652,6 +722,11 @@ export default function StockMovementList({ direction }: { direction: MovementDi
                         {summary.spec}
                         {summary.more > 0 ? ` 等 ${movement.items.length} 项` : ""}
                       </div>
+                      {movement.remark && (
+                        <div className="mt-0.5 truncate text-xs text-primary-600" title={movement.remark}>
+                          · {movement.remark}
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center font-semibold text-gray-900">{getMovementTotalQty(movement)}</td>
                     <td className="px-4 py-3 text-left text-gray-600">

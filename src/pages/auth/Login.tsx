@@ -1,7 +1,9 @@
-import { Eye, EyeSlash, Lock, User } from "@phosphor-icons/react";
+import { Eye, EyeSlash, Lightning, Lock, User } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import { setAuthed } from "../../lib/auth";
+import { getHomePath, getQuickLoginUsers, signIn, signInAs } from "../../lib/auth";
+import { getStoreName } from "../../lib/org";
+import { getRole } from "../../lib/rbac";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,7 +12,33 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
+  const quickUsers = useMemo(() => getQuickLoginUsers(), []);
   const canSubmit = useMemo(() => account.trim().length > 0 && password.trim().length > 0, [account, password]);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!canSubmit) {
+      setError("请输入账号和密码");
+      return;
+    }
+    const result = signIn(account, password);
+    if (!result.ok) {
+      setError(result.message);
+      return;
+    }
+    setError("");
+    navigate(getHomePath(result.session), { replace: true });
+  };
+
+  const handleQuickLogin = (userId: string) => {
+    const result = signInAs(userId);
+    if (!result.ok) {
+      setError(result.message);
+      return;
+    }
+    setError("");
+    navigate(getHomePath(result.session), { replace: true });
+  };
 
   return (
     <div className="min-h-screen bg-[#f3f4f6] p-4">
@@ -84,25 +112,11 @@ export default function Login() {
         </div>
 
         <div className="flex items-center justify-center rounded-[28px] bg-[#f3f4f6] px-6 py-14">
-          <div className="w-full max-w-[420px] rounded-[28px] border border-gray-200 bg-white px-8 py-10 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
+          <div className="w-full max-w-[460px] rounded-[28px] border border-gray-200 bg-white px-8 py-10 shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
             <div className="text-2xl font-bold tracking-tight text-gray-900">欢迎回来</div>
-            <div className="mt-2 text-sm text-gray-500">请输入门店账号与密码登录系统。</div>
+            <div className="mt-2 text-sm text-gray-500">请输入门店账号与密码登录系统，不同角色进入后看到的内容不同。</div>
 
-            <form
-              className="mt-8 space-y-4"
-              onSubmit={(event) => {
-                event.preventDefault();
-                const nextAccount = account.trim();
-                const nextPassword = password.trim();
-                if (!nextAccount || !nextPassword) {
-                  setError("请输入账号和密码");
-                  return;
-                }
-                setError("");
-                setAuthed();
-                navigate("/", { replace: true });
-              }}
-            >
+            <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
               <div>
                 <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">账号</label>
                 <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3.5 py-3 focus-within:border-primary-300 focus-within:ring-2 focus-within:ring-primary-100">
@@ -154,6 +168,37 @@ export default function Login() {
                 本系统不提供注册入口，如需开通账号请联系管理员。
               </div>
             </form>
+
+            {/* 快捷体验登录：按角色一键进入，便于对比不同身份的可见范围 */}
+            <div className="mt-7 border-t border-dashed border-gray-200 pt-6">
+              <div className="flex items-center gap-2">
+                <Lightning weight="fill" className="text-amber-500" />
+                <span className="text-xs font-bold text-gray-600">快捷体验登录</span>
+                <span className="text-[11px] text-gray-400">演示账号统一密码 weiai123</span>
+              </div>
+
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                {quickUsers.map((user) => {
+                  const role = getRole(user.roleId);
+                  return (
+                    <button
+                      key={user.id}
+                      type="button"
+                      onClick={() => handleQuickLogin(user.id)}
+                      className="flex flex-col items-start gap-1 rounded-xl border border-gray-200 bg-white px-3 py-2.5 text-left transition hover:border-primary-300 hover:bg-primary-50/40"
+                    >
+                      <span className={`rounded-md border px-1.5 py-0.5 text-[10px] font-bold ${role.tone}`}>
+                        {role.label}
+                      </span>
+                      <span className="w-full truncate text-xs font-semibold text-gray-900">{user.name}</span>
+                      <span className="w-full truncate text-[10px] text-gray-400">
+                        {user.storeId ? getStoreName(user.storeId) : role.scopeLabel}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>
